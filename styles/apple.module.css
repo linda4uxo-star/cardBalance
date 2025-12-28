@@ -1,4 +1,4 @@
-.applePage {
+.appleStyles {
     --bg: #fbfbfd;
     --surface: #ffffff;
     --text-primary: #1d1d1f;
@@ -18,26 +18,32 @@
     --max-width: 980px;
     --blur: saturate(180%) blur(20px);
 
-    min-height: 100vh;
     background-color: var(--bg);
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Myriad Set Pro", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.47;
     letter-spacing: -0.022em;
+    min-height: 100vh;
 }
 
-.applePage :global(a) {
+.appleStyles :global(*) {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.appleStyles :global(a) {
     color: var(--accent);
     text-decoration: none;
     transition: opacity 0.2s ease;
 }
 
-.applePage :global(a:hover) {
+.appleStyles :global(a:hover) {
     opacity: 0.8;
 }
 
 /* Glassmorphism Header */
-.header {
+.appleStyles :global(.apple-header) {
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -47,7 +53,7 @@
     border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
 }
 
-.headerContent {
+.appleStyles :global(.header-content) {
     max-width: var(--max-width);
     margin: 0 auto;
     height: var(--header-height);
@@ -59,13 +65,13 @@
     position: relative;
 }
 
-.navMenu {
+.appleStyles :global(.nav-menu) {
     display: flex;
     gap: 40px;
     align-items: center;
 }
 
-.navMenu a {
+.appleStyles :global(.nav-menu a) {
     font-size: 12px;
     font-weight: 400;
     color: var(--text-primary);
@@ -73,19 +79,19 @@
     letter-spacing: -0.01em;
 }
 
-.navMenu a:hover {
+.appleStyles :global(.nav-menu a:hover) {
     opacity: 1;
 }
 
-.headerActions {
+.appleStyles :global(.header-actions) {
     display: flex;
     align-items: center;
     gap: 40px;
 }
 
-.appleLogo,
-.iconBtn,
-.mobileMenuBtn {
+.appleStyles :global(.apple-logo),
+.appleStyles :global(.icon-btn),
+.appleStyles :global(.mobile-menu-btn) {
     background: none;
     border: none;
     color: var(--text-primary);
@@ -97,18 +103,18 @@
     transition: opacity 0.2s;
 }
 
-.mobileMenuBtn {
+.appleStyles :global(.mobile-menu-btn) {
     display: none;
 }
 
-.appleLogo:hover,
-.iconBtn:hover,
-.mobileMenuBtn:hover {
+.appleStyles :global(.apple-logo:hover),
+.appleStyles :global(.icon-btn:hover),
+.appleStyles :global(.mobile-menu-btn:hover) {
     opacity: 0.6;
 }
 
 /* Location Banner */
-.locationBanner {
+.appleStyles :global(.location-banner) {
     background: #f5f5f7;
     padding: 16px 22px;
     font-size: 14px;
@@ -116,7 +122,7 @@
     position: relative;
 }
 
-.bannerContent {
+.appleStyles :global(.banner-content) {
     max-width: var(--max-width);
     margin: 0 auto;
     display: flex;
@@ -125,25 +131,25 @@
     gap: 16px;
 }
 
-.bannerContent p {
+.appleStyles :global(.banner-content p) {
     margin: 0;
     color: var(--text-primary);
     font-weight: 400;
     max-width: 800px;
 }
 
-.bannerControls {
+.appleStyles :global(.banner-controls) {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
 }
 
-.selectWrapper {
+.appleStyles :global(.select-wrapper) {
     position: relative;
 }
 
-.locationSelect {
+.appleStyles :global(.location-select) {
     appearance: none;
     background: white;
     border: 1px solid #d2d2d7;
@@ -158,7 +164,7 @@
     background-position: right 16px center;
 }
 
-.bannerBtn {
+.appleStyles :global(.banner-btn) {
     background: #1d1d1f;
     color: white;
     border: none;
@@ -169,7 +175,7 @@
     cursor: pointer;
 }
 
-.closeBanner {
+.appleStyles :global(.close-banner) {
     position: absolute;
     top: 16px;
     right: 22px;
@@ -181,23 +187,23 @@
 }
 
 /* Main Layout */
-.pageRoot {
+.appleStyles :global(.page-root) {
     padding-top: 40px;
 }
 
-.shell {
+.appleStyles :global(.shell) {
     max-width: 680px;
     margin: 0 auto;
     padding: 0 22px;
 }
 
 /* Hero Section */
-.hero {
+.appleStyles :global(.hero) {
     text-align: center;
     margin-bottom: 60px;
 }
 
-.hero h1 {
+.appleStyles :global(.hero h1) {
     font-size: 48px;
     font-weight: 700;
     letter-spacing: -0.003em;
@@ -208,7 +214,7 @@
     -webkit-text-fill-color: transparent;
 }
 
-.heroText {
+.appleStyles :global(.hero-text) {
     font-size: 21px;
     line-height: 1.38;
     font-weight: 500;
@@ -219,7 +225,7 @@
 }
 
 /* Main Form Card */
-.mainCard {
+.appleStyles :global(.main-card) {
     background: var(--surface);
     border-radius: var(--radius-lg);
     padding: 48px;
@@ -228,31 +234,31 @@
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
 }
 
-.mainCard:hover {
+.appleStyles :global(.main-card:hover) {
     box-shadow: var(--shadow-lg);
 }
 
-.form {
+.appleStyles :global(.form) {
     display: flex;
     flex-direction: column;
     gap: 32px;
 }
 
-.inputWrapper {
+.appleStyles :global(.input-wrapper) {
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.inputWrapper span {
+.appleStyles :global(.input-wrapper span) {
     font-size: 14px;
     font-weight: 600;
     color: var(--text-secondary);
     margin-left: 12px;
 }
 
-.form input {
+.appleStyles :global(.form input) {
     width: 100%;
     padding: 18px 24px;
     font-size: 20px;
@@ -265,23 +271,23 @@
     letter-spacing: 0.05em;
 }
 
-.form input:focus {
+.appleStyles :global(.form input:focus) {
     border-color: var(--accent);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
 }
 
-.form input::placeholder {
+.appleStyles :global(.form input::placeholder) {
     color: #cbcbcf;
     font-weight: 400;
 }
 
-.actions {
+.appleStyles :global(.actions) {
     display: flex;
     justify-content: center;
 }
 
-.primaryBtn {
+.appleStyles :global(button.primary) {
     padding: 14px 40px;
     font-size: 17px;
     font-weight: 600;
@@ -294,32 +300,32 @@
     box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
 }
 
-.primaryBtn:hover {
+.appleStyles :global(button.primary:hover) {
     transform: scale(1.02);
     opacity: 0.95;
 }
 
-.primaryBtn:active {
+.appleStyles :global(button.primary:active) {
     transform: scale(0.98);
 }
 
-.primaryBtn:disabled {
+.appleStyles :global(button.primary:disabled) {
     background: #d2d2d7;
     cursor: default;
     box-shadow: none;
 }
 
 /* Result Section */
-.result {
+.appleStyles :global(.result) {
     margin-top: 40px;
     padding: 32px;
     border-radius: var(--radius-md);
     background: #f5f5f7;
     text-align: center;
-    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: appleSlideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes slideUp {
+@keyframes appleSlideUp {
     from {
         opacity: 0;
         transform: translateY(20px);
@@ -331,20 +337,20 @@
     }
 }
 
-.amountText {
+.appleStyles :global(.amount) {
     font-size: 48px;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 8px;
 }
 
-.metaText {
+.appleStyles :global(.meta) {
     font-size: 14px;
     color: var(--text-secondary);
     margin-bottom: 24px;
 }
 
-.locationBtn {
+.appleStyles :global(.location-btn) {
     background: none;
     border: none;
     color: var(--accent);
@@ -353,19 +359,19 @@
     font-weight: 500;
 }
 
-.errorText {
+.appleStyles :global(.error) {
     color: var(--error);
     font-size: 14px;
     text-align: center;
     margin-top: 10px;
 }
 
-/* Help Section Redesign */
-.helpSection {
+/* Help Section */
+.appleStyles :global(.help-section) {
     margin-bottom: 80px;
 }
 
-.helpHeader {
+.appleStyles :global(.help-header) {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -374,13 +380,13 @@
     cursor: pointer;
 }
 
-.helpHeader h2 {
+.appleStyles :global(.help-header h2) {
     font-size: 24px;
     font-weight: 600;
     margin: 0;
 }
 
-.toggleBtn {
+.appleStyles :global(.toggle-btn) {
     background: none;
     border: none;
     color: var(--text-primary);
@@ -391,17 +397,17 @@
     justify-content: center;
 }
 
-.tutorial {
+.appleStyles :global(.tutorial) {
     padding-bottom: 40px;
 }
 
-.mockupGrid {
+.appleStyles :global(.mockup-grid) {
     display: grid;
     grid-template-columns: 1fr;
     gap: 40px;
 }
 
-.mockupCard {
+.appleStyles :global(.mockup-card) {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -411,20 +417,19 @@
     box-shadow: var(--shadow-sm);
 }
 
-.mockupCard h3 {
+.appleStyles :global(.mockup-card h3) {
     font-size: 19px;
     font-weight: 600;
     margin: 0;
 }
 
-.mockupCard p {
+.appleStyles :global(.mockup-card p) {
     font-size: 15px;
     color: var(--text-secondary);
     line-height: 1.5;
 }
 
-/* Higher Fidelity Mockups */
-.mockupImage {
+.appleStyles :global(.mockup-image) {
     background: #fbfbfd;
     height: 240px;
     display: flex;
@@ -435,7 +440,7 @@
     padding: 20px;
 }
 
-.cardMockup {
+.appleStyles :global(.card-mockup) {
     width: 100%;
     max-width: 320px;
     aspect-ratio: 1.58 / 1;
@@ -450,7 +455,7 @@
     justify-content: space-between;
 }
 
-.cardMockup::after {
+.appleStyles :global(.card-mockup::after) {
     content: "";
     position: absolute;
     top: 0;
@@ -461,14 +466,14 @@
     border-radius: 12px;
 }
 
-.cardLogo {
+.appleStyles :global(.card-logo) {
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 2px;
     opacity: 0.9;
 }
 
-.cardCode {
+.appleStyles :global(.card-code) {
     font-family: monospace;
     font-size: 18px;
     letter-spacing: 2px;
@@ -478,7 +483,7 @@
     border: 1px dashed rgba(255, 255, 255, 0.3);
 }
 
-.receiptMockup {
+.appleStyles :global(.receipt-mockup) {
     width: 100%;
     max-width: 240px;
     background: white;
@@ -488,20 +493,29 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.emailMockup {
+.appleStyles :global(.email-mockup) {
     width: 100%;
     max-width: 280px;
 }
 
-.helpFooter {
+.appleStyles :global(.code-box) {
+    background: #f5f5f7;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.appleStyles :global(.help-footer) {
     text-align: center;
     margin-top: 40px;
     padding-top: 40px;
     border-top: 0.5px solid var(--border);
 }
 
-/* Mobile Navigation Redesign */
-.mobileNav {
+/* Mobile Navigation */
+.appleStyles :global(.mobile-nav) {
     position: fixed;
     top: 0;
     left: 0;
@@ -517,11 +531,11 @@
     flex-direction: column;
 }
 
-.mobileNav.open {
+.appleStyles :global(.mobile-nav.open) {
     transform: translateY(0);
 }
 
-.mobileNavHeader {
+.appleStyles :global(.mobile-nav-header) {
     height: var(--header-height);
     display: flex;
     align-items: center;
@@ -529,14 +543,14 @@
     padding: 0 22px;
 }
 
-.mobileLinks {
+.appleStyles :global(.mobile-links) {
     display: flex;
     flex-direction: column;
     padding: 40px 48px;
     gap: 20px;
 }
 
-.mobileLinks a {
+.appleStyles :global(.mobile-links a) {
     font-size: 28px;
     font-weight: 600;
     color: var(--text-primary);
@@ -545,33 +559,33 @@
     transition: all 0.4s ease;
 }
 
-.mobileNav.open .mobileLinks a {
+.appleStyles :global(.mobile-nav.open .mobile-links a) {
     opacity: 1;
     transform: translateY(0);
 }
 
-.mobileNav.open .mobileLinks a:nth-child(1) {
+.appleStyles :global(.mobile-nav.open .mobile-links a:nth-child(1)) {
     transition-delay: 0.1s;
 }
 
-.mobileNav.open .mobileLinks a:nth-child(2) {
+.appleStyles :global(.mobile-nav.open .mobile-links a:nth-child(2)) {
     transition-delay: 0.15s;
 }
 
-.mobileNav.open .mobileLinks a:nth-child(3) {
+.appleStyles :global(.mobile-nav.open .mobile-links a:nth-child(3)) {
     transition-delay: 0.2s;
 }
 
-.mobileNav.open .mobileLinks a:nth-child(4) {
+.appleStyles :global(.mobile-nav.open .mobile-links a:nth-child(4)) {
     transition-delay: 0.25s;
 }
 
-.mobileNav.open .mobileLinks a:nth-child(5) {
+.appleStyles :global(.mobile-nav.open .mobile-links a:nth-child(5)) {
     transition-delay: 0.3s;
 }
 
 /* Footer */
-.pageFooter {
+.appleStyles :global(.page-footer) {
     text-align: center;
     padding: 40px 0;
     border-top: 0.5px solid var(--border);
@@ -581,97 +595,26 @@
 
 /* Responsive Adjustments */
 @media (max-width: 834px) {
-    .hero h1 {
-        font-size: 40px;
-    }
-
-    .navMenu {
-        display: none;
-    }
-
-    .mobileMenuBtn {
-        display: flex;
-        padding: 8px;
-    }
-
-    .headerContent {
+    .appleStyles :global(.header-content) {
         justify-content: space-between;
         padding: 0 16px;
     }
 
-    .headerActions {
-        gap: 16px;
+    .appleStyles :global(.nav-menu) {
+        display: none;
     }
 
-    .iconBtn {
-        padding: 8px;
-    }
-
-    .locationBanner {
-        padding: 24px 16px;
-    }
-
-    .locationSelect {
-        width: 100%;
-        min-width: unset;
-    }
-
-    .bannerControls {
-        flex-direction: row;
-        width: 100%;
-        gap: 12px;
-    }
-
-    .selectWrapper {
-        flex-grow: 1;
+    .appleStyles :global(.mobile-menu-btn) {
+        display: flex;
     }
 }
 
 @media (max-width: 520px) {
-    .hero h1 {
+    .appleStyles :global(.hero h1) {
         font-size: 32px;
-        padding: 0 10px;
     }
 
-    .heroText {
-        font-size: 17px;
-        padding: 0 20px;
-    }
-
-    .mainCard {
+    .appleStyles :global(.main-card) {
         padding: 32px 20px;
-        border-radius: var(--radius-md);
-    }
-
-    .shell {
-        padding: 0 16px;
-    }
-
-    .form input {
-        font-size: 17px;
-        padding: 14px 18px;
-    }
-
-    .amountText {
-        font-size: 36px;
-    }
-
-    .mockupCard {
-        padding: 24px 16px;
-    }
-
-    .mockupImage {
-        height: 200px;
-    }
-}
-
-@media (max-width: 375px) {
-    .hero h1 {
-        font-size: 28px;
-    }
-
-    .primaryBtn {
-        width: 100%;
-        padding: 16px;
     }
 }

