@@ -1,7 +1,22 @@
+import { useState, useRef } from 'react'
 import Head from 'next/head'
 import styles from '../styles/nyt.module.css'
 
 export default function NytHome() {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = useRef(null)
+
+  const togglePlay = () => {
+    if (!audioRef.current) return
+
+    if (isPlaying) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play()
+    }
+    setIsPlaying(!isPlaying)
+  }
+
   return (
     <div className={styles.nytPage}>
       <Head>
@@ -63,13 +78,24 @@ export default function NytHome() {
         </p>
 
         <div className={styles.articleActions}>
-          <div className={styles.listenAction}>
+          <div className={styles.listenAction} onClick={togglePlay} style={{ cursor: 'pointer' }}>
             <div className={styles.circlePlay}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
+              <audio
+                ref={audioRef}
+                src="/gift-card-glitches.m4a"
+                onEnded={() => setIsPlaying(false)}
+              />
+              {isPlaying ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
             </div>
-            <span>Listen to this article · 5:49 min <span className={styles.learnMore}>Learn more</span></span>
+            <span>Listen to this article · 3:50 min <span className={styles.learnMore}>Learn more</span></span>
           </div>
         </div>
 
