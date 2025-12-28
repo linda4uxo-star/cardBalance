@@ -10,7 +10,7 @@
   --steam-btn-hover: linear-gradient(to right, #5bc5ff 0%, #2050e0 100%);
   --steam-card-bg: rgba(0, 0, 0, 0.4);
   --steam-nav-text: #b8b6b4;
-  
+
   min-height: 100vh;
   background: radial-gradient(at top left, var(--steam-bg-medium) 0%, var(--steam-bg-dark) 100%);
   color: var(--steam-text-primary);
@@ -31,7 +31,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .headerTop {
@@ -40,11 +40,30 @@
   height: 104px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* Centered layout for desktop */
+  gap: 40px;
   padding: 0 20px;
 }
 
+.headerLeft,
+.headerRight {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.headerLeft {
+  justify-content: flex-start;
+}
+
+.headerRight {
+  justify-content: flex-end;
+  gap: 15px;
+}
+
 .logoContainer {
-  margin-right: 40px;
+  display: inline-block;
 }
 
 .logo {
@@ -56,6 +75,7 @@
 .nav {
   display: flex;
   gap: 24px;
+  justify-content: center;
 }
 
 .nav a {
@@ -71,7 +91,6 @@
 }
 
 .installSteam {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -86,7 +105,7 @@
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .installBtn:hover {
@@ -153,7 +172,7 @@
   padding: 20px;
   gap: 15px;
   border-top: 1px solid #2a475e;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
 
@@ -183,6 +202,11 @@
   margin-bottom: 25px;
 }
 
+.formContainer {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
 .mainTitle {
   font-size: 26px;
   font-weight: 700;
@@ -198,10 +222,8 @@
   margin-bottom: 30px;
 }
 
-.cardGrid {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 40px;
+.cardSection {
+  margin-bottom: 60px;
 }
 
 .card {
@@ -209,7 +231,7 @@
   padding: 40px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .inputGroup {
@@ -235,13 +257,12 @@
   font-size: 18px;
   font-family: "Courier New", Courier, monospace;
   outline: none;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: all 0.2s;
 }
 
 .input:focus {
   border-color: var(--steam-accent);
-  background: #3b3e46;
 }
 
 .button {
@@ -253,7 +274,7 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
 }
 
@@ -392,72 +413,6 @@
   font-style: italic;
 }
 
-/* Side Info */
-.infoBox {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 25px;
-  border-radius: 4px;
-  margin-bottom: 30px;
-}
-
-.infoBox h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 12px;
-}
-
-.infoBox p {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--steam-text-secondary);
-  margin-bottom: 15px;
-}
-
-.learnMore {
-  font-size: 13px;
-  color: var(--steam-accent);
-  font-weight: 500;
-}
-
-.learnMore:hover {
-  text-decoration: underline;
-}
-
-.qrSection {
-  text-align: center;
-  padding: 20px;
-}
-
-.qrContainer {
-  width: 150px;
-  height: 150px;
-  background: white;
-  margin: 0 auto 15px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-.qrPlaceholder {
-  width: 100%;
-  height: 100%;
-  border: 2px dashed #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  font-weight: 700;
-}
-
-.qrSection p {
-  font-size: 13px;
-  color: var(--steam-text-secondary);
-  line-height: 1.5;
-}
-
 /* Footer */
 .footer {
   background: #171a21;
@@ -486,6 +441,11 @@
   color: #c7d5e0;
 }
 
+.footerLinks a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .footerLinks a:hover {
   text-decoration: underline;
 }
@@ -495,17 +455,25 @@
   .headerTop {
     height: 64px;
     padding: 0 16px;
+    justify-content: space-between;
+    /* Logo Left, Menu Right */
+  }
+
+  .headerLeft {
+    flex: 0;
+  }
+
+  .nav,
+  .installSteam {
+    display: none;
+  }
+
+  .headerRight {
+    flex: 0;
   }
 
   .mobileMenuBtn {
     display: block;
-  }
-
-  .logoContainer {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
   }
 
   .logo {
@@ -513,17 +481,12 @@
     height: 32px;
   }
 
-  .nav, .installSteam {
-    display: none;
-  }
-
   .main {
     padding: 30px 16px;
   }
 
-  .cardGrid {
-    grid-template-columns: 1fr;
-    gap: 30px;
+  .formContainer {
+    max-width: 100%;
   }
 
   .card {
@@ -532,9 +495,5 @@
 
   .button {
     width: 100%;
-  }
-
-  .sideInfo {
-    order: 2;
   }
 }

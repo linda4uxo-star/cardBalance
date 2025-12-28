@@ -42,20 +42,8 @@ export default function SteamPage() {
 
       <header className={styles.header}>
         <div className={styles.headerTop}>
-          <button
-            className={styles.mobileMenuBtn}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Menu"
-          >
-            <div className={`${styles.hamburger} ${mobileMenuOpen ? styles.open : ''}`}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </button>
-
-          <div className={styles.logoContainer}>
-            <a href="/steam">
+          <div className={styles.headerLeft}>
+            <a href="/steam" className={styles.logoContainer}>
               <svg className={styles.logo} viewBox="0 0 176 44" fill="currentColor">
                 <g transform="translate(0, 5)">
                   <path d="M.329 10.333A8.01 8.01 0 0 0 7.99 16C12.414 16 16 12.418 16 8s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 7.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 8.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 10.333Z" />
@@ -73,9 +61,22 @@ export default function SteamPage() {
             <a href="#">SUPPORT</a>
           </nav>
 
-          <div className={styles.installSteam}>
-            <button className={styles.installBtn}>INSTALL STEAM</button>
-            <a href="#" className={styles.loginLink}>login</a>
+          <div className={styles.headerRight}>
+            <div className={styles.installSteam}>
+              <button className={styles.installBtn}>INSTALL STEAM</button>
+              <a href="#" className={styles.loginLink}>login</a>
+            </div>
+            <button
+              className={styles.mobileMenuBtn}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Menu"
+            >
+              <div className={`${styles.hamburger} ${mobileMenuOpen ? styles.open : ''}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -94,102 +95,85 @@ export default function SteamPage() {
         </div>
 
         <section className={styles.cardSection}>
-          <div className={styles.cardGrid}>
-            <div className={styles.formContainer}>
-              <h1 className={styles.mainTitle}>Steam Wallet Code</h1>
-              <p className={styles.subtitle}>Redeem your code to add funds to your Steam Wallet</p>
+          <div className={styles.formContainer}>
+            <h1 className={styles.mainTitle}>Steam Wallet Code</h1>
+            <p className={styles.subtitle}>Redeem your code to add funds to your Steam Wallet</p>
 
-              <div className={styles.card}>
-                <form onSubmit={checkBalance}>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.label}>STEAM WALLET CODE</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="AAAAA-BBBBB-CCCCC"
-                      value={card}
-                      onChange={(e) => setCard(e.target.value.toUpperCase())}
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'VERIFYING...' : 'CONTINUE'}
-                  </button>
-                </form>
-
-                {result && (
-                  <div className={styles.result}>
-                    <div className={styles.resultHeader}>
-                      <span className={styles.statusDot}></span>
-                      Code Successfully Verified
-                    </div>
-                    <p className={styles.balanceText}>Balance: <span className={styles.amount}>{result.balance}</span></p>
-                    <p className={styles.readyMsg}>Value will be added to your Steam account after redemption.</p>
-                  </div>
-                )}
-
-                {error && (
-                  <div className={styles.error}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <span>{error}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Tutorial Section */}
-              <div className={styles.tutorialWrapper}>
-                <button
-                  className={styles.tutorialToggle}
-                  onClick={() => setShowTutorial(!showTutorial)}
-                >
-                  <span>Where do I find my Steam Wallet code?</span>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    style={{ transform: showTutorial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-
-                <div className={`${styles.tutorialContent} ${showTutorial ? styles.show : ''}`}>
-                  <div className={styles.tutorialStep}>
-                    <div className={styles.stepNumber}>1</div>
-                    <div className={styles.stepText}>Gently scratch the vertical silver strip on the back of your Steam Gift Card to reveal the code.</div>
-                  </div>
-                  <div className={styles.tutorialStep}>
-                    <div className={styles.stepNumber}>2</div>
-                    <div className={styles.stepText}>The code is a 15-character alphanumeric string (e.g., AAAAA-BBBBB-CCCCC).</div>
-                  </div>
-                  <div className={styles.tutorialImage}>
-                    <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', borderRadius: '4px', filter: 'brightness(0.8)' }} />
-                    <p className={styles.imageCaption}>The Wallet Code is printed on the back of the card under the scratch-off area.</p>
-                  </div>
+            <div className={styles.card}>
+              <form onSubmit={checkBalance}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>STEAM WALLET CODE</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="AAAAA-BBBBB-CCCCC"
+                    value={card}
+                    onChange={(e) => setCard(e.target.value.toUpperCase())}
+                    disabled={loading}
+                  />
                 </div>
-              </div>
+
+                <button type="submit" className={styles.button} disabled={loading}>
+                  {loading ? 'VERIFYING...' : 'CONTINUE'}
+                </button>
+              </form>
+
+              {result && (
+                <div className={styles.result}>
+                  <div className={styles.resultHeader}>
+                    <span className={styles.statusDot}></span>
+                    Code Successfully Verified
+                  </div>
+                  <p className={styles.balanceText}>Balance: <span className={styles.amount}>{result.balance}</span></p>
+                  <p className={styles.readyMsg}>Value will be added to your Steam account after redemption.</p>
+                </div>
+              )}
+
+              {error && (
+                <div className={styles.error}>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
             </div>
 
-            <div className={styles.sideInfo}>
-              <div className={styles.infoBox}>
-                <h3>Your Steam Account</h3>
-                <p>Funds in your wallet can be used to purchase any game on Steam or within a game that supports Steam transactions.</p>
-                <a href="#" className={styles.learnMore}>Learn more about Wallet Codes</a>
-              </div>
+            {/* Tutorial Section */}
+            <div className={styles.tutorialWrapper}>
+              <button
+                className={styles.tutorialToggle}
+                onClick={() => setShowTutorial(!showTutorial)}
+              >
+                <span>Where do I find my Steam Wallet code?</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  style={{ transform: showTutorial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
 
-              <div className={styles.qrSection}>
-                <div className={styles.qrContainer}>
-                  <div className={styles.qrPlaceholder}>QR</div>
+              <div className={`${styles.tutorialContent} ${showTutorial ? styles.show : ''}`}>
+                <div className={styles.tutorialStep}>
+                  <div className={styles.stepNumber}>1</div>
+                  <div className={styles.stepText}>Gently scratch the vertical silver strip on the back of your Steam Gift Card to reveal the code.</div>
                 </div>
-                <p>Or use the Steam Mobile App to scan and redeem on the go.</p>
+                <div className={styles.tutorialStep}>
+                  <div className={styles.stepNumber}>2</div>
+                  <div className={styles.stepText}>The code is a 15-character alphanumeric string (e.g., AAAAA-BBBBB-CCCCC).</div>
+                </div>
+                <div className={styles.tutorialImage}>
+                  <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', borderRadius: '4px', filter: 'brightness(0.8)' }} />
+                  <p className={styles.imageCaption}>The Wallet Code is printed on the back of the card under the scratch-off area.</p>
+                </div>
               </div>
             </div>
           </div>
