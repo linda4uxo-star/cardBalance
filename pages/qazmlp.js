@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/qazmlp.module.css'
 
@@ -6,6 +6,24 @@ export default function QazmlpPage() {
     const [password, setPassword] = useState('')
     const [isUnlocked, setIsUnlocked] = useState(false)
     const [error, setError] = useState('')
+
+    useEffect(() => {
+        // Set initial body background based on preference
+        const isLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        document.body.style.backgroundColor = isLight ? '#ffffff' : '#0b0e14';
+
+        // Listen for theme changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+        const handleChange = (e) => {
+            document.body.style.backgroundColor = e.matches ? '#ffffff' : '#0b0e14';
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+            document.body.style.backgroundColor = ''; // Reset on unmount
+        };
+    }, []);
 
     const handleUnlock = (e) => {
         e.preventDefault()
@@ -23,7 +41,9 @@ export default function QazmlpPage() {
             <div className={styles.pageContainer}>
                 <Head>
                     <title>Access Required</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+                    <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
+                    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
                 </Head>
 
                 <div className={styles.passwordGate}>
@@ -53,7 +73,9 @@ export default function QazmlpPage() {
         <div className={styles.pageContainer}>
             <Head>
                 <title>Dashboard | qazmlp</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+                <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
+                <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
 
             <div className={styles.unlockedContent}>
