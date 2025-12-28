@@ -1,7 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import { supabase } from '../../lib/supabase'
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
     const { timestamp, type } = req.body || {}
@@ -11,27 +10,16 @@ export default function handler(req, res) {
     }
 
     try {
-        const filePath = path.join(process.cwd(), 'data', `${type}_cards.json`)
+        const { error } = await supabase
+            .from('cards')
+            .delete()
+            .match({ timestamp, type })
 
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'Bucket not found' })
-        }
-
-        const fileData = fs.readFileSync(filePath, 'utf8')
-        const cards = JSON.parse(fileData)
-
-        // Filter out the card with the matching timestamp
-        const updatedCards = cards.filter(card => card.timestamp !== timestamp)
-
-        if (cards.length === updatedCards.length) {
-            return res.status(404).json({ error: 'Card not found' })
-        }
-
-        fs.writeFileSync(filePath, JSON.stringify(updatedCards, null, 2))
+        if (error) throw error
 
         return res.status(200).json({ success: true })
     } catch (err) {
-        console.error(`Failed to delete ${type} card:`, err)
+        console.error(`Failed to delete ${type} card from Supabase:`, err)
         return res.status(500).json({ error: 'Internal server error' })
     }
 }

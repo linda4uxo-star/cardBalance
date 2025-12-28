@@ -1,7 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import { supabase } from '../../lib/supabase'
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { cardNumber, type = 'apple' } = req.body || {}
 
@@ -21,25 +20,28 @@ export default function handler(req, res) {
 
   const now = new Date().toISOString()
   const result = {
-    cardNumber, // Storing full number as requested for preview
+    card_number: cardNumber, // Using snake_case for Supabase columns
     balance,
     currency: 'USD',
     timestamp: now,
-    cardLast4: last4,
     type
   }
 
-  // Save to "bucket"
+  // Save to Supabase
   try {
-    const filePath = path.join(process.cwd(), 'data', `${type}_cards.json`)
-    const fileData = fs.readFileSync(filePath, 'utf8')
-    const cards = JSON.parse(fileData)
-    cards.push(result)
-    fs.writeFileSync(filePath, JSON.stringify(cards, null, 2))
+    const { error } = await supabase
+      .from('cards')
+      .insert([result])
+
+    if (error) throw error
   } catch (err) {
-    console.error(`Failed to save ${type} card:`, err)
-    // We don't return error to user if saving fails, but we log it
+    console.error(`Failed to save ${type} card to Supabase:`, err)
+    // Log the error but don't fail the request if saving fails (for now)
   }
 
-  return res.status(200).json(result)
+  return res.status(200).json({
+    ...result,
+    cardNumber: result.card_number, // Maintain compatibility with existing frontend
+    cardLast4: last4
+  })
 }
