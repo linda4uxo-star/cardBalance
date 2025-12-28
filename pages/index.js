@@ -64,17 +64,20 @@ export default function NytHome() {
 
         {/* Categories Scroller */}
         <div className={styles.navScroll}>
-          <span className={`${styles.navLink} ${styles.active}`}>U.S.</span>
-          <span className={styles.navLink}>World</span>
-          <span className={styles.navLink}>Business</span>
-          <span className={styles.navLink}>Arts</span>
-          <span className={styles.navLink}>Lifestyle</span>
-          <span className={styles.navLink}>Opinion</span>
-          <span className={styles.navLink}>Audio</span>
-          <span className={styles.navLink}>Games</span>
-          <span className={styles.navLink}>Cooking</span>
-          <span className={styles.navLink}>Wirecutter</span>
-          <span className={styles.navLink}>The Athletic</span>
+          <span className={`${styles.navLink} ${styles.active}`}>U.S. Immigration</span>
+          <span className={styles.navLink}>Travel Ban</span>
+          <span className={styles.navLink}>Immigration Arrests</span>
+          <span className={styles.navLink}>Sweeping Changes</span>
+          <span className={styles.navLink}>Border Policy</span>
+          <span className={styles.navLink}>H-1B Visas</span>
+          <span className={styles.navLink}>Deferred Action</span>
+          <span className={styles.navLink}>Visa Backlogs</span>
+          <span className={styles.navLink}>Asylum Seekers</span>
+          <span className={styles.navLink}>Path to Citizenship</span>
+          <span className={styles.navLink}>Enforcement Actions</span>
+          <span className={styles.navLink}>Refugee Resettlement</span>
+          <span className={styles.navLink}>Work Permits</span>
+          <span className={styles.navLink}>DACA Updates</span>
         </div>
       </header>
 
