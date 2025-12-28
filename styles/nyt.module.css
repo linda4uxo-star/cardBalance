@@ -237,10 +237,7 @@
     padding: 40px 16px;
     text-align: center;
     color: #121212;
-    border: 1px solid #e2e2e2;
-    border-radius: 8px;
     margin-top: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .surveyTitle {
@@ -263,22 +260,34 @@
 }
 
 .giftCardBtn {
-    background: #121212;
-    color: white;
-    border: none;
-    padding: 16px 24px;
+    padding: 18px 24px;
     font-family: var(--nyt-font-sans);
     font-weight: 700;
-    border-radius: 4px;
+    border-radius: 8px;
     display: block;
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     text-align: center;
-    transition: background 0.2s;
+    transition: transform 0.2s, opacity 0.2s;
+    border: none;
+    font-size: 16px;
+}
+
+.appleBtn {
+    background: linear-gradient(180deg, #0077ed 0%, #006ce0 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+}
+
+.steamBtn {
+    background: linear-gradient(90deg, #171a21 0%, #2a475e 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .giftCardBtn:hover {
-    background: #333;
+    transform: scale(1.02);
+    opacity: 0.95;
 }
 
 .bottomNav {

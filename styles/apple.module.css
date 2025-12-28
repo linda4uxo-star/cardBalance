@@ -148,7 +148,7 @@
     justify-content: center;
     gap: 12px;
     width: 100%;
-    padding: 0 4px;
+    padding: 0 20px;
 }
 
 .appleStyles :global(.select-wrapper) {

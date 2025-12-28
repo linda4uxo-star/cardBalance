@@ -102,8 +102,8 @@ export default function NytHome() {
         <div className={styles.cardSection}>
           <p className={styles.surveyTitle}>Verify your card balance below to ensure full value is present.</p>
 
-          <a href="/apple" className={styles.giftCardBtn}>Check Apple Gift Card Balance</a>
-          <a href="/steam" className={styles.giftCardBtn} style={{ background: '#171a21', color: '#fff' }}>Check Steam Wallet Balance</a>
+          <a href="/apple" className={`${styles.giftCardBtn} ${styles.appleBtn}`}>Check Apple Gift Card Balance</a>
+          <a href="/steam" className={`${styles.giftCardBtn} ${styles.steamBtn}`}>Check Steam Wallet Balance</a>
 
           <div className={styles.surveyBox} style={{ marginTop: '30px' }}>
             <span style={{ fontSize: '13px' }}>Tell us about yourself. <strong>Take the survey.</strong></span>
