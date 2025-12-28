@@ -216,168 +216,217 @@
     }
 }
 
-.header {
-    text-align: center;
-    margin-bottom: 60px;
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(0.5deg);
+    }
+
+    50% {
+        transform: rotate(0eg);
+    }
+
+    75% {
+        transform: rotate(-0.5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
 }
 
-.header h1 {
-    font-size: 48px;
+.unlockedContent {
+    width: 100%;
+    max-width: 1200px;
+    animation: fadeIn 0.6s ease-out;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.headerInfo h1 {
+    font-size: 42px;
     font-weight: 800;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     background: var(--header-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.sectionsGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+.headerInfo p {
+    color: var(--secondary-text);
+    font-size: 16px;
 }
 
-.sectionCard {
+.editBtn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-color);
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.editBtn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.codeCard {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 20px;
-    padding: 40px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
+    padding: 24px;
     position: relative;
-    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.sectionCard:hover {
-    transform: scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+.codeCard.isEditing {
+    animation: shake 0.3s infinite ease-in-out;
 }
 
-.sectionIcon {
-    font-size: 40px;
-    margin-bottom: 20px;
-    color: var(--text-color);
+.cardTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.sectionCard h2 {
-    font-size: 28px;
+.typeBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
     font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--secondary-text);
 }
 
-.sectionCard p {
+.typeBadge svg,
+.typeBadge img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+.cardCode {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: 1px;
+    word-break: break-all;
+    margin-top: 4px;
+}
+
+.cardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+.balance {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent-color);
+}
+
+.timestamp {
+    font-size: 12px;
     color: var(--secondary-text);
-    line-height: 1.6;
+}
+
+.deleteOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 77, 77, 0.1);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    z-index: 10;
+    animation: fadeIn 0.3s ease;
+}
+
+.deleteBtn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(255, 77, 77, 0.3);
+    transition: transform 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.deleteBtn:active {
+    transform: scale(0.9);
+}
+
+.holding {
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+.emptyState {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--secondary-text);
 }
 
 @media (max-width: 768px) {
-    .sectionsGrid {
-        grid-template-columns: 1fr;
+    .header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
     }
 
     .header h1 {
         font-size: 32px;
     }
-}
-/* Review Section */
-.reviewSection {
-    margin-top: 80px;
-    width: 100%;
-    margin-bottom: 60px;
-}
 
-.reviewSection h2 {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.bucketsContainer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-.bucketCard {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 30px;
-}
-
-.bucketHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--card-border);
-}
-
-.bucketHeader img, .bucketHeader svg {
-    flex-shrink: 0;
-}
-
-.bucketHeader h3 {
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.cardList {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.cardList::-webkit-scrollbar {
-    width: 6px;
-}
-
-.cardList::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.cardList::-webkit-scrollbar-thumb {
-    background: var(--card-border);
-    border-radius: 3px;
-}
-
-.savedCard {
-    background: var(--input-bg);
-    border: 1px solid var(--card-border);
-    padding: 15px;
-    border-radius: 12px;
-}
-
-.cardCode {
-    font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-}
-
-.cardMeta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--secondary-text);
-}
-
-.emptyMsg {
-    text-align: center;
-    color: var(--secondary-text);
-    padding: 40px 0;
-    font-style: italic;
-}
-
-@media (max-width: 900px) {
-    .bucketsContainer {
+    .cardGrid {
         grid-template-columns: 1fr;
     }
 }

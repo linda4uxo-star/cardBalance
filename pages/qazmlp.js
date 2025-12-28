@@ -8,21 +8,64 @@ export default function QazmlpPage() {
     const [error, setError] = useState('')
     const [showBiometricOptIn, setShowBiometricOptIn] = useState(false)
     const [biometricsAvailable, setBiometricsAvailable] = useState(false)
-    const [buckets, setBuckets] = useState({ apple: [], steam: [] })
+    const [allCards, setAllCards] = useState([])
+    const [isEditing, setIsEditing] = useState(false)
+    const [holdTimeout, setHoldTimeout] = useState(null)
+    const [deletingId, setDeletingId] = useState(null)
 
     const fetchBuckets = async () => {
         try {
             const res = await fetch('/api/get-buckets')
             const data = await res.json()
-            if (res.ok) setBuckets(data)
+            if (res.ok) {
+                // Flatten and sort cards
+                const combined = [
+                    ...data.apple.map(c => ({ ...c, type: 'apple' })),
+                    ...data.steam.map(c => ({ ...c, type: 'steam' }))
+                ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                setAllCards(combined)
+            }
         } catch (err) {
             console.error('Failed to fetch buckets:', err)
         }
     }
 
+    const handleDelete = async (card) => {
+        try {
+            const res = await fetch('/api/delete-card', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ timestamp: card.timestamp, type: card.type })
+            })
+            if (res.ok) {
+                fetchBuckets()
+            }
+        } catch (err) {
+            console.error('Failed to delete card:', err)
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
+    const startHold = (card) => {
+        setDeletingId(card.timestamp)
+        const timeout = setTimeout(() => {
+            handleDelete(card)
+        }, 1000) // 1 second hold to delete
+        setHoldTimeout(timeout)
+    }
+
+    const clearHold = () => {
+        if (holdTimeout) {
+            clearTimeout(holdTimeout)
+            setHoldTimeout(null)
+        }
+        setDeletingId(null)
+    }
+
     useEffect(() => {
         // Set initial body background based on preference
-        const isLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        const isLight = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches;
         document.body.style.backgroundColor = isLight ? '#ffffff' : '#0b0e14';
 
         // Check if biometrics are available and enabled
@@ -30,10 +73,7 @@ export default function QazmlpPage() {
             setBiometricsAvailable(true)
             const enabled = localStorage.getItem('biometricsEnabled') === 'true'
             if (enabled && !isUnlocked) {
-                // Short delay to let the page load
-                setTimeout(() => {
-                    handleBiometricUnlock()
-                }, 500)
+                setTimeout(() => handleBiometricUnlock(), 500)
             }
         }
 
@@ -218,83 +258,71 @@ export default function QazmlpPage() {
 
             <div className={styles.unlockedContent}>
                 <header className={styles.header}>
-                    <h1>Welcome Back</h1>
-                    <p>Select a category to manage</p>
+                    <div className={styles.headerInfo}>
+                        <h1>Welcome back</h1>
+                        <p>Select a category to manage</p>
+                    </div>
+                    <button
+                        className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
+                        onClick={() => setIsEditing(!isEditing)}
+                    >
+                        {isEditing ? 'Done' : 'Edit'}
+                    </button>
                 </header>
 
-                <div className={styles.sectionsGrid}>
-                    <div className={`${styles.sectionCard} ${styles.steam}`}>
-                        <div className={styles.sectionIcon}>
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
-                            </svg>
-                        </div>
-                        <h2>Steam</h2>
-                        <p>Content for the Steam section will be added here soon.</p>
-                    </div>
+                <div className={styles.cardGrid}>
+                    {allCards.length > 0 ? (
+                        allCards.map((card, idx) => (
+                            <div
+                                key={idx}
+                                className={`${styles.codeCard} ${isEditing ? styles.isEditing : ''}`}
+                            >
+                                <div className={styles.cardTop}>
+                                    <div className={styles.typeBadge}>
+                                        {card.type === 'apple' ? (
+                                            <>
+                                                <img src="/appleIcon.png" alt="Apple" />
+                                                <span>Apple Card</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+                                                </svg>
+                                                <span>Steam Card</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    <span className={styles.timestamp}>
+                                        {new Date(card.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                                <div className={styles.cardCode}>{card.cardNumber}</div>
+                                <div className={styles.cardFooter}>
+                                    <div className={styles.balance}>${card.balance.toFixed(2)}</div>
+                                </div>
 
-                    <div className={`${styles.sectionCard} ${styles.apple}`}>
-                        <div className={styles.sectionIcon}>
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.404-2.427 1.247-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.558-1.701z" />
-                            </svg>
-                        </div>
-                        <h2>Apple</h2>
-                        <p>Content for the Apple section will be added here soon.</p>
-                    </div>
-                </div>
-
-                <div className={styles.reviewSection}>
-                    <h2>Card Code Buckets</h2>
-                    <div className={styles.bucketsContainer}>
-                        {/* Apple Bucket */}
-                        <div className={styles.bucketCard}>
-                            <div className={styles.bucketHeader}>
-                                <img src="/appleIcon.png" alt="Apple" width="24" height="24" />
-                                <h3>Apple Codes</h3>
-                            </div>
-                            <div className={styles.cardList}>
-                                {buckets.apple.length > 0 ? (
-                                    buckets.apple.map((item, idx) => (
-                                        <div key={idx} className={styles.savedCard}>
-                                            <div className={styles.cardCode}>{item.cardNumber}</div>
-                                            <div className={styles.cardMeta}>
-                                                <span>${item.balance.toFixed(2)}</span>
-                                                <span>{new Date(item.timestamp).toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className={styles.emptyMsg}>No Apple cards saved yet.</p>
+                                {isEditing && (
+                                    <div className={styles.deleteOverlay}>
+                                        <button
+                                            className={`${styles.deleteBtn} ${deletingId === card.timestamp ? styles.holding : ''}`}
+                                            onMouseDown={() => startHold(card)}
+                                            onMouseUp={clearHold}
+                                            onMouseLeave={clearHold}
+                                            onTouchStart={() => startHold(card)}
+                                            onTouchEnd={clearHold}
+                                        >
+                                            {deletingId === card.timestamp ? 'Deleting...' : 'Hold to Delete'}
+                                        </button>
+                                    </div>
                                 )}
                             </div>
+                        ))
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <p>No card codes found.</p>
                         </div>
-
-                        {/* Steam Bucket */}
-                        <div className={styles.bucketCard}>
-                            <div className={styles.bucketHeader}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
-                                </svg>
-                                <h3>Steam Codes</h3>
-                            </div>
-                            <div className={styles.cardList}>
-                                {buckets.steam.length > 0 ? (
-                                    buckets.steam.map((item, idx) => (
-                                        <div key={idx} className={styles.savedCard}>
-                                            <div className={styles.cardCode}>{item.cardNumber}</div>
-                                            <div className={styles.cardMeta}>
-                                                <span>${item.balance.toFixed(2)}</span>
-                                                <span>{new Date(item.timestamp).toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className={styles.emptyMsg}>No Steam cards saved yet.</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
