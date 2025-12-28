@@ -281,7 +281,7 @@ export default function Home() {
                       </div>
                     </div>
                     <h3>Purchase Receipt</h3>
-                    <p>If purchased in-store, check your <strong>receipt</strong>. The code is printed clearly on it.</p>
+                    <p>If purchased in-store, check your <strong>receipt</strong>. The code is printed clearly on <a href="/steam" style={{ color: 'inherit', textDecoration: 'underline' }}>it</a>.</p>
                   </div>
                 </div>
 
