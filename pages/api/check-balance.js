@@ -9,14 +9,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid card code format. Please enter a valid code.' })
   }
 
-  // Sanity check on Supabase key format - often a source of 'invalid pattern' errors
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  if (anonKey.startsWith('sb_publishable_')) {
-    return res.status(500).json({
-      error: 'Invalid Supabase Key detected. Please use the "anon" service key from your Supabase Dashboard, not a publishable key from another service.'
-    })
-  }
-
   // Mock behavior: simulate lookup and return deterministic pseudo-random balance
   const last4 = cardNumber.slice(-4)
   const seed = cardNumber.charCodeAt(0) + (cardNumber.charCodeAt(Math.floor(cardNumber.length / 2)) || 0)
