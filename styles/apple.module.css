@@ -153,6 +153,10 @@
 
 .appleStyles :global(.select-wrapper) {
     position: relative;
+    flex: 1;
+    /* Allow dropdown to shrink/grow */
+    min-width: 0;
+    /* Prevent flex overflow */
 }
 
 .appleStyles :global(.location-select) {
@@ -160,11 +164,12 @@
     background: white;
     border: 1px solid #d2d2d7;
     border-radius: 8px;
-    padding: 10px 40px 10px 16px;
-    font-size: 17px;
+    padding: 10px 32px 10px 12px;
+    font-size: 16px;
     color: var(--text-primary);
     cursor: pointer;
-    min-width: 280px;
+    width: 100%;
+    /* Take full width of wrapper */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 5 3 3 3-3'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
@@ -625,6 +630,30 @@
 }
 
 @media (max-width: 520px) {
+    .appleStyles :global(.location-banner) {
+        padding: 30px 16px 24px;
+    }
+
+    .appleStyles :global(.banner-content) {
+        padding: 0;
+    }
+
+    .appleStyles :global(.banner-controls) {
+        padding: 0;
+        gap: 8px;
+    }
+
+    .appleStyles :global(.location-select) {
+        font-size: 15px;
+        width: 100%;
+    }
+
+    .appleStyles :global(.banner-btn) {
+        padding: 10px 16px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
     .appleStyles :global(.hero h1) {
         font-size: 32px;
     }
@@ -633,3 +662,4 @@
         padding: 32px 20px;
     }
 }
+
