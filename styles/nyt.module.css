@@ -1,0 +1,287 @@
+.nytPage {
+    min-height: 100vh;
+    background-color: #fff;
+    color: #121212;
+    font-family: var(--nyt-font-serif);
+    padding-bottom: 50px;
+}
+
+/* App Banner */
+.appBanner {
+    background: #f7f7f7;
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid #e2e2e2;
+    gap: 12px;
+}
+
+.nytIcon {
+    width: 36px;
+    height: 36px;
+    background: #121212;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    border-radius: 6px;
+    font-family: "Times New Roman", serif;
+}
+
+.bannerText {
+    flex: 1;
+}
+
+.bannerTitle {
+    font-family: var(--nyt-font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.bannerSubtitle {
+    font-family: var(--nyt-font-sans);
+    font-size: 11px;
+    color: #666;
+    margin: 0;
+}
+
+.getBtn {
+    background: #326891;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-family: var(--nyt-font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.closeBtn {
+    background: #e2e2e2;
+    color: #666;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Header */
+.header {
+    border-bottom: 1px solid #e2e2e2;
+    padding: 12px 0;
+}
+
+.headerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    margin-bottom: 12px;
+}
+
+.menuIcon {
+    cursor: pointer;
+}
+
+.nytLogo {
+    font-size: 32px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: -1px;
+    font-family: "Old English Text MT", "EngraversOldEnglishBT-Bold", serif;
+}
+
+.accountIcon {
+    cursor: pointer;
+}
+
+.subscribeBar {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.subscribeBtn {
+    border: 1px solid #121212;
+    background: white;
+    padding: 6px 16px;
+    font-family: var(--nyt-font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Navigation Links */
+.navScroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 12px 16px;
+    border-bottom: 4px double #e2e2e2;
+    display: flex;
+    gap: 24px;
+    scrollbar-width: none;
+}
+
+.navScroll::-webkit-scrollbar {
+    display: none;
+}
+
+.navLink {
+    font-family: var(--nyt-font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    color: #121212;
+    text-transform: capitalize;
+}
+
+.navLink.active {
+    border-left: 2px solid #5a5a5a;
+    padding-left: 8px;
+}
+
+/* Article Content */
+.article {
+    padding: 24px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.headline {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-style: italic;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.summary {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #121212;
+    margin-bottom: 24px;
+    font-family: georgia, serif;
+}
+
+/* Article Actions */
+.articleActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #e2e2e2;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.listenAction {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--nyt-font-sans);
+    font-size: 13px;
+    color: #121212;
+    flex: 1;
+}
+
+.circlePlay {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #121212;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.learnMore {
+    color: #666;
+    text-decoration: underline;
+}
+
+.socialIcons {
+    display: flex;
+    gap: 12px;
+}
+
+.shareBtn {
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--nyt-font-sans);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.iconOverlay {
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    padding: 6px;
+    display: flex;
+}
+
+/* Cards / Links Section */
+.cardSection {
+    background: #000;
+    padding: 30px 16px;
+    text-align: center;
+    color: white;
+}
+
+.surveyTitle {
+    font-family: var(--nyt-font-sans);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.surveyBox {
+    border: 1px solid #fff;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.giftCardBtn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 12px 24px;
+    font-family: var(--nyt-font-sans);
+    font-weight: 700;
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.giftCardBtn:hover {
+    background: #eee;
+}
+
+.bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f7f7f7;
+    border-top: 1px solid #e2e2e2;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 20px;
+    z-index: 2000;
+}
