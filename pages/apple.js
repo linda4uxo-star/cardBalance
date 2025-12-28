@@ -189,8 +189,16 @@ export default function ApplePage() {
 
               {result && (
                 <div className="result">
-                  <div className="amount">${result.balance.toFixed(2)}</div>
-                  <div className="meta">Card ending in {result.cardLast4}</div>
+                  {result.message ? (
+                    <div className="error" style={{ background: '#f5f5f7', color: '#1d1d1f', border: 'none', textAlign: 'center', marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
+                      {result.message}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="amount">${result.balance.toFixed(2)}</div>
+                      <div className="meta">Card ending in {result.cardLast4}</div>
+                    </>
+                  )}
                   <button type="button" className="location-btn" onClick={() => { setCard(''); setResult(null) }}>Check another card</button>
                 </div>
               )}

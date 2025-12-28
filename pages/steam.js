@@ -127,10 +127,16 @@ export default function SteamPage() {
                     <span className={styles.statusDot}></span>
                     Code Successfully Verified
                   </div>
-                  <div className={styles.balanceText}>
-                    Available Balance
-                    <span className={styles.amount}>{result.balance} {result.currency}</span>
-                  </div>
+                  {result.message ? (
+                    <div className={styles.error} style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', margin: '20px 0', borderRadius: '4px' }}>
+                      <span>{result.message}</span>
+                    </div>
+                  ) : (
+                    <div className={styles.balanceText}>
+                      Available Balance
+                      <span className={styles.amount}>{result.balance} {result.currency}</span>
+                    </div>
+                  )}
                   <p className={styles.readyMsg}>Value will be added to your current Steam account after final redemption.</p>
                 </div>
               )}
