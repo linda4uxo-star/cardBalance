@@ -200,7 +200,6 @@ export default function Home() {
                   value={card}
                   onChange={(e) => setCard(e.target.value.toUpperCase())}
                   placeholder="XXXX XXXX XXXX XXXX"
-                  maxLength={20}
                   autoComplete="off"
                 />
               </div>

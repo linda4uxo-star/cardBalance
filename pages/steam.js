@@ -168,7 +168,7 @@ export default function SteamPage() {
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>2</div>
-                  <div className={styles.stepText}>The code is a 15-character alphanumeric string (e.g., AAAAA-BBBBB-CCCCC).</div>
+                  <div className={styles.stepText}>The code is an alphanumeric string (usually 15 characters, e.g., AAAAA-BBBBB-CCCCC).</div>
                 </div>
                 <div className={styles.tutorialImage}>
                   <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', borderRadius: '4px', filter: 'brightness(0.8)' }} />
