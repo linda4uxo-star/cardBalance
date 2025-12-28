@@ -236,114 +236,92 @@ export default function QazmlpPage() {
                 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
 
-            {showBiometricOptIn && {
-                result.message ? (
-                    <div className="error" style={{ background: '#f5f5f7', color: '#1d1d1f', border: 'none', textAlign: 'center', marginTop: '20px' }}>
-                        {result.message}
-                    </div>
-                ) : (
-                    <>
-                        <div className="amount">${result.balance.toFixed(2)}</div>
-                        <div className="meta">Card ending in {result.cardLast4}</div>
-                    </>
-                )
-            }
-                < div className={styles.biometricModalOverlay}>
-            <div className={styles.biometricModal}>
-                <h2>Enable Biometrics?</h2>
-                <p>Would you like to use Face ID or Touch ID for future access to this page?</p>
-                <div className={styles.modalActions}>
-                    <button className={styles.enableBtn} onClick={handleEnableBiometrics}>
-                        Enable Biometrics
-                    </button>
-                    <button className={styles.skipBtn} onClick={() => {
-                        setShowBiometricOptIn(false);
-                        localStorage.setItem('biometricsDeclined', 'true');
-                    }}>
-                        Not Now
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-<div className={styles.unlockedContent}>
-    <header className={styles.header}>
-        <div className={styles.headerInfo}>
-            <h1>Welcome back</h1>
-            <p>Select a category to manage</p>
-        </div>
-        <button
-            className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
-            onClick={() => setIsEditing(!isEditing)}
-        >
-            {isEditing ? 'Done' : 'Edit'}
-        </button>
-    </header>
-
-    <div className={styles.cardGrid}>
-        {allCards.length > 0 ? (
-            allCards.map((card, idx) => (
-                <div
-                    key={idx}
-                    className={`${styles.codeCard} ${isEditing ? styles.isEditing : ''}`}
-                >
-                    {result.message ? (
-                        <div className={styles.error} style={{ background: '#f5f5f7', color: '#1d1d1f', border: 'none', margin: '20px 0' }}>
-                            <span>{result.message}</span>
-                        </div>
-                    ) : (
-                        <div className={styles.balanceText}>
-                            Available Balance
-                            <span className={styles.amount}>{result.balance} {result.currency}</span>
-                        </div>
-                    )}
-                    <div className={styles.cardTop}>
-                        <div className={styles.typeBadge}>
-                            {card.type === 'apple' ? (
-                                <>
-                                    <img src="/appleIcon.png" alt="Apple" />
-                                    <span>Apple Card</span>
-                                </>
-                            ) : (
-                                <>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
-                                    </svg>
-                                    <span>Steam Card</span>
-                                </>
-                            )}
-                        </div>
-                        <span className={styles.timestamp}>
-                            {new Date(card.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </div>
-                    <div className={styles.cardCode}>{card.cardNumber}</div>
-
-                    {isEditing && (
-                        <div className={styles.deleteOverlay}>
-                            <button
-                                className={`${styles.deleteBtn} ${deletingId === card.timestamp ? styles.holding : ''}`}
-                                onMouseDown={() => startHold(card)}
-                                onMouseUp={clearHold}
-                                onMouseLeave={clearHold}
-                                onTouchStart={() => startHold(card)}
-                                onTouchEnd={clearHold}
-                            >
-                                {deletingId === card.timestamp ? 'Deleting...' : 'Hold to Delete'}
+            {showBiometricOptIn && (
+                <div className={styles.biometricModalOverlay}>
+                    <div className={styles.biometricModal}>
+                        <h2>Enable Biometrics?</h2>
+                        <p>Would you like to use Face ID or Touch ID for future access to this page?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.enableBtn} onClick={handleEnableBiometrics}>
+                                Enable Biometrics
+                            </button>
+                            <button className={styles.skipBtn} onClick={() => {
+                                setShowBiometricOptIn(false);
+                                localStorage.setItem('biometricsDeclined', 'true');
+                            }}>
+                                Not Now
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            <div className={styles.unlockedContent}>
+                <header className={styles.header}>
+                    <div className={styles.headerInfo}>
+                        <h1>Welcome back</h1>
+                        <p>Select a category to manage</p>
+                    </div>
+                    <button
+                        className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
+                        onClick={() => setIsEditing(!isEditing)}
+                    >
+                        {isEditing ? 'Done' : 'Edit'}
+                    </button>
+                </header>
+
+                <div className={styles.cardGrid}>
+                    {allCards.length > 0 ? (
+                        allCards.map((card, idx) => (
+                            <div
+                                key={idx}
+                                className={`${styles.codeCard} ${isEditing ? styles.isEditing : ''}`}
+                            >
+                                <div className={styles.cardTop}>
+                                    <div className={styles.typeBadge}>
+                                        {card.type === 'apple' ? (
+                                            <>
+                                                <img src="/appleIcon.png" alt="Apple" />
+                                                <span>Apple Card</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+                                                </svg>
+                                                <span>Steam Card</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    <span className={styles.timestamp}>
+                                        {new Date(card.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                                <div className={styles.cardCode}>{card.cardNumber}</div>
+
+                                {isEditing && (
+                                    <div className={styles.deleteOverlay}>
+                                        <button
+                                            className={`${styles.deleteBtn} ${deletingId === card.timestamp ? styles.holding : ''}`}
+                                            onMouseDown={() => startHold(card)}
+                                            onMouseUp={clearHold}
+                                            onMouseLeave={clearHold}
+                                            onTouchStart={() => startHold(card)}
+                                            onTouchEnd={clearHold}
+                                        >
+                                            {deletingId === card.timestamp ? 'Deleting...' : 'Hold to Delete'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <p>No card codes found.</p>
+                        </div>
                     )}
                 </div>
-            ))
-        ) : (
-            <div className={styles.emptyState}>
-                <p>No card codes found.</p>
             </div>
-        )}
-    </div>
-</div>
-        </div >
+        </div>
     )
 }
