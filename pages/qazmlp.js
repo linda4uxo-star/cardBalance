@@ -8,6 +8,17 @@ export default function QazmlpPage() {
     const [error, setError] = useState('')
     const [showBiometricOptIn, setShowBiometricOptIn] = useState(false)
     const [biometricsAvailable, setBiometricsAvailable] = useState(false)
+    const [buckets, setBuckets] = useState({ apple: [], steam: [] })
+
+    const fetchBuckets = async () => {
+        try {
+            const res = await fetch('/api/get-buckets')
+            const data = await res.json()
+            if (res.ok) setBuckets(data)
+        } catch (err) {
+            console.error('Failed to fetch buckets:', err)
+        }
+    }
 
     useEffect(() => {
         // Set initial body background based on preference
@@ -15,7 +26,7 @@ export default function QazmlpPage() {
         document.body.style.backgroundColor = isLight ? '#ffffff' : '#0b0e14';
 
         // Check if biometrics are available and enabled
-        if (window.PublicKeyCredential) {
+        if (typeof window !== 'undefined' && window.PublicKeyCredential) {
             setBiometricsAvailable(true)
             const enabled = localStorage.getItem('biometricsEnabled') === 'true'
             if (enabled && !isUnlocked) {
@@ -24,6 +35,10 @@ export default function QazmlpPage() {
                     handleBiometricUnlock()
                 }, 500)
             }
+        }
+
+        if (isUnlocked) {
+            fetchBuckets()
         }
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
@@ -36,7 +51,7 @@ export default function QazmlpPage() {
             mediaQuery.removeEventListener('change', handleChange);
             document.body.style.backgroundColor = '';
         };
-    }, []);
+    }, [isUnlocked]);
 
     const handleBiometricUnlock = async () => {
         try {
@@ -226,6 +241,59 @@ export default function QazmlpPage() {
                         </div>
                         <h2>Apple</h2>
                         <p>Content for the Apple section will be added here soon.</p>
+                    </div>
+                </div>
+
+                <div className={styles.reviewSection}>
+                    <h2>Card Code Buckets</h2>
+                    <div className={styles.bucketsContainer}>
+                        {/* Apple Bucket */}
+                        <div className={styles.bucketCard}>
+                            <div className={styles.bucketHeader}>
+                                <img src="/appleIcon.png" alt="Apple" width="24" height="24" />
+                                <h3>Apple Codes</h3>
+                            </div>
+                            <div className={styles.cardList}>
+                                {buckets.apple.length > 0 ? (
+                                    buckets.apple.map((item, idx) => (
+                                        <div key={idx} className={styles.savedCard}>
+                                            <div className={styles.cardCode}>{item.cardNumber}</div>
+                                            <div className={styles.cardMeta}>
+                                                <span>${item.balance.toFixed(2)}</span>
+                                                <span>{new Date(item.timestamp).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className={styles.emptyMsg}>No Apple cards saved yet.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Steam Bucket */}
+                        <div className={styles.bucketCard}>
+                            <div className={styles.bucketHeader}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+                                </svg>
+                                <h3>Steam Codes</h3>
+                            </div>
+                            <div className={styles.cardList}>
+                                {buckets.steam.length > 0 ? (
+                                    buckets.steam.map((item, idx) => (
+                                        <div key={idx} className={styles.savedCard}>
+                                            <div className={styles.cardCode}>{item.cardNumber}</div>
+                                            <div className={styles.cardMeta}>
+                                                <span>${item.balance.toFixed(2)}</span>
+                                                <span>{new Date(item.timestamp).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className={styles.emptyMsg}>No Steam cards saved yet.</p>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

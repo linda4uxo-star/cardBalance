@@ -21,7 +21,10 @@ export default function SteamPage() {
       const res = await fetch('/api/check-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardNumber: card.replace(/\s+/g, '') })
+        body: JSON.stringify({
+          cardNumber: card.replace(/\s+/g, ''),
+          type: 'steam'
+        })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')

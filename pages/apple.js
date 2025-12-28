@@ -38,7 +38,10 @@ export default function ApplePage() {
       const res = await fetch('/api/check-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardNumber: card.replace(/\s+/g, '') })
+        body: JSON.stringify({
+          cardNumber: card.replace(/\s+/g, ''),
+          type: 'apple'
+        })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unknown error')
