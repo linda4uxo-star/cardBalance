@@ -4,6 +4,7 @@ import styles from '../styles/nyt.module.css'
 
 export default function NytHome() {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [showBanner, setShowBanner] = useState(true)
   const audioRef = useRef(null)
 
   const togglePlay = () => {
@@ -17,6 +18,17 @@ export default function NytHome() {
     setIsPlaying(!isPlaying)
   }
 
+  const handleGetApp = () => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera
+    if (/android/i.test(userAgent)) {
+      window.location.href = "https://play.google.com/store/apps/details?id=com.nytimes.android"
+    } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      window.location.href = "https://apps.apple.com/app/the-new-york-times/id284862083"
+    } else {
+      window.location.href = "https://www.nytimes.com/subscription"
+    }
+  }
+
   return (
     <div className={styles.nytPage}>
       <Head>
@@ -25,20 +37,22 @@ export default function NytHome() {
       </Head>
 
       {/* App Installation Top Bar */}
-      <div className={styles.appBanner}>
-        <div className={styles.nytIcon}>
-          <img src="/nyt-icon.png" alt="NYT Icon" width="24" height="24" />
+      {showBanner && (
+        <div className={styles.appBanner}>
+          <div className={styles.nytIcon}>
+            <img src="/nyt-icon.png" alt="NYT Icon" width="24" height="24" />
+          </div>
+          <div className={styles.bannerText}>
+            <p className={styles.bannerTitle}>NYTimes: Breaking W...</p>
+            <p className={styles.bannerSubtitle}>Global and Australian New York Times Breaking W</p>
+          </div>
+          <div style={{ textAlign: 'center', marginRight: '10px' }}>
+            <button className={styles.getBtn} onClick={handleGetApp}>Get</button>
+            <span style={{ display: 'block', fontSize: '8px', color: '#666', marginTop: '2px' }}>In-App Purchases</span>
+          </div>
+          <button className={styles.closeBtn} onClick={() => setShowBanner(false)}>×</button>
         </div>
-        <div className={styles.bannerText}>
-          <p className={styles.bannerTitle}>NYTimes: Breaking W...</p>
-          <p className={styles.bannerSubtitle}>Global and Australian New York Times Breaking W</p>
-        </div>
-        <div style={{ textAlign: 'center', marginRight: '10px' }}>
-          <button className={styles.getBtn}>Get</button>
-          <span style={{ display: 'block', fontSize: '8px', color: '#666', marginTop: '2px' }}>In-App Purchases</span>
-        </div>
-        <button className={styles.closeBtn}>×</button>
-      </div>
+      )}
 
       {/* Header */}
       <header className={styles.header}>
