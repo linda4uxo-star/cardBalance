@@ -24,15 +24,14 @@
 .nytIcon {
     width: 36px;
     height: 36px;
-    background: #fff;
-    color: #121212;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
     border-radius: 6px;
-    font-family: "Old English Text MT", serif;
-    border: 1px solid #e2e2e2;
+}
+
+.nytIcon img {
+    border-radius: 4px;
 }
 
 .bannerText {
