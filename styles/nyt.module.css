@@ -1,9 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
 .nytPage {
     min-height: 100vh;
     background-color: #fff;
     color: #121212;
-    font-family: var(--nyt-font-serif);
+    font-family: 'Georgia', serif;
     padding-bottom: 50px;
+    /* Typography Tokens */
+    --nyt-serif: 'Playfair Display', 'Georgia', serif;
+    --nyt-sans: 'Libre Franklin', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* App Banner */
@@ -19,14 +24,15 @@
 .nytIcon {
     width: 36px;
     height: 36px;
-    background: #121212;
-    color: white;
+    background: #fff;
+    color: #121212;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
     border-radius: 6px;
-    font-family: "Times New Roman", serif;
+    font-family: "Old English Text MT", serif;
+    border: 1px solid #e2e2e2;
 }
 
 .bannerText {
@@ -34,14 +40,14 @@
 }
 
 .bannerTitle {
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 14px;
     font-weight: 700;
     margin: 0;
 }
 
 .bannerSubtitle {
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 11px;
     color: #666;
     margin: 0;
@@ -53,30 +59,29 @@
     border: none;
     border-radius: 999px;
     padding: 6px 18px;
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
 }
 
 .closeBtn {
-    background: #e2e2e2;
+    background: none;
     color: #666;
     border: none;
     width: 24px;
     height: 24px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 20px;
     cursor: pointer;
 }
 
 /* Header */
 .header {
     border-bottom: 1px solid #e2e2e2;
-    padding: 12px 0;
+    padding: 12px 0 0 0;
 }
 
 .headerTop {
@@ -89,35 +94,41 @@
 
 .menuIcon {
     cursor: pointer;
+    color: #121212;
 }
 
 .nytLogo {
-    font-size: 32px;
-    font-weight: 800;
-    text-align: center;
-    letter-spacing: -1px;
-    font-family: "Old English Text MT", "EngraversOldEnglishBT-Bold", serif;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.nytLogo svg {
+    height: 28px;
 }
 
 .accountIcon {
     cursor: pointer;
+    color: #121212;
 }
 
 .subscribeBar {
     display: flex;
-    justify-content: center;
-    padding: 8px 0;
+    justify-content: flex-end;
+    padding: 0 16px 12px 0;
 }
 
 .subscribeBtn {
     border: 1px solid #121212;
     background: white;
-    padding: 6px 16px;
-    font-family: var(--nyt-font-sans);
+    padding: 8px 12px;
+    font-family: var(--nyt-sans);
     font-size: 11px;
     font-weight: 700;
     border-radius: 4px;
     cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Navigation Links */
@@ -125,7 +136,7 @@
     overflow-x: auto;
     white-space: nowrap;
     padding: 12px 16px;
-    border-bottom: 4px double #e2e2e2;
+    border-bottom: 1px solid #ccc;
     display: flex;
     gap: 24px;
     scrollbar-width: none;
@@ -136,11 +147,11 @@
 }
 
 .navLink {
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 12px;
     font-weight: 700;
     color: #121212;
-    text-transform: capitalize;
+    text-transform: uppercase;
 }
 
 .navLink.active {
@@ -156,20 +167,21 @@
 }
 
 .headline {
-    font-size: 34px;
+    font-family: var(--nyt-serif);
+    font-size: 32px;
     font-weight: 700;
     line-height: 1.1;
     font-style: italic;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     letter-spacing: -0.5px;
+    color: #121212;
 }
 
 .summary {
     font-size: 18px;
     line-height: 1.5;
-    color: #121212;
+    color: #333;
     margin-bottom: 24px;
-    font-family: georgia, serif;
 }
 
 /* Article Actions */
@@ -179,14 +191,14 @@
     gap: 16px;
     border-bottom: 1px solid #e2e2e2;
     padding-bottom: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .listenAction {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 13px;
     color: #121212;
     flex: 1;
@@ -196,7 +208,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: 1px solid #121212;
+    border: 1px solid #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,6 +217,7 @@
 .learnMore {
     color: #666;
     text-decoration: underline;
+    font-size: 12px;
 }
 
 .socialIcons {
@@ -219,9 +232,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 12px;
     font-weight: 700;
+    color: #121212;
 }
 
 .iconOverlay {
@@ -234,14 +248,14 @@
 /* Cards / Links Section */
 .cardSection {
     background: #fff;
-    padding: 40px 16px;
+    padding: 20px 0;
     text-align: center;
     color: #121212;
     margin-top: 20px;
 }
 
 .surveyTitle {
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 24px;
@@ -249,19 +263,26 @@
 }
 
 .surveyBox {
-    border: 1px solid #121212;
-    padding: 12px 16px;
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
+    padding: 16px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 400px;
-    margin: 30px auto 0;
-    border-radius: 4px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.surveyText {
+    font-family: var(--nyt-sans);
+    font-size: 14px;
+    color: #333;
+    text-align: left;
 }
 
 .giftCardBtn {
     padding: 18px 24px;
-    font-family: var(--nyt-font-sans);
+    font-family: var(--nyt-sans);
     font-weight: 700;
     border-radius: 8px;
     display: block;
