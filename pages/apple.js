@@ -78,7 +78,7 @@ export default function ApplePage() {
                 >
                   {countries.map(country => (
                     <option key={country} value={country}>
-                      {country === location ? `✓  ${country}` : country}
+                      {country}
                     </option>
                   ))}
                 </select>
