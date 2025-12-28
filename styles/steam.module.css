@@ -67,9 +67,10 @@
 }
 
 .logo {
-  width: 176px;
-  height: 44px;
+  width: 210px;
+  height: 52px;
   fill: white;
+  display: block;
 }
 
 .nav {
