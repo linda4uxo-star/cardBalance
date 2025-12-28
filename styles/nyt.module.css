@@ -233,44 +233,52 @@
 
 /* Cards / Links Section */
 .cardSection {
-    background: #000;
-    padding: 30px 16px;
+    background: #fff;
+    padding: 40px 16px;
     text-align: center;
-    color: white;
+    color: #121212;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .surveyTitle {
     font-family: var(--nyt-font-sans);
-    font-size: 14px;
-    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.4;
 }
 
 .surveyBox {
-    border: 1px solid #fff;
-    padding: 10px;
+    border: 1px solid #121212;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     max-width: 400px;
-    margin: 0 auto;
+    margin: 30px auto 0;
+    border-radius: 4px;
 }
 
 .giftCardBtn {
-    background: white;
-    color: black;
+    background: #121212;
+    color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 16px 24px;
     font-family: var(--nyt-font-sans);
     font-weight: 700;
     border-radius: 4px;
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     text-align: center;
+    transition: background 0.2s;
 }
 
 .giftCardBtn:hover {
-    background: #eee;
+    background: #333;
 }
 
 .bottomNav {
