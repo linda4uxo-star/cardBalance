@@ -9,6 +9,7 @@
   --steam-btn-bg: linear-gradient(to right, #47bfff 0%, #1a44c2 100%);
   --steam-btn-hover: linear-gradient(to right, #5bc5ff 0%, #2050e0 100%);
   --steam-card-bg: rgba(0, 0, 0, 0.4);
+  --steam-nav-text: #b8b6b4;
   
   min-height: 100vh;
   background: radial-gradient(at top left, var(--steam-bg-medium) 0%, var(--steam-bg-dark) 100%);
@@ -16,122 +17,226 @@
   font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
-/* Override potential global styles */
 .steamPage :global(a) {
-  color: inherit;
   text-decoration: none;
+  color: inherit;
 }
 
-.steamPage :global(h1), 
-.steamPage :global(h2), 
-.steamPage :global(h3), 
-.steamPage :global(p) {
-  margin: 0;
-  font-weight: normal;
-}
-
+/* Header */
 .header {
-  height: 104px;
   background: var(--steam-bg-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.headerTop {
+  max-width: 940px;
+  margin: 0 auto;
+  height: 104px;
   display: flex;
   align-items: center;
-  padding: 0 5%;
-  position: relative;
-  box-shadow: 0 0 12px rgba(0,0,0,0.5);
-  z-index: 100;
+  padding: 0 20px;
 }
 
 .logoContainer {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  margin-right: 40px;
 }
 
 .logo {
   width: 176px;
   height: 44px;
-  color: white;
-  fill: currentColor;
+  fill: white;
 }
 
 .nav {
-  margin-left: 40px;
   display: flex;
   gap: 24px;
-  text-transform: uppercase;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 .nav a {
-  color: #b8b6b4 !important;
-  text-decoration: none;
+  color: var(--steam-nav-text);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
   transition: color 0.2s;
 }
 
 .nav a:hover {
-  color: var(--steam-accent) !important;
+  color: white;
 }
 
+.installSteam {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.installBtn {
+  background: #5c7e10;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.installBtn:hover {
+  background: #6a9112;
+}
+
+.loginLink {
+  font-size: 11px;
+  color: #b8b6b4;
+}
+
+.loginLink:hover {
+  color: white;
+}
+
+/* Mobile Menu Button */
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.hamburger {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile Nav Overlay */
+.mobileNav {
+  display: none;
+  background: #171a21;
+  position: absolute;
+  top: 64px;
+  left: 0;
+  width: 100%;
+  flex-direction: column;
+  padding: 20px;
+  gap: 15px;
+  border-top: 1px solid #2a475e;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+
+.mobileNav.active {
+  display: flex;
+}
+
+.mobileNav a {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  padding: 10px 0;
+}
+
+/* Main Content */
 .main {
   max-width: 940px;
   margin: 0 auto;
   padding: 40px 20px;
 }
 
-.hero {
-  margin-bottom: 40px;
+.breadcrumb {
+  font-size: 12px;
+  color: var(--steam-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
 }
 
-.hero h1 {
+.mainTitle {
   font-size: 26px;
+  font-weight: 700;
+  color: white;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 8px;
-  color: white;
-  font-weight: 700;
+  margin-bottom: 5px;
 }
 
-.hero p {
+.subtitle {
+  font-size: 14px;
   color: var(--steam-text-secondary);
-  font-size: 15px;
-  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
 }
 
 .card {
   background: var(--steam-card-bg);
   padding: 40px;
   border-radius: 4px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .inputGroup {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .label {
   display: block;
   font-size: 13px;
-  margin-bottom: 10px;
+  font-weight: 600;
   color: var(--steam-accent);
+  margin-bottom: 12px;
   letter-spacing: 1px;
 }
 
 .input {
   width: 100%;
-  max-width: 450px;
   background: #32353c;
-  border: 1px solid #000;
+  border: 1.5px solid #000;
   border-radius: 3px;
-  padding: 14px 16px;
+  padding: 14px 18px;
   color: white;
   font-size: 18px;
+  font-family: "Courier New", Courier, monospace;
   outline: none;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-  font-family: monospace;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+  transition: all 0.2s;
 }
 
 .input:focus {
@@ -141,88 +246,295 @@
 
 .button {
   background: var(--steam-btn-bg);
-  border: none;
-  border-radius: 2px;
   color: white;
-  padding: 14px 40px;
+  border: none;
+  padding: 14px 45px;
+  border-radius: 2px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transition: all 0.2s;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .button:hover:not(:disabled) {
   background: var(--steam-btn-hover);
-  box-shadow: 0 0 15px rgba(102, 192, 244, 0.5);
+  box-shadow: 0 0 20px rgba(102, 192, 244, 0.4);
   transform: translateY(-1px);
 }
 
-.button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* Result & Error */
 .result {
   margin-top: 30px;
-  padding: 25px;
   background: rgba(102, 192, 244, 0.05);
   border: 1px solid rgba(102, 192, 244, 0.2);
   border-left: 4px solid var(--steam-accent);
-  border-radius: 3px;
+  padding: 20px;
+  border-radius: 4px;
 }
 
-.result p {
-  margin: 5px 0;
+.resultHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background: #34c759;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #34c759;
+}
+
+.balanceText {
+  font-size: 16px;
+  color: var(--steam-text-primary);
+}
+
+.amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.readyMsg {
+  font-size: 13px;
+  color: var(--steam-text-secondary);
+  margin-top: 5px;
 }
 
 .error {
-  margin-top: 30px;
-  padding: 15px;
+  margin-top: 25px;
   background: rgba(255, 77, 77, 0.1);
   border: 1px solid rgba(255, 77, 77, 0.2);
   border-left: 4px solid #ff4d4d;
+  padding: 15px;
+  border-radius: 4px;
   color: #ff4d4d;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
 }
 
-/* Mobile Styles */
+/* Tutorial */
+.tutorialWrapper {
+  margin-top: 30px;
+}
+
+.tutorialToggle {
+  background: none;
+  border: none;
+  color: #c6d4df;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.tutorialToggle:hover {
+  color: white;
+}
+
+.tutorialContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, margin-top 0.4s;
+  margin-top: 0;
+}
+
+.tutorialContent.show {
+  max-height: 1000px;
+  margin-top: 25px;
+}
+
+.tutorialStep {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stepNumber {
+  background: var(--steam-accent);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stepText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c6d4df;
+}
+
+.tutorialImage {
+  margin-top: 15px;
+}
+
+.imageCaption {
+  font-size: 12px;
+  color: var(--steam-text-secondary);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Side Info */
+.infoBox {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 25px;
+  border-radius: 4px;
+  margin-bottom: 30px;
+}
+
+.infoBox h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.infoBox p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--steam-text-secondary);
+  margin-bottom: 15px;
+}
+
+.learnMore {
+  font-size: 13px;
+  color: var(--steam-accent);
+  font-weight: 500;
+}
+
+.learnMore:hover {
+  text-decoration: underline;
+}
+
+.qrSection {
+  text-align: center;
+  padding: 20px;
+}
+
+.qrContainer {
+  width: 150px;
+  height: 150px;
+  background: white;
+  margin: 0 auto 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.qrPlaceholder {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-weight: 700;
+}
+
+.qrSection p {
+  font-size: 13px;
+  color: var(--steam-text-secondary);
+  line-height: 1.5;
+}
+
+/* Footer */
+.footer {
+  background: #171a21;
+  padding: 60px 20px;
+  border-top: 1px solid #2a475e;
+  margin-top: 80px;
+}
+
+.footerContent {
+  max-width: 940px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.footerDetails p {
+  font-size: 12px;
+  color: #8f98a0;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.footerLinks {
+  font-size: 12px;
+  color: #c7d5e0;
+}
+
+.footerLinks a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile Responsive */
 @media (max-width: 834px) {
-  .header {
+  .headerTop {
     height: 64px;
-    padding: 0 20px;
+    padding: 0 16px;
   }
-  
+
+  .mobileMenuBtn {
+    display: block;
+  }
+
+  .logoContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+  }
+
   .logo {
     width: 130px;
     height: 32px;
   }
-  
-  .nav {
+
+  .nav, .installSteam {
     display: none;
   }
-  
+
   .main {
-    padding: 20px 16px;
+    padding: 30px 16px;
   }
-  
-  .hero h1 {
-    font-size: 20px;
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
-  
-  .hero p {
-    font-size: 14px;
-  }
-  
+
   .card {
-    padding: 24px 20px;
+    padding: 30px 20px;
   }
-  
-  .input {
-    max-width: 100%;
-    font-size: 16px;
-  }
-  
+
   .button {
     width: 100%;
+  }
+
+  .sideInfo {
+    order: 2;
   }
 }
