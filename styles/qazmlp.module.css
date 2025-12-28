@@ -105,6 +105,98 @@
     font-weight: 500;
 }
 
+.biometricBtn {
+    margin-top: 20px;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--secondary-text);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.biometricBtn:hover {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+/* Biometric Opt-in Prompt */
+.biometricModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.biometricModal {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.biometricModal h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.biometricModal p {
+    color: var(--secondary-text);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modalActions {
+    display: flex;
+    gap: 12px;
+}
+
+.modalActions button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.enableBtn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+.skipBtn {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--secondary-text);
+}
+
+.skipBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
 /* Content Styles */
 .unlockedContent {
     width: 100%;

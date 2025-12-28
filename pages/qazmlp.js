@@ -6,13 +6,26 @@ export default function QazmlpPage() {
     const [password, setPassword] = useState('')
     const [isUnlocked, setIsUnlocked] = useState(false)
     const [error, setError] = useState('')
+    const [showBiometricOptIn, setShowBiometricOptIn] = useState(false)
+    const [biometricsAvailable, setBiometricsAvailable] = useState(false)
 
     useEffect(() => {
         // Set initial body background based on preference
         const isLight = window.matchMedia('(prefers-color-scheme: light)').matches;
         document.body.style.backgroundColor = isLight ? '#ffffff' : '#0b0e14';
 
-        // Listen for theme changes
+        // Check if biometrics are available and enabled
+        if (window.PublicKeyCredential) {
+            setBiometricsAvailable(true)
+            const enabled = localStorage.getItem('biometricsEnabled') === 'true'
+            if (enabled && !isUnlocked) {
+                // Short delay to let the page load
+                setTimeout(() => {
+                    handleBiometricUnlock()
+                }, 500)
+            }
+        }
+
         const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
         const handleChange = (e) => {
             document.body.style.backgroundColor = e.matches ? '#ffffff' : '#0b0e14';
@@ -21,15 +34,96 @@ export default function QazmlpPage() {
         mediaQuery.addEventListener('change', handleChange);
         return () => {
             mediaQuery.removeEventListener('change', handleChange);
-            document.body.style.backgroundColor = ''; // Reset on unmount
+            document.body.style.backgroundColor = '';
         };
     }, []);
+
+    const handleBiometricUnlock = async () => {
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const credentialIdStr = localStorage.getItem('biometricCredentialId');
+            if (!credentialIdStr) return;
+
+            const credentialId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
+
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge,
+                    allowCredentials: [{
+                        id: credentialId,
+                        type: 'public-key',
+                        transports: ['internal']
+                    }],
+                    userVerification: 'required',
+                    timeout: 60000
+                }
+            });
+
+            if (assertion) {
+                setIsUnlocked(true)
+                setError('')
+            }
+        } catch (err) {
+            console.error('Biometric authentication failed:', err)
+            // Don't show error for cancel
+            if (err.name !== 'NotAllowedError') {
+                setError('Biometric authentication failed. Please use your password.')
+            }
+        }
+    }
+
+    const handleEnableBiometrics = async () => {
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const userID = new Uint8Array(16);
+            window.crypto.getRandomValues(userID);
+
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge,
+                    rp: { name: "cardBalance" },
+                    user: {
+                        id: userID,
+                        name: "user@cardbalance",
+                        displayName: "CardBalance User"
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required"
+                    },
+                    timeout: 60000
+                }
+            });
+
+            if (credential) {
+                const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                localStorage.setItem('biometricCredentialId', idBase64);
+                localStorage.setItem('biometricsEnabled', 'true');
+                setShowBiometricOptIn(false);
+            }
+        } catch (err) {
+            console.error('Failed to enable biometrics:', err);
+            setShowBiometricOptIn(false);
+        }
+    }
 
     const handleUnlock = (e) => {
         e.preventDefault()
         if (password === 'Aaaaa1$.') {
             setIsUnlocked(true)
             setError('')
+
+            // Check if we should offer biometrics
+            const enabled = localStorage.getItem('biometricsEnabled') === 'true'
+            const declined = localStorage.getItem('biometricsDeclined') === 'true'
+            if (biometricsAvailable && !enabled && !declined) {
+                setShowBiometricOptIn(true)
+            }
         } else {
             setError('Incorrect password. Please try again.')
             setPassword('')
@@ -64,6 +158,15 @@ export default function QazmlpPage() {
                         </button>
                     </form>
                     {error && <p className={styles.errorMessage}>{error}</p>}
+
+                    {biometricsAvailable && localStorage.getItem('biometricsEnabled') === 'true' && (
+                        <button onClick={handleBiometricUnlock} className={styles.biometricBtn}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                            </svg>
+                            Unlock with Biometrics
+                        </button>
+                    )}
                 </div>
             </div>
         )
@@ -77,6 +180,26 @@ export default function QazmlpPage() {
                 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
                 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
+
+            {showBiometricOptIn && (
+                <div className={styles.biometricModalOverlay}>
+                    <div className={styles.biometricModal}>
+                        <h2>Enable Biometrics?</h2>
+                        <p>Would you like to use Face ID or Touch ID for future access to this page?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.enableBtn} onClick={handleEnableBiometrics}>
+                                Enable Biometrics
+                            </button>
+                            <button className={styles.skipBtn} onClick={() => {
+                                setShowBiometricOptIn(false);
+                                localStorage.setItem('biometricsDeclined', 'true');
+                            }}>
+                                Not Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.unlockedContent}>
                 <header className={styles.header}>
