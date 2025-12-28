@@ -64,10 +64,17 @@ export default function NytHome() {
 
         {/* Categories Scroller */}
         <div className={styles.navScroll}>
-          <span className={`${styles.navLink} ${styles.active}`}>U.S. Immigration</span>
-          <span className={styles.navLink}>Travel Ban</span>
-          <span className={styles.navLink}>Immigration Arrests</span>
-          <span className={styles.navLink}>Sweeping Changes</span>
+          <span className={`${styles.navLink} ${styles.active}`}>U.S.</span>
+          <span className={styles.navLink}>World</span>
+          <span className={styles.navLink}>Business</span>
+          <span className={styles.navLink}>Arts</span>
+          <span className={styles.navLink}>Lifestyle</span>
+          <span className={styles.navLink}>Opinion</span>
+          <span className={styles.navLink}>Audio</span>
+          <span className={styles.navLink}>Games</span>
+          <span className={styles.navLink}>Cooking</span>
+          <span className={styles.navLink}>Wirecutter</span>
+          <span className={styles.navLink}>The Athletic</span>
         </div>
       </header>
 
@@ -145,32 +152,6 @@ export default function NytHome() {
           </div>
         </div>
       </main>
-
-      {/* Browser Interaction Mockup */}
-      <div className={styles.bottomNav}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="1.5">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="1.5">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#e2e2e2', padding: '6px 16px', borderRadius: '12px' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0110 0v4" />
-          </svg>
-          <span style={{ fontSize: '13px', fontFamily: 'sans-serif' }}>nytimes.com</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2">
-            <path d="M23 4v6h-6M1 20v-6h6" />
-            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-          </svg>
-        </div>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="1" />
-          <circle cx="19" cy="12" r="1" />
-          <circle cx="5" cy="12" r="1" />
-        </svg>
-      </div>
-    </div>
+    </div >
   )
 }
