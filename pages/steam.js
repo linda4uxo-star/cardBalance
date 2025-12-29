@@ -10,6 +10,7 @@ export default function SteamPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const [location, setLocation] = useState('Unknown')
+  const [deviceId, setDeviceId] = useState(null)
 
   useEffect(() => {
     async function detectLocation() {
