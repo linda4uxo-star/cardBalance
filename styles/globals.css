@@ -16,9 +16,17 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
+  background-color: #ffffff;
   color: var(--nyt-text-primary);
   font-family: var(--nyt-font-serif);
+}
+
+@media (prefers-color-scheme: dark) {
+
+  html,
+  body {
+    background-color: #0b0e14;
+  }
 }
 
 a {
