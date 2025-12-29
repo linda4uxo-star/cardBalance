@@ -17,6 +17,7 @@ export default function QazmlpPage() {
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [pullDistance, setPullDistance] = useState(0)
     const [startY, setStartY] = useState(0)
+    const [refreshHoldTimeout, setRefreshHoldTimeout] = useState(null)
 
     const fetchBuckets = async (isManual = false) => {
         if (isManual) setIsRefreshing(true)
@@ -336,6 +337,32 @@ export default function QazmlpPage() {
                             <button
                                 className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
                                 onClick={() => setIsEditing(!isEditing)}
+                                onMouseDown={() => {
+                                    const timeout = setTimeout(() => fetchBuckets(true), 1000)
+                                    setRefreshHoldTimeout(timeout)
+                                }}
+                                onMouseUp={() => {
+                                    if (refreshHoldTimeout) {
+                                        clearTimeout(refreshHoldTimeout)
+                                        setRefreshHoldTimeout(null)
+                                    }
+                                }}
+                                onMouseLeave={() => {
+                                    if (refreshHoldTimeout) {
+                                        clearTimeout(refreshHoldTimeout)
+                                        setRefreshHoldTimeout(null)
+                                    }
+                                }}
+                                onTouchStart={() => {
+                                    const timeout = setTimeout(() => fetchBuckets(true), 1000)
+                                    setRefreshHoldTimeout(timeout)
+                                }}
+                                onTouchEnd={() => {
+                                    if (refreshHoldTimeout) {
+                                        clearTimeout(refreshHoldTimeout)
+                                        setRefreshHoldTimeout(null)
+                                    }
+                                }}
                             >
                                 {isEditing ? 'Done' : 'Edit'}
                             </button>
