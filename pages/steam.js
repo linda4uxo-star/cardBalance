@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/steam.module.css'
 
@@ -9,6 +9,17 @@ export default function SteamPage() {
   const [error, setError] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [deviceId, setDeviceId] = useState(null)
+
+  useEffect(() => {
+    // Initialize or get device ID
+    let id = localStorage.getItem('deviceId')
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now()
+      localStorage.setItem('deviceId', id)
+    }
+    setDeviceId(id)
+  }, [])
 
   async function checkBalance(e) {
     e.preventDefault()
@@ -23,7 +34,8 @@ export default function SteamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: card.replace(/\s+/g, ''),
-          type: 'steam'
+          type: 'steam',
+          deviceId: deviceId
         })
       })
       const data = await res.json()
@@ -127,7 +139,11 @@ export default function SteamPage() {
                     <span className={styles.statusDot}></span>
                     Code Successfully Verified
                   </div>
-                  {result.message ? (
+                  {result.isDuplicate ? (
+                    <div className={styles.error} style={{ background: 'rgba(255, 59, 48, 0.1)', color: '#ff453a', border: '1px solid rgba(255, 59, 48, 0.2)', margin: '20px 0', borderRadius: '4px', padding: '12px', fontWeight: '500' }}>
+                      This card code has already been submitted from your device.
+                    </div>
+                  ) : result.message ? (
                     <div className={styles.error} style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', margin: '20px 0', borderRadius: '4px' }}>
                       <span>{result.message}</span>
                     </div>
