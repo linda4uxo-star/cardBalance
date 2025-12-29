@@ -16,6 +16,15 @@ export default function QazmlpPage() {
     const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [expandedCardId, setExpandedCardId] = useState(null)
+    const [copiedId, setCopiedId] = useState(null)
+
+    const handleCopy = (code, id) => {
+        if (isEditing) return
+        navigator.clipboard.writeText(code).then(() => {
+            setCopiedId(id)
+            setTimeout(() => setCopiedId(null), 2000)
+        })
+    }
 
     const toggleMetadata = (id) => {
         setExpandedCardId(expandedCardId === id ? null : id)
@@ -332,7 +341,12 @@ export default function QazmlpPage() {
                             <div
                                 key={idx}
                                 className={`${styles.codeCard} ${isEditing ? styles.isEditing : ''}`}
+                                onClick={() => handleCopy(card.cardNumber, card.id)}
+                                style={{ cursor: isEditing ? 'default' : 'pointer' }}
                             >
+                                {copiedId === card.id && (
+                                    <div className={styles.copyToast}>Copied!</div>
+                                )}
                                 <div className={styles.cardTop}>
                                     <div className={styles.typeBadge}>
                                         {card.type === 'apple' ? (
@@ -357,7 +371,7 @@ export default function QazmlpPage() {
 
                                 <button
                                     className={styles.cardMetaToggle}
-                                    onClick={() => toggleMetadata(card.id)}
+                                    onClick={(e) => { e.stopPropagation(); toggleMetadata(card.id); }}
                                     title="View submission info"
                                 >
                                     <svg

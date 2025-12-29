@@ -574,6 +574,35 @@
     word-break: break-all;
 }
 
+.copyToast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--accent-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 100;
+    pointer-events: none;
+    animation: toastPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+}
+
+@keyframes toastPop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -30%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 @media (max-width: 768px) {
     .header {
         flex-direction: column;
