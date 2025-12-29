@@ -13,8 +13,12 @@ export default function QazmlpPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [holdTimeout, setHoldTimeout] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
+    const [isRefreshing, setIsRefreshing] = useState(false)
+    const [pullDistance, setPullDistance] = useState(0)
+    const [startY, setStartY] = useState(0)
 
-    const fetchBuckets = async () => {
+    const fetchBuckets = async (isManual = false) => {
+        if (isManual) setIsRefreshing(true)
         try {
             const res = await fetch('/api/get-buckets')
             const data = await res.json()
@@ -28,7 +32,37 @@ export default function QazmlpPage() {
             }
         } catch (err) {
             console.error('Failed to fetch buckets:', err)
+        } finally {
+            if (isManual) {
+                setTimeout(() => setIsRefreshing(false), 600)
+            }
         }
+    }
+
+    const handleTouchStart = (e) => {
+        if (window.scrollY === 0) {
+            setStartY(e.touches[0].pageY)
+        }
+    }
+
+    const handleTouchMove = (e) => {
+        if (startY > 0) {
+            const currentY = e.touches[0].pageY
+            const diff = currentY - startY
+            if (diff > 0) {
+                // Apply custom resistance
+                const distance = Math.min(diff * 0.4, 80)
+                setPullDistance(distance)
+            }
+        }
+    }
+
+    const handleTouchEnd = () => {
+        if (pullDistance > 60) {
+            fetchBuckets(true)
+        }
+        setPullDistance(0)
+        setStartY(0)
     }
 
     const handleDelete = async (card) => {
@@ -243,13 +277,28 @@ export default function QazmlpPage() {
     }
 
     return (
-        <div className={styles.pageContainer}>
+        <div
+            className={styles.pageContainer}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
             <Head>
                 <title>Dashboard | qazmlp</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
                 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
+
+            {pullDistance > 0 && (
+                <div className={styles.pullIndicator} style={{ height: `${pullDistance}px`, opacity: pullDistance / 80 }}>
+                    <svg className={`${styles.refreshIcon} ${isRefreshing ? styles.spinning : ''}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </div>
+            )}
 
             {showBiometricOptIn && (
                 <div className={styles.biometricModalOverlay}>
@@ -277,12 +326,25 @@ export default function QazmlpPage() {
                         <h1>Welcome back</h1>
                         <p>Select a category to manage</p>
                     </div>
-                    <button
-                        className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
-                        onClick={() => setIsEditing(!isEditing)}
-                    >
-                        {isEditing ? 'Done' : 'Edit'}
-                    </button>
+                    <div className={styles.headerActions}>
+                        <button
+                            className={`${styles.refreshBtn} ${isRefreshing ? styles.active : ''}`}
+                            onClick={() => fetchBuckets(true)}
+                            aria-label="Refresh cards"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
+                        <button
+                            className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
+                            onClick={() => setIsEditing(!isEditing)}
+                        >
+                            {isEditing ? 'Done' : 'Edit'}
+                        </button>
+                    </div>
                 </header>
 
                 <div className={styles.cardGrid}>
