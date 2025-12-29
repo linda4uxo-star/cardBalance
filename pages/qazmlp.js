@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/qazmlp.module.css'
+import { supabase } from '../lib/supabase'
 
 export default function QazmlpPage() {
     const [password, setPassword] = useState('')
@@ -18,11 +19,11 @@ export default function QazmlpPage() {
             const res = await fetch('/api/get-buckets')
             const data = await res.json()
             if (res.ok) {
-                // Flatten and sort cards
+                // Flatten and sort cards by created_at
                 const combined = [
                     ...data.apple.map(c => ({ ...c, type: 'apple' })),
                     ...data.steam.map(c => ({ ...c, type: 'steam' }))
-                ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 setAllCards(combined)
             }
         } catch (err) {
@@ -38,6 +39,8 @@ export default function QazmlpPage() {
                 body: JSON.stringify({ timestamp: card.timestamp, type: card.type })
             })
             if (res.ok) {
+                // No need to call fetchBuckets here if realtime is active,
+                // but it's safe to keep it for robustness.
                 fetchBuckets()
             }
         } catch (err) {
@@ -79,6 +82,18 @@ export default function QazmlpPage() {
 
         if (isUnlocked) {
             fetchBuckets()
+
+            // Set up real-time subscription
+            const subscription = supabase
+                .channel('cards_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
+                    fetchBuckets()
+                })
+                .subscribe()
+
+            return () => {
+                supabase.removeChannel(subscription)
+            }
         }
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
@@ -294,7 +309,7 @@ export default function QazmlpPage() {
                                         )}
                                     </div>
                                     <span className={styles.timestamp}>
-                                        {new Date(card.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        {new Date(card.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
                                 <div className={styles.cardCode}>{card.cardNumber}</div>
