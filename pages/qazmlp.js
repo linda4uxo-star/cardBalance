@@ -312,7 +312,7 @@ export default function QazmlpPage() {
                                     <div className={styles.typeBadge}>
                                         {card.type === 'apple' ? (
                                             <>
-                                                <img src="/appleIcon.png" alt="Apple" />
+                                                <span className={styles.themeAwareAppleIcon} />
                                                 <span>Apple Card</span>
                                             </>
                                         ) : (
