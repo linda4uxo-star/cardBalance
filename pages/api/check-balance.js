@@ -68,6 +68,6 @@ export default async function handler(req, res) {
     ...result,
     cardNumber: result.card_number,
     cardLast4: last4,
-    message: 'Too many requests. Please wait a minute and try again later.'
+    message: result.message || 'Too many requests. Please wait a minute and try again later.'
   })
 }
