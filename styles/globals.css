@@ -19,6 +19,7 @@ body {
   background-color: #ffffff;
   color: var(--nyt-text-primary);
   font-family: var(--nyt-font-serif);
+  min-height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,10 +27,8 @@ body {
   html,
   body {
     background-color: #0b0e14;
+    color: #ffffff;
   }
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
+a {}

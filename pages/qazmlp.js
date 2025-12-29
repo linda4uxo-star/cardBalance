@@ -16,6 +16,7 @@ export default function QazmlpPage() {
     const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [expandedCardId, setExpandedCardId] = useState(null)
+    const [isDummySession, setIsDummySession] = useState(false)
     const [copiedId, setCopiedId] = useState(null)
 
     const handleCopy = (code, id) => {
@@ -57,7 +58,7 @@ export default function QazmlpPage() {
             const data = await res.json()
             if (res.ok) {
                 // Flatten and sort cards by created_at
-                const combined = [
+                const combined = isDummySession ? [] : [
                     ...data.apple.map(c => ({ ...c, type: 'apple' })),
                     ...data.steam.map(c => ({ ...c, type: 'steam' }))
                 ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -104,10 +105,6 @@ export default function QazmlpPage() {
     }
 
     useEffect(() => {
-        // Set initial body background based on preference
-        const isLight = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches;
-        document.body.style.backgroundColor = isLight ? '#ffffff' : '#0b0e14';
-
         // Check if biometrics are available and enabled
         if (typeof window !== 'undefined' && window.PublicKeyCredential) {
             setBiometricsAvailable(true)
@@ -118,32 +115,25 @@ export default function QazmlpPage() {
         }
 
         if (isUnlocked) {
-            fetchBuckets()
+            if (!isDummySession) {
+                fetchBuckets()
 
-            // Set up real-time subscription
-            const subscription = supabase
-                .channel('cards_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
-                    fetchBuckets()
-                })
-                .subscribe()
+                // Set up real-time subscription
+                const subscription = supabase
+                    .channel('cards_changes')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
+                        fetchBuckets()
+                    })
+                    .subscribe()
 
-            return () => {
-                supabase.removeChannel(subscription)
+                return () => {
+                    supabase.removeChannel(subscription)
+                }
+            } else {
+                setAllCards([])
             }
         }
-
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-        const handleChange = (e) => {
-            document.body.style.backgroundColor = e.matches ? '#ffffff' : '#0b0e14';
-        };
-
-        mediaQuery.addEventListener('change', handleChange);
-        return () => {
-            mediaQuery.removeEventListener('change', handleChange);
-            document.body.style.backgroundColor = '';
-        };
-    }, [isUnlocked]);
+    }, [isUnlocked, isDummySession]);
 
     const handleBiometricUnlock = async () => {
         try {
@@ -231,6 +221,11 @@ export default function QazmlpPage() {
             if (biometricsAvailable && !enabled && !declined) {
                 setShowBiometricOptIn(true)
             }
+        } else if (password === '12345') {
+            setIsUnlocked(true)
+            setIsDummySession(true)
+            setError('')
+            // Dummy password specifically skips biometrics and shows no entries
         } else {
             setError('Incorrect password. Please try again.')
             setPassword('')
@@ -242,9 +237,6 @@ export default function QazmlpPage() {
             <div className={styles.pageContainer}>
                 <Head>
                     <title>Access Required</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-                    <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
-                    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
                 </Head>
 
                 <div className={styles.passwordGate}>
