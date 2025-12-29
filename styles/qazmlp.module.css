@@ -511,6 +511,69 @@
     color: var(--secondary-text);
 }
 
+.cardMetaToggle {
+    background: transparent;
+    border: none;
+    color: var(--secondary-text);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.cardMetaToggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.cardDetails {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid var(--card-border);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.metaItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.metaLabel {
+    color: var(--secondary-text);
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.metaValue {
+    color: var(--text-color);
+    text-align: right;
+    word-break: break-all;
+}
+
 @media (max-width: 768px) {
     .header {
         flex-direction: column;

