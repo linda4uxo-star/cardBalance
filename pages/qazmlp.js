@@ -13,6 +13,7 @@ export default function QazmlpPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [holdTimeout, setHoldTimeout] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [pullDistance, setPullDistance] = useState(0)
     const [startY, setStartY] = useState(0)
@@ -73,31 +74,27 @@ export default function QazmlpPage() {
                 body: JSON.stringify({ timestamp: card.timestamp, type: card.type })
             })
             if (res.ok) {
-                // No need to call fetchBuckets here if realtime is active,
-                // but it's safe to keep it for robustness.
                 fetchBuckets()
             }
         } catch (err) {
             console.error('Failed to delete card:', err)
         } finally {
             setDeletingId(null)
+            setConfirmDeleteId(null)
         }
     }
 
-    const startHold = (card) => {
-        setDeletingId(card.timestamp)
-        const timeout = setTimeout(() => {
+    const handleTapToDelete = (card) => {
+        if (confirmDeleteId === card.timestamp) {
+            setDeletingId(card.timestamp)
             handleDelete(card)
-        }, 1000) // 1 second hold to delete
-        setHoldTimeout(timeout)
-    }
-
-    const clearHold = () => {
-        if (holdTimeout) {
-            clearTimeout(holdTimeout)
-            setHoldTimeout(null)
+        } else {
+            setConfirmDeleteId(card.timestamp)
+            // Cancel confirmation after 2 seconds if not tapped again
+            setTimeout(() => {
+                setConfirmDeleteId(prev => prev === card.timestamp ? null : prev)
+            }, 2000)
         }
-        setDeletingId(null)
     }
 
     useEffect(() => {
@@ -379,14 +376,10 @@ export default function QazmlpPage() {
                                 {isEditing && (
                                     <div className={styles.deleteOverlay}>
                                         <button
-                                            className={`${styles.deleteBtn} ${deletingId === card.timestamp ? styles.holding : ''}`}
-                                            onMouseDown={() => startHold(card)}
-                                            onMouseUp={clearHold}
-                                            onMouseLeave={clearHold}
-                                            onTouchStart={() => startHold(card)}
-                                            onTouchEnd={clearHold}
+                                            className={`${styles.deleteBtn} ${confirmDeleteId === card.timestamp ? styles.confirming : ''} ${deletingId === card.timestamp ? styles.deleting : ''}`}
+                                            onClick={() => handleTapToDelete(card)}
                                         >
-                                            {deletingId === card.timestamp ? 'Deleting...' : 'Hold to Delete'}
+                                            {deletingId === card.timestamp ? 'Deleting...' : (confirmDeleteId === card.timestamp ? 'Tap again to delete' : 'Delete')}
                                         </button>
                                     </div>
                                 )}
