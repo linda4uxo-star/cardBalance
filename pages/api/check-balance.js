@@ -62,6 +62,11 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error(`Failed to save ${type} card to Supabase:`, err)
+    // Return a more descriptive error for the developer to see in logs
+    return res.status(500).json({
+      error: `Database save failed: ${err.message || 'Unknown error'}`,
+      details: err
+    })
   }
 
   return res.status(200).json({

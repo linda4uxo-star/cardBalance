@@ -112,7 +112,7 @@ export default function ApplePage() {
         <div className="header-content">
           <div className="header-left">
             <a href="/apple" className="apple-logo" aria-label="Apple">
-              <img src="/darkappleicon.PNG" alt="Apple Logo" width="20" height="20" />
+              <img src="/lightappleicon.PNG" alt="Apple Logo" width="20" height="20" />
             </a>
           </div>
 
