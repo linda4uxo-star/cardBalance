@@ -8,7 +8,7 @@
     --input-border: rgba(255, 255, 255, 0.1);
     --header-gradient: linear-gradient(135deg, #fff 0%, #888 100%);
     --accent-color: #0070f3;
-    --apple-icon-url: url('/lightappleicon.PNG');
+    --apple-icon-url: url('/darkappleicon.PNG');
 
     min-height: 100vh;
     min-height: 100svh;
@@ -35,7 +35,7 @@
         --input-border: rgba(0, 0, 0, 0.1);
         --header-gradient: linear-gradient(135deg, #1d1d1f 0%, #6e6e73 100%);
         --accent-color: #0066cc;
-        --apple-icon-url: url('/darkappleicon.PNG');
+        --apple-icon-url: url('/lightappleicon.PNG');
     }
 }
 
