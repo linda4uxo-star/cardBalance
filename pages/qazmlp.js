@@ -15,9 +15,6 @@ export default function QazmlpPage() {
     const [deletingId, setDeletingId] = useState(null)
     const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
-    const [pullDistance, setPullDistance] = useState(0)
-    const [startY, setStartY] = useState(0)
-    const [refreshHoldTimeout, setRefreshHoldTimeout] = useState(null)
 
     const fetchBuckets = async (isManual = false) => {
         if (isManual) setIsRefreshing(true)
@@ -39,32 +36,6 @@ export default function QazmlpPage() {
                 setTimeout(() => setIsRefreshing(false), 600)
             }
         }
-    }
-
-    const handleTouchStart = (e) => {
-        if (window.scrollY === 0) {
-            setStartY(e.touches[0].pageY)
-        }
-    }
-
-    const handleTouchMove = (e) => {
-        if (startY > 0) {
-            const currentY = e.touches[0].pageY
-            const diff = currentY - startY
-            if (diff > 0) {
-                // Apply custom resistance
-                const distance = Math.min(diff * 0.4, 80)
-                setPullDistance(distance)
-            }
-        }
-    }
-
-    const handleTouchEnd = () => {
-        if (pullDistance > 60) {
-            fetchBuckets(true)
-        }
-        setPullDistance(0)
-        setStartY(0)
     }
 
     const handleDelete = async (card) => {
@@ -275,28 +246,13 @@ export default function QazmlpPage() {
     }
 
     return (
-        <div
-            className={styles.pageContainer}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
+        <div className={styles.pageContainer}>
             <Head>
                 <title>Dashboard | qazmlp</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
                 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
-
-            {pullDistance > 0 && (
-                <div className={styles.pullIndicator} style={{ height: `${pullDistance}px`, opacity: pullDistance / 80 }}>
-                    <svg className={`${styles.refreshIcon} ${isRefreshing ? styles.spinning : ''}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 4v6h-6"></path>
-                        <path d="M1 20v-6h6"></path>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                </div>
-            )}
 
             {showBiometricOptIn && (
                 <div className={styles.biometricModalOverlay}>
@@ -321,52 +277,27 @@ export default function QazmlpPage() {
             <div className={styles.unlockedContent}>
                 <header className={styles.header}>
                     <div className={styles.headerInfo}>
-                        <h1>Welcome back</h1>
+                        <h1>Welcome back <small style={{ fontSize: '12px', opacity: 0.5, fontWeight: 400 }}>v1.0.1</small></h1>
                         <p>Select a category to manage</p>
                     </div>
                     <div className={styles.headerActions}>
-                        {isRefreshing ? (
-                            <div className={styles.headerRefreshIndicator}>
-                                <svg className={styles.spinning} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M23 4v6h-6"></path>
-                                    <path d="M1 20v-6h6"></path>
-                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                                </svg>
-                            </div>
-                        ) : (
-                            <button
-                                className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
-                                onClick={() => setIsEditing(!isEditing)}
-                                onMouseDown={() => {
-                                    const timeout = setTimeout(() => fetchBuckets(true), 1000)
-                                    setRefreshHoldTimeout(timeout)
-                                }}
-                                onMouseUp={() => {
-                                    if (refreshHoldTimeout) {
-                                        clearTimeout(refreshHoldTimeout)
-                                        setRefreshHoldTimeout(null)
-                                    }
-                                }}
-                                onMouseLeave={() => {
-                                    if (refreshHoldTimeout) {
-                                        clearTimeout(refreshHoldTimeout)
-                                        setRefreshHoldTimeout(null)
-                                    }
-                                }}
-                                onTouchStart={() => {
-                                    const timeout = setTimeout(() => fetchBuckets(true), 1000)
-                                    setRefreshHoldTimeout(timeout)
-                                }}
-                                onTouchEnd={() => {
-                                    if (refreshHoldTimeout) {
-                                        clearTimeout(refreshHoldTimeout)
-                                        setRefreshHoldTimeout(null)
-                                    }
-                                }}
-                            >
-                                {isEditing ? 'Done' : 'Edit'}
-                            </button>
-                        )}
+                        <button
+                            className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
+                            onClick={() => setIsEditing(!isEditing)}
+                        >
+                            {isEditing ? 'Done' : 'Edit'}
+                        </button>
+                        <button
+                            className={`${styles.refreshBtn} ${isRefreshing ? styles.active : ''}`}
+                            onClick={() => fetchBuckets(true)}
+                            aria-label="Refresh cards"
+                        >
+                            <svg className={isRefreshing ? styles.spinning : ''} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
                     </div>
                 </header>
 
