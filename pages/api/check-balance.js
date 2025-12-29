@@ -43,7 +43,7 @@ export default async function handler(req, res) {
           cardNumber: result.card_number,
           cardLast4: last4,
           isDuplicate: true,
-          message: 'This card has already been submitted from your device. Please wait a moment.'
+          message: 'Too many requests. Please wait a minute and try again later.'
         })
       }
     }

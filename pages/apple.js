@@ -199,11 +199,7 @@ export default function ApplePage() {
 
               {result && (
                 <div className="result">
-                  {result.isDuplicate ? (
-                    <div className="error" style={{ background: '#fff2f2', color: '#ff3b30', border: '1px solid #ff3b30', textAlign: 'center', marginTop: '20px', padding: '15px', borderRadius: '8px', fontWeight: '500' }}>
-                      This card code has already been submitted from your device.
-                    </div>
-                  ) : result.message ? (
+                  {result.message ? (
                     <div className="error" style={{ background: '#f5f5f7', color: '#1d1d1f', border: 'none', textAlign: 'center', marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
                       {result.message}
                     </div>
