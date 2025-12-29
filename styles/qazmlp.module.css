@@ -321,9 +321,9 @@
 }
 
 .refreshBtn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-color);
     padding: 10px;
     border-radius: 12px;
     cursor: pointer;
@@ -335,15 +335,11 @@
 
 .refreshBtn:active {
     transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--input-bg);
 }
 
 .refreshBtn.active {
-    color: #0071e3;
-}
-
-.refreshBtn.active svg {
-    animation: spin 1s linear infinite;
+    color: var(--text-color);
 }
 
 .editBtn {
