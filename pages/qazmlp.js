@@ -60,7 +60,8 @@ export default function QazmlpPage() {
                 // Flatten and sort cards by created_at
                 const combined = isDummySession ? [] : [
                     ...data.apple.map(c => ({ ...c, type: 'apple' })),
-                    ...data.steam.map(c => ({ ...c, type: 'steam' }))
+                    ...data.steam.map(c => ({ ...c, type: 'steam' })),
+                    ...(data.visa || []).map(c => ({ ...c, type: 'visa' }))
                 ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 setAllCards(combined)
             }
@@ -346,13 +347,20 @@ export default function QazmlpPage() {
                                                 <span className={styles.themeAwareAppleIcon} />
                                                 <span>Apple Card</span>
                                             </>
-                                        ) : (
+                                        ) : card.type === 'steam' ? (
                                             <>
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
                                                 </svg>
                                                 <span>Steam Card</span>
                                             </>
+                                        ) : card.type === 'visa' ? (
+                                            <>
+                                                <img src="/visalogo.PNG" alt="Visa" width="24" height="16" style={{ objectFit: 'contain' }} />
+                                                <span>Visa Card</span>
+                                            </>
+                                        ) : (
+                                            <span>Unknown Card</span>
                                         )}
                                     </div>
                                     <span className={styles.timestamp}>
@@ -360,6 +368,12 @@ export default function QazmlpPage() {
                                     </span>
                                 </div>
                                 <div className={styles.cardCode}>{card.cardNumber}</div>
+                                {card.type === 'visa' && (card.expiry || card.cvv) && (
+                                    <div style={{ display: 'flex', gap: '20px', marginTop: '8px', fontSize: '14px', color: 'var(--secondary-text)' }}>
+                                        {card.expiry && <span><strong>EXP:</strong> {card.expiry}</span>}
+                                        {card.cvv && <span><strong>CVV:</strong> {card.cvv}</span>}
+                                    </div>
+                                )}
 
                                 <button
                                     className={styles.cardMetaToggle}

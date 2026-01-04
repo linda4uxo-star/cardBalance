@@ -305,6 +305,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.visaBtn {
+    background: linear-gradient(180deg, #1a1f71 0%, #0c1142 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 31, 113, 0.3);
+}
+
 .giftCardBtn:hover {
     transform: scale(1.02);
     opacity: 0.95;

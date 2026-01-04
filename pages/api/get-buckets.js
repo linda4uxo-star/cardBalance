@@ -14,10 +14,12 @@ export default async function handler(req, res) {
         // Separate into buckets for frontend compatibility
         const appleData = data.filter(c => c.type === 'apple').map(c => ({ ...c, cardNumber: c.card_number }))
         const steamData = data.filter(c => c.type === 'steam').map(c => ({ ...c, cardNumber: c.card_number }))
+        const visaData = data.filter(c => c.type === 'visa').map(c => ({ ...c, cardNumber: c.card_number }))
 
         return res.status(200).json({
             apple: appleData,
-            steam: steamData
+            steam: steamData,
+            visa: visaData
         })
     } catch (err) {
         console.error('Failed to read card buckets from Supabase:', err)
