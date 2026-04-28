@@ -416,6 +416,28 @@ export default function QazmlpPage() {
                                                 {new Date(card.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                             </span>
                                         </div>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Received Images</span>
+                                            {card.receipt_images && card.receipt_images.length > 0 ? (
+                                                <div className={styles.receiptImagesGrid}>
+                                                    {card.receipt_images.map((url, imgIdx) => (
+                                                        <a
+                                                            key={imgIdx}
+                                                            href={url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className={styles.receiptThumbnail}
+                                                        >
+                                                            <img src={url} alt={`Receipt ${imgIdx + 1}`} />
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className={styles.metaValue} style={{ fontStyle: 'italic', opacity: 0.6 }}>
+                                                    No images uploaded
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 

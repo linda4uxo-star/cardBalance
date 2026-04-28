@@ -386,6 +386,125 @@
     margin-top: 10px;
 }
 
+/* Upload Step */
+.appleStyles :global(.upload-step) {
+    margin-top: 40px;
+    padding: 32px;
+    border-radius: var(--radius-md);
+    background: #f5f5f7;
+    text-align: center;
+    animation: appleSlideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.appleStyles :global(.upload-header) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.appleStyles :global(.upload-header svg) {
+    color: var(--accent);
+}
+
+.appleStyles :global(.upload-header h3) {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.appleStyles :global(.upload-subtitle) {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 24px 0;
+}
+
+.appleStyles :global(.image-preview-grid) {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.appleStyles :global(.preview-item) {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.appleStyles :global(.preview-item img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.appleStyles :global(.remove-btn) {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.appleStyles :global(.remove-btn:hover) {
+    background: rgba(255, 59, 48, 0.9);
+}
+
+.appleStyles :global(.add-image-btn) {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.appleStyles :global(.add-image-btn:hover) {
+    border-color: var(--accent);
+    background: rgba(0, 113, 227, 0.05);
+}
+
+.appleStyles :global(.add-image-btn span:first-of-type) {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+}
+
+.appleStyles :global(.add-image-btn .add-text) {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.appleStyles :global(.upload-actions) {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 /* Help Section */
 .appleStyles :global(.help-section) {
     margin-bottom: 80px;

