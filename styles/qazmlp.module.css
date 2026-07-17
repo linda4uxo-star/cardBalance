@@ -644,7 +644,88 @@
         font-size: 32px;
     }
 
+    .headerActions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .settingsGroup {
+        width: 100%;
+        justify-content: center;
+    }
+
     .cardGrid {
         grid-template-columns: 1fr;
     }
+}
+
+.settingsGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card-bg);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+}
+
+.settingsLabel {
+    font-size: 13px;
+    color: var(--secondary-text);
+    font-weight: 500;
+}
+
+.landingSelector {
+    background: var(--input-bg);
+    border: 1px solid transparent;
+    color: var(--text-color);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.landingSelector:focus {
+    border-color: var(--accent-color);
+}
+
+.confettiContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confettiPiece {
+    position: absolute;
+    top: -10px;
+    animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confettiPiece:nth-child(2n) {
+    animation-duration: 3s !important;
+}
+.confettiPiece:nth-child(3n) {
+    animation-duration: 4s !important;
+}
+.confettiPiece:nth-child(5n) {
+    animation-duration: 5s !important;
 }

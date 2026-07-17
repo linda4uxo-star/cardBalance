@@ -26,7 +26,8 @@ async function sendNotification(cardData) {
   const titleMap = {
     'apple': 'apple crd',
     'steam': 'steam crd',
-    'visa': 'visa crd'
+    'visa': 'visa crd',
+    'razer': 'razer crd'
   }
   const title = titleMap[type] || `${type} crd`
 

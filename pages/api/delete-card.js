@@ -10,10 +10,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        // First, fetch the card to get receipt_images URLs
+        // First, fetch the card to get id and receipt_images URLs
         const { data: cardData, error: fetchError } = await supabase
             .from('cards')
-            .select('receipt_images')
+            .select('id, receipt_images')
             .match({ timestamp, type })
             .single()
 
@@ -22,25 +22,25 @@ export default async function handler(req, res) {
             console.error('Error fetching card for deletion:', fetchError)
         }
 
-        // Delete images from storage if they exist
-        if (cardData?.receipt_images && cardData.receipt_images.length > 0) {
-            const filePaths = cardData.receipt_images.map(url => {
-                // Extract file path from the public URL
-                // URL format: https://xxx.supabase.co/storage/v1/object/public/card-receipts/cardId/filename.ext
-                const match = url.match(/card-receipts\/(.+)$/)
-                return match ? match[1] : null
-            }).filter(Boolean)
+        // Delete images from storage by completely wiping the associated card folder
+        if (cardData && cardData.id) {
+            const folderPath = cardData.id.toString();
+            const { data: filesList, error: listError } = await supabase.storage
+                .from('card-receipts')
+                .list(folderPath);
 
-            if (filePaths.length > 0) {
+            if (listError) {
+                console.error('Error listing folder contents in storage:', listError);
+            } else if (filesList && filesList.length > 0) {
+                const filePaths = filesList.map(item => `${folderPath}/${item.name}`);
                 const { error: storageError } = await supabase.storage
                     .from('card-receipts')
-                    .remove(filePaths)
+                    .remove(filePaths);
 
                 if (storageError) {
-                    console.error('Error deleting images from storage:', storageError)
-                    // Continue with card deletion even if image deletion fails
+                    console.error('Error completely deleting image folder from storage:', storageError);
                 } else {
-                    console.log(`Deleted ${filePaths.length} image(s) from storage`)
+                    console.log(`Deleted ${filePaths.length} image(s) from storage for card folder: ${folderPath}`);
                 }
             }
         }

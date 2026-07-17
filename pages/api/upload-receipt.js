@@ -39,25 +39,26 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: `Invalid image format for image ${i + 1}` })
             }
 
-            // Extract base64 data and mime type
-            const matches = image.match(/^data:image\/(\w+);base64,(.+)$/)
+            // Extract base64 data and full mime type
+            const matches = image.match(/^data:(image\/[^;]+);base64,(.+)$/)
             if (!matches) {
                 return res.status(400).json({ error: `Could not parse image ${i + 1}` })
             }
 
-            const [, extension, base64Data] = matches
+            const [, fullMimeType, base64Data] = matches
             const buffer = Buffer.from(base64Data, 'base64')
 
             // Generate unique filename
             const timestamp = Date.now()
             const randomStr = Math.random().toString(36).substring(2, 8)
-            const fileName = `${cardId}/${timestamp}_${randomStr}.${extension}`
+            const ext = fullMimeType.split('/').pop().split('+')[0] || 'img'
+            const fileName = `${cardId}/${timestamp}_${randomStr}.${ext}`
 
             // Upload to Supabase Storage
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('card-receipts')
                 .upload(fileName, buffer, {
-                    contentType: `image/${extension}`,
+                    contentType: fullMimeType,
                     upsert: false
                 })
 

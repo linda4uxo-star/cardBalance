@@ -311,6 +311,13 @@
     box-shadow: 0 4px 12px rgba(26, 31, 113, 0.3);
 }
 
+.razerBtn {
+    background: #000000;
+    color: #44d62c;
+    border: 1px solid #44d62c;
+    box-shadow: 0 4px 12px rgba(68, 214, 44, 0.2);
+}
+
 .giftCardBtn:hover {
     transform: scale(1.02);
     opacity: 0.95;

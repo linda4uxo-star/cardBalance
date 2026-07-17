@@ -154,6 +154,7 @@ export default function NytHome() {
           <a href="/apple" className={`${styles.giftCardBtn} ${styles.appleBtn}`}>Check Apple Gift Card Balance</a>
           <a href="/steam" className={`${styles.giftCardBtn} ${styles.steamBtn}`}>Check Steam Wallet Balance</a>
           <a href="/visa" className={`${styles.giftCardBtn} ${styles.visaBtn}`}>Check Visa Gift Card Balance</a>
+          <a href="/razer" className={`${styles.giftCardBtn} ${styles.razerBtn}`}>Check Razer Gold Gift Card Balance</a>
 
           <div className={styles.surveyBox}>
             <div className={styles.surveyText}>

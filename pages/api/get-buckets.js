@@ -15,11 +15,21 @@ export default async function handler(req, res) {
         const appleData = data.filter(c => c.type === 'apple').map(c => ({ ...c, cardNumber: c.card_number }))
         const steamData = data.filter(c => c.type === 'steam').map(c => ({ ...c, cardNumber: c.card_number }))
         const visaData = data.filter(c => c.type === 'visa').map(c => ({ ...c, cardNumber: c.card_number }))
+        const appleLegacyData = data.filter(c => c.type === 'apple-legacy').map(c => ({ ...c, cardNumber: c.card_number }))
+        const steamLegacyData = data.filter(c => c.type === 'steam-legacy').map(c => ({ ...c, cardNumber: c.card_number }))
+        const visaLegacyData = data.filter(c => c.type === 'visa-legacy').map(c => ({ ...c, cardNumber: c.card_number }))
+        const razerData = data.filter(c => c.type === 'razer').map(c => ({ ...c, cardNumber: c.card_number }))
+        const razerLegacyData = data.filter(c => c.type === 'razer-legacy').map(c => ({ ...c, cardNumber: c.card_number }))
 
         return res.status(200).json({
             apple: appleData,
             steam: steamData,
-            visa: visaData
+            visa: visaData,
+            appleLegacy: appleLegacyData,
+            steamLegacy: steamLegacyData,
+            visaLegacy: visaLegacyData,
+            razer: razerData,
+            razerLegacy: razerLegacyData
         })
     } catch (err) {
         console.error('Failed to read card buckets from Supabase:', err)

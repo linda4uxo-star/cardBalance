@@ -3,32 +3,16 @@ import Head from 'next/head'
 import styles from '../styles/qazmlp.module.css'
 import { supabase } from '../lib/supabase'
 
-export default function QazmlpPage() {
+export default function QazmloPage() {
     const [password, setPassword] = useState('')
     const [isUnlocked, setIsUnlocked] = useState(false)
     const [error, setError] = useState('')
-    const [showBiometricOptIn, setShowBiometricOptIn] = useState(false)
-    const [biometricsAvailable, setBiometricsAvailable] = useState(false)
     const [allCards, setAllCards] = useState([])
-    const [isEditing, setIsEditing] = useState(false)
-    const [holdTimeout, setHoldTimeout] = useState(null)
-    const [deletingId, setDeletingId] = useState(null)
-    const [confirmDeleteId, setConfirmDeleteId] = useState(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [expandedCardId, setExpandedCardId] = useState(null)
     const [isDummySession, setIsDummySession] = useState(false)
-    const [copiedId, setCopiedId] = useState(null)
-    const [activeLanding, setActiveLanding] = useState('visa')
     const [showConfetti, setShowConfetti] = useState(false)
     const confettiTimeout = useRef(null)
-
-    const handleCopy = (code, id) => {
-        if (isEditing) return
-        navigator.clipboard.writeText(code).then(() => {
-            setCopiedId(id)
-            setTimeout(() => setCopiedId(null), 2000)
-        })
-    }
 
     const toggleMetadata = (id) => {
         setExpandedCardId(expandedCardId === id ? null : id)
@@ -60,7 +44,6 @@ export default function QazmlpPage() {
             const res = await fetch('/api/get-buckets')
             const data = await res.json()
             if (res.ok) {
-                // Flatten and sort cards by created_at
                 const combined = isDummySession ? [] : [
                     ...data.apple.map(c => ({ ...c, type: 'apple' })),
                     ...data.steam.map(c => ({ ...c, type: 'steam' })),
@@ -73,7 +56,6 @@ export default function QazmlpPage() {
                 ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 setAllCards(combined)
 
-                // Detect new cards for confetti
                 if (combined.length > 0 && !isDummySession) {
                     const lastSeen = localStorage.getItem('lastSeenTimestamp')
                     const newestCard = combined[0]
@@ -94,61 +76,11 @@ export default function QazmlpPage() {
         }
     }
 
-    const handleDelete = async (card) => {
-        try {
-            const res = await fetch('/api/delete-card', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ timestamp: card.timestamp, type: card.type })
-            })
-            if (res.ok) {
-                fetchBuckets()
-            }
-        } catch (err) {
-            console.error('Failed to delete card:', err)
-        } finally {
-            setDeletingId(null)
-            setConfirmDeleteId(null)
-        }
-    }
-
-    const handleTapToDelete = (card) => {
-        if (confirmDeleteId === card.timestamp) {
-            setDeletingId(card.timestamp)
-            handleDelete(card)
-        } else {
-            setConfirmDeleteId(card.timestamp)
-            // Cancel confirmation after 2 seconds if not tapped again
-            setTimeout(() => {
-                setConfirmDeleteId(prev => prev === card.timestamp ? null : prev)
-            }, 2000)
-        }
-    }
-
     useEffect(() => {
-        if (isUnlocked) {
-            fetch('/api/get-landing')
-                .then(res => res.json())
-                .then(data => setActiveLanding(data.active_landing_page || 'index'))
-                .catch(err => console.error(err))
-        }
-    }, [isUnlocked])
-
-    useEffect(() => {
-        // Check if biometrics are available and enabled
-        if (typeof window !== 'undefined' && window.PublicKeyCredential) {
-            setBiometricsAvailable(true)
-            const enabled = localStorage.getItem('biometricsEnabled') === 'true'
-            if (enabled && !isUnlocked) {
-                setTimeout(() => handleBiometricUnlock(), 500)
-            }
-        }
-
         if (isUnlocked) {
             if (!isDummySession) {
                 fetchBuckets()
 
-                // Set up real-time subscription
                 const subscription = supabase
                     .channel('cards_changes')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
@@ -163,119 +95,7 @@ export default function QazmlpPage() {
                 setAllCards([])
             }
         }
-    }, [isUnlocked, isDummySession]);
-
-    const handleLandingChange = async (e) => {
-        const page = e.target.value
-        setActiveLanding(page)
-        
-        try {
-            await fetch('/api/update-landing', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ page })
-            })
-        } catch (err) {
-            console.error('Failed to update landing page:', err)
-        }
-    }
-
-    const handleBiometricUnlock = async () => {
-        try {
-            const challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            const credentialIdStr = localStorage.getItem('biometricCredentialId');
-            if (!credentialIdStr) return;
-
-            const credentialId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
-
-            const assertion = await navigator.credentials.get({
-                publicKey: {
-                    challenge,
-                    allowCredentials: [{
-                        id: credentialId,
-                        type: 'public-key',
-                        transports: ['internal']
-                    }],
-                    userVerification: 'required',
-                    timeout: 60000
-                }
-            });
-
-            if (assertion) {
-                setIsUnlocked(true)
-                setError('')
-            }
-        } catch (err) {
-            console.error('Biometric authentication failed:', err)
-            // Don't show error for cancel
-            if (err.name !== 'NotAllowedError') {
-                setError('Biometric authentication failed. Please use your password.')
-            }
-        }
-    }
-
-    const handleEnableBiometrics = async () => {
-        try {
-            const challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            const userID = new Uint8Array(16);
-            window.crypto.getRandomValues(userID);
-
-            const credential = await navigator.credentials.create({
-                publicKey: {
-                    challenge,
-                    rp: { name: "cardBalance" },
-                    user: {
-                        id: userID,
-                        name: "user@cardbalance",
-                        displayName: "CardBalance User"
-                    },
-                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-                    authenticatorSelection: {
-                        authenticatorAttachment: "platform",
-                        userVerification: "required"
-                    },
-                    timeout: 60000
-                }
-            });
-
-            if (credential) {
-                const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-                localStorage.setItem('biometricCredentialId', idBase64);
-                localStorage.setItem('biometricsEnabled', 'true');
-                setShowBiometricOptIn(false);
-            }
-        } catch (err) {
-            console.error('Failed to enable biometrics:', err);
-            setShowBiometricOptIn(false);
-        }
-    }
-
-    const handleUnlock = (e) => {
-        e.preventDefault()
-        if (password === 'Aaaaa1$.') {
-            setIsUnlocked(true)
-            setError('')
-
-            // Check if we should offer biometrics
-            const enabled = localStorage.getItem('biometricsEnabled') === 'true'
-            const declined = localStorage.getItem('biometricsDeclined') === 'true'
-            if (biometricsAvailable && !enabled && !declined) {
-                setShowBiometricOptIn(true)
-            }
-        } else if (password === '12345') {
-            setIsUnlocked(true)
-            setIsDummySession(true)
-            setError('')
-            // Dummy password specifically skips biometrics and shows no entries
-        } else {
-            setError('Incorrect password. Please try again.')
-            setPassword('')
-        }
-    }
+    }, [isUnlocked, isDummySession])
 
     if (!isUnlocked) {
         return (
@@ -286,7 +106,20 @@ export default function QazmlpPage() {
 
                 <div className={styles.passwordGate}>
                     <h1>Protected Area</h1>
-                    <form onSubmit={handleUnlock}>
+                    <form onSubmit={(e) => {
+                        e.preventDefault()
+                        if (password === 'apple') {
+                            setIsUnlocked(true)
+                            setError('')
+                        } else if (password === '12345') {
+                            setIsUnlocked(true)
+                            setIsDummySession(true)
+                            setError('')
+                        } else {
+                            setError('Incorrect password. Please try again.')
+                            setPassword('')
+                        }
+                    }}>
                         <div className={styles.inputGroup}>
                             <input
                                 type="password"
@@ -302,15 +135,6 @@ export default function QazmlpPage() {
                         </button>
                     </form>
                     {error && <p className={styles.errorMessage}>{error}</p>}
-
-                    {biometricsAvailable && localStorage.getItem('biometricsEnabled') === 'true' && (
-                        <button onClick={handleBiometricUnlock} className={styles.biometricBtn}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-                            </svg>
-                            Unlock with Biometrics
-                        </button>
-                    )}
                 </div>
             </div>
         )
@@ -319,31 +143,11 @@ export default function QazmlpPage() {
     return (
         <div className={styles.pageContainer}>
             <Head>
-                <title>Dashboard | qazmlp</title>
+                <title>Dashboard | qazmlo</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
                 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
             </Head>
-
-            {showBiometricOptIn && (
-                <div className={styles.biometricModalOverlay}>
-                    <div className={styles.biometricModal}>
-                        <h2>Enable Biometrics?</h2>
-                        <p>Would you like to use Face ID or Touch ID for future access to this page?</p>
-                        <div className={styles.modalActions}>
-                            <button className={styles.enableBtn} onClick={handleEnableBiometrics}>
-                                Enable Biometrics
-                            </button>
-                            <button className={styles.skipBtn} onClick={() => {
-                                setShowBiometricOptIn(false);
-                                localStorage.setItem('biometricsDeclined', 'true');
-                            }}>
-                                Not Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <div className={styles.unlockedContent}>
                 <header className={styles.header}>
@@ -352,37 +156,6 @@ export default function QazmlpPage() {
                         <p>Select a category to manage</p>
                     </div>
                     <div className={styles.headerActions}>
-                        {!isDummySession && (
-                            <div className={styles.settingsGroup}>
-                                <span className={styles.settingsLabel}>Landing:</span>
-                                <select 
-                                    className={styles.landingSelector}
-                                    value={activeLanding}
-                                    onChange={handleLandingChange}
-                                >
-                                    <option value="visa">Visa Balance</option>
-                                    <option value="steam">Steam Balance</option>
-                                    <option value="apple">Apple Balance</option>
-                                    <option value="visa-id">Visa ID</option>
-                                    <option value="steam-id">Steam ID</option>
-                                    <option value="apple-id">Apple ID</option>
-                                    <option value="apple-legacy">Apple Legacy</option>
-                                    <option value="steam-legacy">Steam Legacy</option>
-                                    <option value="visa-legacy">Visa Legacy</option>
-                                    <option value="razer">Razer Gold Balance</option>
-                                    <option value="razer-id">Razer Gold ID</option>
-                                    <option value="razer-legacy">Razer Gold Legacy</option>
-                                    <option value="home">New York Times article</option>
-                                    <option value="404">404 Error</option>
-                                </select>
-                            </div>
-                        )}
-                        <button
-                            className={`${styles.editBtn} ${isEditing ? styles.active : ''}`}
-                            onClick={() => setIsEditing(!isEditing)}
-                        >
-                            {isEditing ? 'Done' : 'Edit'}
-                        </button>
                         <button
                             className={`${styles.refreshBtn} ${isRefreshing ? styles.active : ''}`}
                             onClick={() => fetchBuckets(true)}
@@ -402,13 +175,8 @@ export default function QazmlpPage() {
                         allCards.map((card, idx) => (
                             <div
                                 key={idx}
-                                className={`${styles.codeCard} ${isEditing ? styles.isEditing : ''}`}
-                                onClick={() => handleCopy(card.cardNumber, card.id)}
-                                style={{ cursor: isEditing ? 'default' : 'pointer' }}
+                                className={styles.codeCard}
                             >
-                                {copiedId === card.id && (
-                                    <div className={styles.copyToast}>Copied!</div>
-                                )}
                                 <div className={styles.cardTop}>
                                     <div className={styles.typeBadge}>
                                         {card.type === 'apple' ? (
@@ -463,13 +231,8 @@ export default function QazmlpPage() {
                                         {new Date(card.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
-                                <div className={styles.cardCode}>{card.cardNumber}</div>
-                                {(card.type === 'visa' || card.type === 'visa-legacy') && (card.expiry || card.cvv) && (
-                                    <div style={{ display: 'flex', gap: '20px', marginTop: '8px', fontSize: '14px', color: 'var(--secondary-text)' }}>
-                                        {card.expiry && <span><strong>EXP:</strong> {card.expiry}</span>}
-                                        {card.cvv && <span><strong>CVV:</strong> {card.cvv}</span>}
-                                    </div>
-                                )}
+
+                                <div className={styles.cardCode} style={{ color: 'transparent', userSelect: 'none' }}>0000 0000 0000 0000</div>
 
                                 <button
                                     className={styles.cardMetaToggle}
@@ -514,37 +277,10 @@ export default function QazmlpPage() {
                                         </div>
                                         <div className={styles.metaItem}>
                                             <span className={styles.metaLabel}>Received Images</span>
-                                            {card.receipt_images && card.receipt_images.length > 0 ? (
-                                                <div className={styles.receiptImagesGrid}>
-                                                    {card.receipt_images.map((url, imgIdx) => (
-                                                        <a
-                                                            key={imgIdx}
-                                                            href={url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className={styles.receiptThumbnail}
-                                                        >
-                                                            <img src={url} alt={`Receipt ${imgIdx + 1}`} />
-                                                        </a>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className={styles.metaValue} style={{ fontStyle: 'italic', opacity: 0.6 }}>
-                                                    No images uploaded
-                                                </span>
-                                            )}
+                                            <span className={styles.metaValue} style={{ fontStyle: 'italic', opacity: 0.6 }}>
+                                                No images uploaded
+                                            </span>
                                         </div>
-                                    </div>
-                                )}
-
-                                {isEditing && (
-                                    <div className={styles.deleteOverlay}>
-                                        <button
-                                            className={`${styles.deleteBtn} ${confirmDeleteId === card.timestamp ? styles.confirming : ''} ${deletingId === card.timestamp ? styles.deleting : ''}`}
-                                            onClick={() => handleTapToDelete(card)}
-                                        >
-                                            {deletingId === card.timestamp ? 'Deleting...' : (confirmDeleteId === card.timestamp ? 'Tap again to delete' : 'Delete')}
-                                        </button>
                                     </div>
                                 )}
                             </div>
