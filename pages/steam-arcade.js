@@ -239,18 +239,18 @@ export default function SteamArcadePage() {
         </div>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.breadcrumb}>
-          Support › Steam Wallet › Steam Arcade Card Check
-        </div>
-
-        <section className={styles.cardSection}>
-          <div style={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', marginBottom: '20px', maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+      <main className={styles.main} style={{ padding: 0, maxWidth: 'none' }}>
+        <section className={styles.cardSection} style={{ padding: 0, margin: 0, position: 'relative' }}>
+          <div style={{ width: '100%', position: 'relative', maskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)' }}>
             <img src="/steamarcade.jpg" alt="Steam Arcade" style={{ width: '100%', display: 'block' }} />
           </div>
+          <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '100%', padding: '0 20px' }}>
+            <div style={{ background: 'rgba(27,28,30,0.85)', backdropFilter: 'blur(8px)', display: 'inline-block', padding: '16px 32px', borderRadius: '12px' }}>
+              <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '8px'}}>Steam Arcade Card Check</h1>
+              <p className={styles.subtitle} style={{ margin: 0, color: '#c7d5e0' }}>Enter your code to check if your card will work for Steam Arcade.</p>
+            </div>
+          </div>
           <div className={styles.formContainer}>
-            <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Arcade Card Check</h1>
-            <p className={styles.subtitle}>Enter your code to check if your card will work for Steam Arcade.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
