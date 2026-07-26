@@ -288,7 +288,7 @@ export default function RazerArcadePage() {
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'Verifying...' : 'Check ID'}
+                    {loading ? 'Verifying...' : 'Check Card'}
                   </button>
                 )}
               </form>

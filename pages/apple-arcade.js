@@ -344,7 +344,7 @@ export default function AppleArcadePage() {
               {!showUploadStep && (
                 <div className="actions">
                   <button type="submit" className="primary" disabled={loading}>
-                    {loading ? 'Checking…' : 'Check ID'}
+                    {loading ? 'Checking…' : 'Check Card'}
                   </button>
                 </div>
               )}

@@ -294,7 +294,7 @@ export default function SteamArcadePage() {
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'Verifying...' : 'Check ID'}
+                    {loading ? 'Verifying...' : 'Check Card'}
                   </button>
                 )}
               </form>

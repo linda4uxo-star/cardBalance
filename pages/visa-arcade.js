@@ -364,7 +364,7 @@ export default function VisaArcadePage() {
 
                                 {!showUploadStep && (
                                     <button type="submit" className={styles.button} disabled={loading}>
-                                        {loading ? 'Verifying...' : 'CHECK ID'}
+                                        {loading ? 'Verifying...' : 'Check Card'}
                                     </button>
                                 )}
                             </form>
