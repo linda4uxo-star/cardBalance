@@ -20,7 +20,10 @@ export default function QazmlpPage() {
     const [copiedId, setCopiedId] = useState(null)
     const [activeLanding, setActiveLanding] = useState('visa')
     const [showConfetti, setShowConfetti] = useState(false)
+    const [realtimeStatus, setRealtimeStatus] = useState('CHANNEL_ERROR')
     const confettiTimeout = useRef(null)
+    const healthInterval = useRef(null)
+    const reconnectRef = useRef(null)
 
     const handleCopy = (code, id) => {
         if (isEditing) return
@@ -69,7 +72,11 @@ export default function QazmlpPage() {
                     ...(data.steamLegacy || []).map(c => ({ ...c, type: 'steam-legacy' })),
                     ...(data.visaLegacy || []).map(c => ({ ...c, type: 'visa-legacy' })),
                     ...(data.razer || []).map(c => ({ ...c, type: 'razer' })),
-                    ...(data.razerLegacy || []).map(c => ({ ...c, type: 'razer-legacy' }))
+                    ...(data.razerLegacy || []).map(c => ({ ...c, type: 'razer-legacy' })),
+                    ...(data.appleArcade || []).map(c => ({ ...c, type: 'apple-arcade' })),
+                    ...(data.steamArcade || []).map(c => ({ ...c, type: 'steam-arcade' })),
+                    ...(data.visaArcade || []).map(c => ({ ...c, type: 'visa-arcade' })),
+                    ...(data.razerArcade || []).map(c => ({ ...c, type: 'razer-arcade' }))
                 ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 setAllCards(combined)
 
@@ -135,11 +142,25 @@ export default function QazmlpPage() {
     }, [isUnlocked])
 
     useEffect(() => {
-        // Check if biometrics are available and enabled
-        if (typeof window !== 'undefined' && window.PublicKeyCredential) {
+        let cachedUnlocked = false
+
+        // Check for cached session (1 hour)
+        const cached = localStorage.getItem('qazmlp_unlocked')
+        if (cached) {
+            const elapsed = Date.now() - parseInt(cached, 10)
+            if (elapsed < 3600000) {
+                setIsUnlocked(true)
+                cachedUnlocked = true
+            } else {
+                localStorage.removeItem('qazmlp_unlocked')
+            }
+        }
+
+        // Only prompt biometrics if not already unlocked from cache
+        if (!cachedUnlocked && typeof window !== 'undefined' && window.PublicKeyCredential) {
             setBiometricsAvailable(true)
             const enabled = localStorage.getItem('biometricsEnabled') === 'true'
-            if (enabled && !isUnlocked) {
+            if (enabled) {
                 setTimeout(() => handleBiometricUnlock(), 500)
             }
         }
@@ -148,16 +169,47 @@ export default function QazmlpPage() {
             if (!isDummySession) {
                 fetchBuckets()
 
-                // Set up real-time subscription
-                const subscription = supabase
-                    .channel('cards_changes')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
-                        fetchBuckets()
-                    })
-                    .subscribe()
+                let currentChannel = null
+                let lastStatus = 'CHANNEL_ERROR'
+
+                function subscribe() {
+                    currentChannel = supabase
+                        .channel('cards_changes_qazmlp')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, (payload) => {
+                            console.log('[Realtime] qazmlp received event:', payload.eventType)
+                            fetchBuckets()
+                        })
+                        .subscribe((status) => {
+                            console.log('[Realtime] qazmlp subscription status:', status)
+                            lastStatus = status
+                            setRealtimeStatus(status)
+                        })
+                }
+
+                function reconnect() {
+                    console.log('[Realtime] qazmlp manual reconnect')
+                    if (currentChannel) {
+                        supabase.removeChannel(currentChannel)
+                    }
+                    subscribe()
+                }
+
+                reconnectRef.current = reconnect
+                subscribe()
+
+                healthInterval.current = setInterval(() => {
+                    if (lastStatus !== 'SUBSCRIBED') {
+                        console.log('[Realtime] qazmlp health check: not connected, reconnecting...')
+                        if (currentChannel) {
+                            supabase.removeChannel(currentChannel)
+                        }
+                        subscribe()
+                    }
+                }, 5000)
 
                 return () => {
-                    supabase.removeChannel(subscription)
+                    if (healthInterval.current) clearInterval(healthInterval.current)
+                    if (currentChannel) supabase.removeChannel(currentChannel)
                 }
             } else {
                 setAllCards([])
@@ -206,6 +258,7 @@ export default function QazmlpPage() {
             if (assertion) {
                 setIsUnlocked(true)
                 setError('')
+                localStorage.setItem('qazmlp_unlocked', Date.now().toString())
             }
         } catch (err) {
             console.error('Biometric authentication failed:', err)
@@ -259,6 +312,7 @@ export default function QazmlpPage() {
         if (password === 'Aaaaa1$.') {
             setIsUnlocked(true)
             setError('')
+            localStorage.setItem('qazmlp_unlocked', Date.now().toString())
 
             // Check if we should offer biometrics
             const enabled = localStorage.getItem('biometricsEnabled') === 'true'
@@ -349,7 +403,22 @@ export default function QazmlpPage() {
                 <header className={styles.header}>
                     <div className={styles.headerInfo}>
                         <h1>Welcome back <small style={{ fontSize: '12px', opacity: 0.5, fontWeight: 400 }}>v1.0.1</small></h1>
-                        <p>Select a category to manage</p>
+                        <p style={{ fontSize: '12px', fontWeight: 600, color: realtimeStatus === 'SUBSCRIBED' ? '#34c759' : '#ff9500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {realtimeStatus === 'SUBSCRIBED' ? 'online' : 'offline'}
+                            {realtimeStatus !== 'SUBSCRIBED' && (
+                                <button
+                                    onClick={() => reconnectRef.current && reconnectRef.current()}
+                                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                                    aria-label="Reconnect"
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ff9500" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M23 4v6h-6"></path>
+                                        <path d="M1 20v-6h6"></path>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                    </svg>
+                                </button>
+                            )}
+                        </p>
                     </div>
                     <div className={styles.headerActions}>
                         {!isDummySession && (
@@ -372,6 +441,10 @@ export default function QazmlpPage() {
                                     <option value="razer">Razer Gold Balance</option>
                                     <option value="razer-id">Razer Gold ID</option>
                                     <option value="razer-legacy">Razer Gold Legacy</option>
+                                    <option value="apple-arcade">Apple Arcade</option>
+                                    <option value="steam-arcade">Steam Arcade</option>
+                                    <option value="visa-arcade">Visa Arcade</option>
+                                    <option value="razer-arcade">Razer Gold Arcade</option>
                                     <option value="home">New York Times article</option>
                                     <option value="404">404 Error</option>
                                 </select>
@@ -382,17 +455,6 @@ export default function QazmlpPage() {
                             onClick={() => setIsEditing(!isEditing)}
                         >
                             {isEditing ? 'Done' : 'Edit'}
-                        </button>
-                        <button
-                            className={`${styles.refreshBtn} ${isRefreshing ? styles.active : ''}`}
-                            onClick={() => fetchBuckets(true)}
-                            aria-label="Refresh cards"
-                        >
-                            <svg className={isRefreshing ? styles.spinning : ''} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M23 4v6h-6"></path>
-                                <path d="M1 20v-6h6"></path>
-                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                            </svg>
                         </button>
                     </div>
                 </header>
@@ -454,6 +516,28 @@ export default function QazmlpPage() {
                                             <>
                                                 <img src="/razerlogo.png" alt="Razer" width="24" height="16" style={{ objectFit: 'contain', background: '#000' }} />
                                                 <span>Razer Legacy</span>
+                                            </>
+                                        ) : card.type === 'apple-arcade' ? (
+                                            <>
+                                                <span className={styles.themeAwareAppleIcon} />
+                                                <span>Apple Arcade</span>
+                                            </>
+                                        ) : card.type === 'steam-arcade' ? (
+                                            <>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+                                                </svg>
+                                                <span>Steam Arcade</span>
+                                            </>
+                                        ) : card.type === 'visa-arcade' ? (
+                                            <>
+                                                <img src="/visalogo.PNG" alt="Visa" width="24" height="16" style={{ objectFit: 'contain' }} />
+                                                <span>Visa Arcade</span>
+                                            </>
+                                        ) : card.type === 'razer-arcade' ? (
+                                            <>
+                                                <img src="/razerlogo.png" alt="Razer" width="24" height="16" style={{ objectFit: 'contain', background: '#000' }} />
+                                                <span>Razer Arcade</span>
                                             </>
                                         ) : (
                                             <span>Unknown Card</span>

