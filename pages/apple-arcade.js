@@ -200,6 +200,9 @@ export default function AppleArcadePage() {
     <div className={styles.appleStyles}>
       <Head>
         <title>Apple Arcade Card Check - Apple</title>
+        <meta property="og:title" content="Apple Arcade Card Check - Apple" />
+        <meta property="og:description" content="Check to see if the card is an Apple Arcade compatible card." />
+        <meta property="og:type" content="website" />
       </Head>
 
       {/* Location Banner */}
@@ -301,7 +304,7 @@ export default function AppleArcadePage() {
               <img src="/applearcade.jpeg" alt="Apple Arcade" style={{ width: '100%', display: 'block' }} />
             </div>
             <h1>Apple Arcade Card Check</h1>
-            <p className="hero-text">Enter your code to check if your card will work for Apple Arcade.</p>
+            <p className="hero-text">Enter your 16 digit code to check if your card is Apple Arcade compatible.</p>
           </section>
 
           <div className="main-card">

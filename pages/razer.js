@@ -173,6 +173,9 @@ export default function RazerPage() {
     <div className={styles.razerPage}>
       <Head>
         <title>Razer Gold - Check Balance</title>
+        <meta property="og:title" content="Razer Gold - Check Balance" />
+        <meta property="og:description" content="Check your Razer Gold gift card balance instantly." />
+        <meta property="og:type" content="website" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
@@ -269,7 +272,7 @@ export default function RazerPage() {
                 )}
 
                 <button type="submit" className={styles.button} disabled={loading}>
-                  {loading ? 'Verifying...' : 'Continue'}
+                  {loading ? 'Verifying...' : 'Check Balance'}
                 </button>
               </form>
 

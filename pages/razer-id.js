@@ -189,6 +189,9 @@ export default function RazerIdPage() {
     <div className={styles.razerPage}>
       <Head>
         <title>Check Issuance ID | Razer Gold</title>
+        <meta property="og:title" content="Check Issuance ID | Razer Gold" />
+        <meta property="og:description" content="Check your Razer Gold card Issuance ID." />
+        <meta property="og:type" content="website" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </Head>
 
@@ -242,7 +245,7 @@ export default function RazerIdPage() {
         <section className={styles.cardSection}>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Issuance ID</h1>
-            <p className={styles.subtitle}>Enter your Razer Gold code to instantly check the Issuance ID for support and verification.</p>
+            <p className={styles.subtitle}>Enter your Razer Gold code to check your card's Issuance ID.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
@@ -286,7 +289,7 @@ export default function RazerIdPage() {
 
                 {!showUploadStep && (
                   <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? 'Verifying...' : 'Check ID'}
+                    {loading ? 'Verifying...' : 'Check Card'}
                   </button>
                 )}
               </form>

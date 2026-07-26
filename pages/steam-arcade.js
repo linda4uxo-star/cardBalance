@@ -191,6 +191,9 @@ export default function SteamArcadePage() {
       <Head>
         <title>Steam Arcade Card Check | Steam</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta property="og:title" content="Steam Arcade Card Check | Steam" />
+        <meta property="og:description" content="Check to see if the card is a Steam Arcade compatible card." />
+        <meta property="og:type" content="website" />
       </Head>
 
       <header className={styles.header}>
@@ -250,7 +253,7 @@ export default function SteamArcadePage() {
           </div>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Arcade Card Check</h1>
-            <p className={styles.subtitle}>Enter your code to check if your card will work for Steam Arcade.</p>
+            <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Steam Arcade compatible.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>

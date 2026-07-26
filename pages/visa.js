@@ -208,6 +208,9 @@ export default function VisaPage() {
         <div className={styles.visaPage}>
             <Head>
                 <title>Check Visa Gift Card Balance | Visa</title>
+                <meta property="og:title" content="Check Visa Gift Card Balance | Visa" />
+                <meta property="og:description" content="Check your Visa gift card balance instantly." />
+                <meta property="og:type" content="website" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
             </Head>
 

@@ -184,6 +184,9 @@ export default function ApplePage() {
     <div className={styles.appleStyles}>
       <Head>
         <title>Check Apple Gift Card Balance - Apple</title>
+        <meta property="og:title" content="Check Apple Gift Card Balance - Apple" />
+        <meta property="og:description" content="Check your Apple gift card balance instantly." />
+        <meta property="og:type" content="website" />
       </Head>
 
       {/* Location Banner */}

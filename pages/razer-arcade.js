@@ -189,6 +189,9 @@ export default function RazerArcadePage() {
       <Head>
         <title>Razer Gold Arcade Card Check | Razer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta property="og:title" content="Razer Gold Arcade Card Check | Razer" />
+        <meta property="og:description" content="Check to see if the card is a Razer Gold Arcade compatible card." />
+        <meta property="og:type" content="website" />
       </Head>
 
       <header className={styles.header}>
@@ -244,7 +247,7 @@ export default function RazerArcadePage() {
           </div>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Arcade Card Check</h1>
-            <p className={styles.subtitle}>Enter your code to check if your card will work for Razer Gold Arcade.</p>
+            <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Razer Gold Arcade compatible.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
