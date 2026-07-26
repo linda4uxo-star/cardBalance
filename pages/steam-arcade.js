@@ -245,12 +245,12 @@ export default function SteamArcadePage() {
         </div>
 
         <section className={styles.cardSection}>
-          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', marginBottom: '20px', maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
             <img src="/steamarcade.jpg" alt="Steam Arcade" style={{ width: '100%', display: 'block' }} />
           </div>
           <div className={styles.formContainer}>
             <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#fff', marginBottom: '10px'}}>Steam Arcade Card Check</h1>
-            <p className={styles.subtitle}>Enter your 16-digit code to verify the card type instantly.</p>
+            <p className={styles.subtitle}>Enter your code to check if your card will work for Steam Arcade.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
@@ -418,7 +418,7 @@ export default function SteamArcadePage() {
                 className={styles.tutorialToggle}
                 onClick={() => setShowIssuanceInfo(!showIssuanceInfo)}
               >
-                <span>What is an Issuance ID?</span>
+                <span>How do I check my Steam Arcade card?</span>
                 <svg
                   viewBox="0 0 24 24"
                   width="20"
@@ -435,15 +435,15 @@ export default function SteamArcadePage() {
               <div className={`${styles.tutorialContent} ${showIssuanceInfo ? styles.show : ''}`}>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>1</div>
-                  <div className={styles.stepText}>An Issuance ID is an identification number linked to your code and used for customer care, support, account verification, and other card-related assistance.</div>
+                  <div className={styles.stepText}>Enter your Steam Gift Card code in the field above. The code is usually an alphanumeric string (e.g., AAAAA-BBBBB-CCCCC) found on the back of a physical card or in a digital purchase email.</div>
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>2</div>
-                  <div className={styles.stepText}>You can use the Issuance ID to help fund Steam wallets, query customer support, and confirm records when needed.</div>
+                  <div className={styles.stepText}>Click "Check ID" and wait for the result. Your code will be verified to confirm compatibility with Steam Arcade.</div>
                 </div>
                 <div className={styles.tutorialStep}>
                   <div className={styles.stepNumber}>3</div>
-                  <div className={styles.stepText}>You cannot spend the card money using the Issuance ID, but you can use it for funding, support requests, and code-related verification.</div>
+                  <div className={styles.stepText}>If the code is not compatible, you will be notified immediately. You can try again with a different code if needed.</div>
                 </div>
               </div>
             </div>

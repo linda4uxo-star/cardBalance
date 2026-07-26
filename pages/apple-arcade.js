@@ -297,11 +297,11 @@ export default function AppleArcadePage() {
       <main className="page-root">
         <div className="shell">
           <section className="hero">
-            <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
+            <div style={{ width: '100vw', position: 'relative', left: '50%', transform: 'translateX(-50%)', marginBottom: '20px', maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
               <img src="/applearcade.jpeg" alt="Apple Arcade" style={{ width: '100%', display: 'block' }} />
             </div>
             <h1>Apple Arcade Card Check</h1>
-            <p className="hero-text">Enter your 16-digit code to verify the card type instantly.</p>
+            <p className="hero-text">Enter your code to check if your card will work for Apple Arcade.</p>
           </section>
 
           <div className="main-card">
@@ -480,11 +480,11 @@ export default function AppleArcadePage() {
             )}
             
             <div className="help-header" onClick={() => setShowIssuanceInfo(!showIssuanceInfo)} style={{ borderTop: '1px solid #d2d2d7', paddingTop: '20px', marginTop: '20px' }}>
-              <h2>What is an Issuance ID?</h2>
+              <h2>How do I check my Apple Arcade card?</h2>
               <button
                 className="toggle-btn"
                 aria-expanded={showIssuanceInfo}
-                aria-label="Toggle Issuance Info"
+                aria-label="Toggle Tutorial"
               >
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showIssuanceInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}>
                   <polyline points="6 9 12 15 18 9" />
@@ -497,15 +497,15 @@ export default function AppleArcadePage() {
                 <div style={{ background: '#f5f5f7', padding: '20px', borderRadius: '12px' }}>
                   <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                     <div style={{ width: '24px', height: '24px', background: '#0071e3', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 'bold', fontSize: '12px' }}>1</div>
-                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>An Issuance ID is an identification number linked to your code and used for customer care, support, account verification, and other card-related assistance.</p>
+                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>Enter your Apple Gift Card code in the field above. The code is usually 16 digits and can be found on the back of a physical card or in a digital email.</p>
                   </div>
                   <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                     <div style={{ width: '24px', height: '24px', background: '#0071e3', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 'bold', fontSize: '12px' }}>2</div>
-                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>You can use the Issuance ID to help fund Apple wallets, query customer support, and confirm records when needed.</p>
+                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>Click "Check ID" and wait for the result. Your card will be verified against our database to confirm its compatibility with Apple Arcade.</p>
                   </div>
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <div style={{ width: '24px', height: '24px', background: '#0071e3', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 'bold', fontSize: '12px' }}>3</div>
-                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>You cannot spend the card money using the Issuance ID, but you can use it for funding, support requests, and code-related verification.</p>
+                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>If the card is not compatible, you will be notified immediately. You can try again with a different code if needed.</p>
                   </div>
                 </div>
               </div>
