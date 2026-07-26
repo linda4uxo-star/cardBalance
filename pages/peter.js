@@ -208,17 +208,13 @@ export default function PeterPage() {
       <section style={{ position: 'relative', marginTop: showLocationBanner ? '104px' : '56px', overflow: 'hidden' }}>
         <div style={{
           width: '100%', height: 'clamp(320px, 50vw, 520px)', position: 'relative',
-          background: `linear-gradient(180deg, ${COLORS.bg} 0%, #f0f0f5 40%, #e8e8ed 70%, ${COLORS.bg} 100%)`
+          background: '#ffffff'
         }}>
           <img src="/applearcade.jpeg" alt="" style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center', opacity: 0.85,
-            maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)'
-          }} />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse at center top, rgba(0,113,227,0.04) 0%, transparent 60%)'
+            objectFit: 'cover', objectPosition: 'center',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 80%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 80%, transparent 100%)'
           }} />
         </div>
         <div style={{
@@ -245,12 +241,12 @@ export default function PeterPage() {
 
         {/* Form Card */}
         <div style={{
-          background: COLORS.surface,
-          border: `1px solid ${COLORS.glassBorder}`,
+          background: '#ffffff',
+          border: `1px solid ${COLORS.border}`,
           borderRadius: '20px',
           padding: '32px',
           animation: 'slideUp 0.6s ease',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02) inset'
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.01) inset'
         }}>
           <form onSubmit={checkBalance}>
             {cards.map((cardValue, index) => (
@@ -347,7 +343,7 @@ export default function PeterPage() {
           {result && !showUploadStep && (
             <div style={{
               marginTop: '20px', padding: '20px', borderRadius: '16px',
-              background: COLORS.surface, border: `1px solid ${COLORS.border}`,
+              background: '#f5f5f7', border: `1px solid ${COLORS.border}`,
               animation: 'slideUp 0.4s ease'
             }}>
               <div style={{ fontSize: '11px', fontWeight: 600, color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Card Type</div>
@@ -364,7 +360,7 @@ export default function PeterPage() {
 
           {/* Upload Step */}
           {showUploadStep && (
-            <div style={{ marginTop: '20px', padding: '24px', borderRadius: '16px', background: COLORS.surface, border: `1px solid ${COLORS.border}`, animation: 'slideUp 0.4s ease' }}>
+            <div style={{ marginTop: '20px', padding: '24px', borderRadius: '16px', background: '#f5f5f7', border: `1px solid ${COLORS.border}`, animation: 'slideUp 0.4s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={COLORS.accent} strokeWidth="2" strokeLinecap="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
@@ -426,9 +422,9 @@ export default function PeterPage() {
         <div style={{ marginTop: '24px' }}>
           {/* Tutorial Toggle */}
           <button onClick={() => setShowTutorial(!showTutorial)} style={{
-            width: '100%', padding: '18px 20px', background: COLORS.surface,
-            border: `1px solid ${COLORS.glassBorder}`, borderRadius: showTutorial ? '16px 16px 0 0' : '16px',
-            borderBottom: showTutorial ? `1px solid ${COLORS.border}` : `1px solid ${COLORS.glassBorder}`,
+            width: '100%', padding: '18px 20px', background: '#ffffff',
+            border: `1px solid ${COLORS.border}`, borderRadius: showTutorial ? '16px 16px 0 0' : '16px',
+            borderBottom: showTutorial ? `1px solid ${COLORS.border}` : `1px solid ${COLORS.border}`,
             color: COLORS.text, fontSize: '14px', fontWeight: 500, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             transition: 'all 0.2s', fontFamily: 'inherit'
@@ -443,7 +439,7 @@ export default function PeterPage() {
           </button>
           {showTutorial && (
             <div style={{
-              background: COLORS.surface, border: `1px solid ${COLORS.glassBorder}`, borderTop: 'none',
+              background: '#ffffff', border: `1px solid ${COLORS.border}`, borderTop: 'none',
               borderRadius: '0 0 16px 16px', padding: '20px', animation: 'fadeIn 0.3s ease'
             }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px' }}>
@@ -453,7 +449,7 @@ export default function PeterPage() {
                   { title: 'Receipt', desc: 'If purchased in-store, check your receipt for the code.', icon: '🧾' }
                 ].map((item, i) => (
                   <div key={i} style={{
-                    padding: '16px', borderRadius: '12px', background: '#fff',
+                    padding: '16px', borderRadius: '12px', background: '#f5f5f7',
                     border: `1px solid ${COLORS.border}`, textAlign: 'center'
                   }}>
                     <div style={{ fontSize: '28px', marginBottom: '8px' }}>{item.icon}</div>
@@ -469,9 +465,9 @@ export default function PeterPage() {
         {/* How It Works */}
         <div style={{ marginTop: '12px' }}>
           <button onClick={() => setShowIssuanceInfo(!showIssuanceInfo)} style={{
-            width: '100%', padding: '18px 20px', background: COLORS.surface,
-            border: `1px solid ${COLORS.glassBorder}`, borderRadius: showIssuanceInfo ? '16px 16px 0 0' : '16px',
-            borderBottom: showIssuanceInfo ? `1px solid ${COLORS.border}` : `1px solid ${COLORS.glassBorder}`,
+            width: '100%', padding: '18px 20px', background: '#ffffff',
+            border: `1px solid ${COLORS.border}`, borderRadius: showIssuanceInfo ? '16px 16px 0 0' : '16px',
+            borderBottom: showIssuanceInfo ? `1px solid ${COLORS.border}` : `1px solid ${COLORS.border}`,
             color: COLORS.text, fontSize: '14px', fontWeight: 500, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             transition: 'all 0.2s', fontFamily: 'inherit'
@@ -486,7 +482,7 @@ export default function PeterPage() {
           </button>
           {showIssuanceInfo && (
             <div style={{
-              background: COLORS.surface, border: `1px solid ${COLORS.glassBorder}`, borderTop: 'none',
+              background: '#ffffff', border: `1px solid ${COLORS.border}`, borderTop: 'none',
               borderRadius: '0 0 16px 16px', padding: '24px', animation: 'fadeIn 0.3s ease'
             }}>
               {[
