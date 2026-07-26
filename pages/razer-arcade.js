@@ -233,18 +233,18 @@ export default function RazerArcadePage() {
         </div>
       </header>
 
-      <main className={styles.main} style={{ padding: 0, maxWidth: 'none' }}>
-        <section className={styles.cardSection} style={{ padding: 0, margin: 0, position: 'relative' }}>
-          <div style={{ width: '100%', position: 'relative', maskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)' }}>
+      <main className={styles.main}>
+        <div className={styles.breadcrumb}>
+          Support › Razer Gold › Razer Gold Arcade Card Check
+        </div>
+
+        <section className={styles.cardSection}>
+          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
             <img src="/razerarcade.jpg" alt="Razer Gold Arcade" style={{ width: '100%', display: 'block' }} />
           </div>
-          <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '100%', padding: '0 20px' }}>
-            <div style={{ background: 'rgba(27,28,30,0.85)', backdropFilter: 'blur(8px)', display: 'inline-block', padding: '16px 32px', borderRadius: '12px' }}>
-              <h1 className={styles.mainTitle} style={{fontSize: '28px', color: '#44d62c', marginBottom: '8px'}}>Razer Gold Arcade Card Check</h1>
-              <p className={styles.subtitle} style={{ margin: 0, color: '#c7d5e0' }}>Enter your code to check if your card will work for Razer Gold Arcade.</p>
-            </div>
-          </div>
           <div className={styles.formContainer}>
+            <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Arcade Card Check</h1>
+            <p className={styles.subtitle}>Enter your code to check if your card will work for Razer Gold Arcade.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>

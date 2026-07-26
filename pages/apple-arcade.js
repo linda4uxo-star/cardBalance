@@ -294,18 +294,14 @@ export default function AppleArcadePage() {
         </nav>
       </aside>
 
-      <main className="page-root" style={{ paddingTop: 0 }}>
-        <div className="shell" style={{ padding: 0, maxWidth: 'none' }}>
-          <section className="hero" style={{ position: 'relative', margin: 0, padding: 0, marginBottom: 0 }}>
-            <div style={{ width: '100%', position: 'relative', maskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)' }}>
+      <main className="page-root">
+        <div className="shell">
+          <section className="hero">
+            <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
               <img src="/applearcade.jpeg" alt="Apple Arcade" style={{ width: '100%', display: 'block' }} />
             </div>
-            <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '100%', padding: '0 20px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)', display: 'inline-block', padding: '16px 32px', borderRadius: '12px' }}>
-                <h1 style={{ margin: '0 0 8px' }}>Apple Arcade Card Check</h1>
-                <p className="hero-text" style={{ margin: 0 }}>Enter your code to check if your card will work for Apple Arcade.</p>
-              </div>
-            </div>
+            <h1>Apple Arcade Card Check</h1>
+            <p className="hero-text">Enter your code to check if your card will work for Apple Arcade.</p>
           </section>
 
           <div className="main-card">

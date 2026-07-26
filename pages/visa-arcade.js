@@ -265,18 +265,17 @@ export default function VisaArcadePage() {
                 </div>
             </header>
 
-            <main className={styles.main} style={{ padding: 0, maxWidth: 'none' }}>
-                <section className={styles.cardSection} style={{ padding: 0, margin: 0, position: 'relative' }}>
-                    <div style={{ width: '100%', position: 'relative', maskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 6%, black 88%, transparent)' }}>
+            <main className={styles.main}>
+                <div className={styles.breadcrumb}>
+                    Support › cards › Visa Arcade Card Check
+                </div>
+
+                <section className={styles.cardSection}>
+                    <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
                         <img src="/visaarcade.jpg" alt="Visa Arcade" style={{ width: '100%', display: 'block' }} />
                     </div>
-                    <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '100%', padding: '0 20px' }}>
-                        <div style={{ background: 'rgba(26,31,113,0.85)', backdropFilter: 'blur(8px)', display: 'inline-block', padding: '16px 32px', borderRadius: '12px' }}>
-                            <h1 className={styles.mainTitle} style={{ fontSize: '28px', color: '#fff', marginBottom: '8px' }}>Visa Arcade Card Check</h1>
-                            <p className={styles.subtitle} style={{ margin: 0, color: '#c7d5e0' }}>Enter your code to check if your card will work for Visa Arcade.</p>
-                        </div>
-                    </div>
                     <div className={styles.formContainer}>
+                        <p className={styles.subtitle}>Enter your code to check if your card will work for Visa Arcade.</p>
 
                         <div className={styles.card}>
                             <form onSubmit={checkBalance}>
