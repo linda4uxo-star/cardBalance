@@ -303,8 +303,7 @@ export default function AppleArcadePage() {
             <div style={{ width: '100%', margin: '0 auto' }}>
               <img src="/applearcade.png" alt="Apple Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)' }} />
             </div>
-            <h1 style={{ marginTop: 0, marginBottom: '8px' }}>Apple Arcade Card Check</h1>
-            <p className="hero-text">Enter your 16 digit code to check if your card is Apple Arcade compatible.</p>
+            <p className="hero-text" style={{ marginTop: 0 }}>Enter your 16 digit code to check if your card is Apple Arcade compatible.</p>
           </section>
 
           <div className="main-card">
