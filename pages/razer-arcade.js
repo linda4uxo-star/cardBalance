@@ -185,7 +185,7 @@ export default function RazerArcadePage() {
   }
 
   return (
-    <div className={styles.razerPage}>
+    <div className={styles.razerPage} style={{ background: '#f6f6fb' }}>
       <Head>
         <title>Razer Gold Arcade Card Check | Razer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
