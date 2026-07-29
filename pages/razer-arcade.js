@@ -236,18 +236,13 @@ export default function RazerArcadePage() {
         </div>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.breadcrumb}>
-          Support › Razer Gold › Razer Gold Arcade Card Check
-        </div>
-
+      <main className={styles.main} style={{ padding: '0 24px', background: '#f6f6fb', minHeight: '100vh' }}>
         <section className={styles.cardSection}>
-          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto 20px', borderRadius: '12px', overflow: 'hidden' }}>
-            <img src="/razerarcade.jpg" alt="Razer Gold Arcade" style={{ width: '100%', display: 'block' }} />
+          <div style={{ width: '100%', margin: '0 auto' }}>
+            <img src="/razerarcade.png" alt="Razer Gold Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)' }} />
           </div>
           <div className={styles.formContainer}>
-            <h1 className={styles.mainTitle} style={{fontSize: '28px', marginBottom: '10px'}}>Razer Gold Arcade Card Check</h1>
-            <p className={styles.subtitle}>Enter your 16 digit code to check if your card is Razer Gold Arcade compatible.</p>
+            <p className={styles.subtitle} style={{ marginTop: 0, marginBottom: '40px' }}>Enter your 16 digit code to check if your card is Razer Gold Arcade compatible.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
