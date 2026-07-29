@@ -245,10 +245,10 @@ export default function SteamArcadePage() {
       <main className={styles.main} style={{ padding: '0 24px', minHeight: '100vh' }}>
         <section className={styles.cardSection}>
           <div style={{ width: '100%', margin: '0 auto' }}>
-            <img src="/steamarcade.png" alt="Steam Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)' }} />
+            <img src="/steamarcade.png" alt="Steam Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 100%)' }} />
           </div>
           <div className={styles.formContainer}>
-            <p className={styles.subtitle} style={{ marginTop: 0, marginBottom: '40px' }}>Enter your 16 digit code to check if your card is Steam Arcade compatible.</p>
+            <p className={styles.subtitle} style={{ marginTop: '40px', marginBottom: '40px' }}>Enter your 16 digit code to check if your card is Steam Arcade compatible.</p>
 
             <div className={styles.card}>
               <form onSubmit={checkBalance}>
