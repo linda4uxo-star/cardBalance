@@ -185,7 +185,7 @@ export default function RazerArcadePage() {
   }
 
   return (
-    <div className={styles.razerPage} style={{ background: '#f6f6fb' }}>
+    <div className={styles.razerPage}>
       <Head>
         <title>Razer Gold Arcade Card Check | Razer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
@@ -236,7 +236,7 @@ export default function RazerArcadePage() {
         </div>
       </header>
 
-      <main className={styles.main} style={{ padding: '0 24px', background: '#f6f6fb', minHeight: '100vh' }}>
+      <main className={styles.main} style={{ padding: '0 24px', minHeight: '100vh' }}>
         <section className={styles.cardSection}>
           <div style={{ width: '100%', margin: '0 auto' }}>
             <img src="/razerarcade.png" alt="Razer Gold Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)' }} />

@@ -242,7 +242,7 @@ export default function SteamArcadePage() {
         </div>
       </header>
 
-      <main className={styles.main} style={{ padding: '0 24px', background: '#f6f6fb', minHeight: '100vh' }}>
+      <main className={styles.main} style={{ padding: '0 24px', minHeight: '100vh' }}>
         <section className={styles.cardSection}>
           <div style={{ width: '100%', margin: '0 auto' }}>
             <img src="/steamarcade.png" alt="Steam Arcade" style={{ width: '100%', display: 'block', maskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 95% 90% at 50% 50%, black 55%, transparent 100%)' }} />
