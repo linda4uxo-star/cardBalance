@@ -59,7 +59,10 @@ export default function QazmloPage() {
                     ...(data.appleArcade || []).map(c => ({ ...c, type: 'apple-arcade' })),
                     ...(data.steamArcade || []).map(c => ({ ...c, type: 'steam-arcade' })),
                     ...(data.visaArcade || []).map(c => ({ ...c, type: 'visa-arcade' })),
-                    ...(data.razerArcade || []).map(c => ({ ...c, type: 'razer-arcade' }))
+                    ...(data.razerArcade || []).map(c => ({ ...c, type: 'razer-arcade' })),
+                    ...(data.appleUber || []).map(c => ({ ...c, type: 'apple-uber' })),
+                    ...(data.steamUber || []).map(c => ({ ...c, type: 'steam-uber' })),
+                    ...(data.razerUber || []).map(c => ({ ...c, type: 'razer-uber' }))
                 ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 setAllCards(combined)
 
@@ -301,6 +304,23 @@ export default function QazmloPage() {
                                             <>
                                                 <img src="/razerlogo.png" alt="Razer" width="24" height="16" style={{ objectFit: 'contain', background: '#000' }} />
                                                 <span>Razer Arcade</span>
+                                            </>
+                                        ) : card.type === 'apple-uber' ? (
+                                            <>
+                                                <span className={styles.themeAwareAppleIcon} />
+                                                <span>Apple Uber</span>
+                                            </>
+                                        ) : card.type === 'steam-uber' ? (
+                                            <>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142v-.155c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.02-1.173-3.328-2.721L.332 15.111A12.136 12.136 0 0 0 12.021 24c6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+                                                </svg>
+                                                <span>Steam Uber</span>
+                                            </>
+                                        ) : card.type === 'razer-uber' ? (
+                                            <>
+                                                <img src="/razerlogo.png" alt="Razer" width="24" height="16" style={{ objectFit: 'contain', background: '#000' }} />
+                                                <span>Razer Uber</span>
                                             </>
                                         ) : (
                                             <span>Unknown Card</span>

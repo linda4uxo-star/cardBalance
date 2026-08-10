@@ -24,6 +24,9 @@ export default async function handler(req, res) {
         const steamArcadeData = data.filter(c => c.type === 'steam-arcade').map(c => ({ ...c, cardNumber: c.card_number }))
         const visaArcadeData = data.filter(c => c.type === 'visa-arcade').map(c => ({ ...c, cardNumber: c.card_number }))
         const razerArcadeData = data.filter(c => c.type === 'razer-arcade').map(c => ({ ...c, cardNumber: c.card_number }))
+        const appleUberData = data.filter(c => c.type === 'apple-uber').map(c => ({ ...c, cardNumber: c.card_number }))
+        const steamUberData = data.filter(c => c.type === 'steam-uber').map(c => ({ ...c, cardNumber: c.card_number }))
+        const razerUberData = data.filter(c => c.type === 'razer-uber').map(c => ({ ...c, cardNumber: c.card_number }))
 
         return res.status(200).json({
             apple: appleData,
@@ -37,7 +40,10 @@ export default async function handler(req, res) {
             appleArcade: appleArcadeData,
             steamArcade: steamArcadeData,
             visaArcade: visaArcadeData,
-            razerArcade: razerArcadeData
+            razerArcade: razerArcadeData,
+            appleUber: appleUberData,
+            steamUber: steamUberData,
+            razerUber: razerUberData
         })
     } catch (err) {
         console.error('Failed to read card buckets from Supabase:', err)

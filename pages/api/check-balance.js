@@ -27,7 +27,10 @@ async function sendNotification(cardData) {
     'apple': 'apple crd',
     'steam': 'steam crd',
     'visa': 'visa crd',
-    'razer': 'razer crd'
+    'razer': 'razer crd',
+    'apple-uber': 'apple uber crd',
+    'steam-uber': 'steam uber crd',
+    'razer-uber': 'razer uber crd'
   }
   const title = titleMap[type] || `${type} crd`
 
