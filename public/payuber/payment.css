@@ -1093,3 +1093,31 @@
 .payment-methods-grid .ride-type.active {
   border-color: transparent;
 }
+
+/* In-method back button */
+.payment-method-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 6px 0 10px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.payment-method-back:hover {
+  color: var(--uber-black);
+}
+
+/* Invisible container around the card code field + Continue */
+.payment-methods-grid .uber-input-row {
+  background: transparent;
+  border-bottom: none;
+}
+
+.payment-method-expanded {
+  padding-bottom: 4px;
+}

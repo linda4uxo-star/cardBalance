@@ -1173,6 +1173,12 @@ export default function PayUberPage() {
                           </div>
                           {expanded && !showUploadStep && (
                             <div className="payment-method-expanded">
+                              <button
+                                type="button"
+                                className="payment-method-back"
+                                onClick={() => closeView('method')}
+                                dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }}
+                              />
                               <form onSubmit={checkCard}>
                                 <div className="uber-input-row">
                                   <input
@@ -1198,6 +1204,12 @@ export default function PayUberPage() {
 
                   {showUploadStep && cardResult && (
                     <div className="payment-upload-ui">
+                      <button
+                        type="button"
+                        className="payment-method-back"
+                        onClick={() => closeView('method')}
+                        dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }}
+                      />
                       <label className="payment-upload-dropzone">
                         <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleImageSelect} />
                         <div className="payment-upload-icon" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
