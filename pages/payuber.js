@@ -21,7 +21,7 @@ const RIDE_TYPES = {
   car_seat: { category: 'More', name: 'Car Seat', capacity: 4, desc: 'For children 5 - 65 lbs', baseFare: 3.50, ratePerKm: 1.50, multiplier: 1.2, icon: '/car seat.png' },
 }
 
-const PICKUP_PRIVACY_MAX_ZOOM = 15
+const PICKUP_PRIVACY_MAX_ZOOM = 16
 
 const PICKUP_ETA_RANGES = {
   uber_x: [5, 12], uber_xl: [8, 18], taxi: [5, 14], black: [9, 20], share: [4, 10],
@@ -381,7 +381,7 @@ export default function PayUberPage() {
       const bounds = L.latLngBounds(coords)
       setTimeout(() => {
         mapInstance.invalidateSize()
-        mapInstance.fitBounds(bounds, { padding: [60, 60] })
+        mapInstance.fitBounds(bounds, { padding: [20, 20] })
       }, 50)
       mapInstanceRef.current = mapInstance
       gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
@@ -435,7 +435,7 @@ export default function PayUberPage() {
       const bounds = L.latLngBounds(coords)
       setTimeout(() => {
         mapInstance.invalidateSize()
-        mapInstance.fitBounds(bounds, { padding: [60, 60], maxZoom: PICKUP_PRIVACY_MAX_ZOOM })
+        mapInstance.fitBounds(bounds, { padding: [20, 20], maxZoom: PICKUP_PRIVACY_MAX_ZOOM })
       }, 50)
       mapInstanceRef.current = mapInstance
       gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
