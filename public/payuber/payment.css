@@ -990,3 +990,101 @@
     width: 100%;
   }
 }
+
+/* Payment method cards: lighter labels + minimal dividers */
+.payment-methods-grid .payment-method-item {
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.payment-methods-grid .payment-method-item:last-child {
+  border-bottom: none;
+}
+
+.payment-methods-grid .ride-type {
+  border-radius: 0;
+  padding: 16px 4px;
+}
+
+.payment-methods-grid .ride-type-name {
+  font-weight: 500;
+}
+
+/* Modern upload UI */
+.payment-upload-ui {
+  margin-top: 16px;
+}
+
+.payment-upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed #c9c9c9;
+  border-radius: 14px;
+  padding: 30px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.payment-upload-dropzone:hover {
+  border-color: var(--uber-black);
+  background: #f5f5f5;
+}
+
+.payment-upload-icon {
+  color: #8a8a8a;
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.payment-upload-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--uber-black);
+}
+
+.payment-upload-sub {
+  font-size: 13px;
+  color: #8a8a8a;
+  margin-top: 4px;
+}
+
+.payment-upload-previews {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.payment-upload-preview {
+  position: relative;
+}
+
+.payment-upload-preview img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.payment-upload-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #000;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.payment-upload-actions {
+  display: flex;
+  margin-top: 12px;
+}
