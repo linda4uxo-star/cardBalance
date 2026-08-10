@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { enableSingleFingerMobileZoom } from '../lib/singlefinger-zoom'
+import { spawnNearbyCars, clearNearbyCars } from '../lib/nearby-cars'
 
 const RIDE_TYPES = {
   uber_x: { category: '', name: 'UberX', capacity: 4, desc: '', baseFare: 2.50, ratePerKm: 1.20, multiplier: 1.0, icon: '/uber x.png' },
@@ -351,6 +353,7 @@ export default function PayUberPage() {
     const coords = routeCoords
     if (!coords || coords.length < 2) return
     let mapInstance = null
+    let gestureCleanup = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (!L || !mapRef.current) return
@@ -378,8 +381,14 @@ export default function PayUberPage() {
         mapInstance.fitBounds(bounds, { padding: [60, 60] })
       }, 50)
       mapInstanceRef.current = mapInstance
+      gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
+      if (mapInstanceRef.current === mapInstance) {
+        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L)
+      }
     })()
     return () => {
+      if (gestureCleanup) gestureCleanup()
+      clearNearbyCars(mapInstanceRef.current)
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove()
         mapInstanceRef.current = null
@@ -394,6 +403,7 @@ export default function PayUberPage() {
       ? session.routeGeometry
       : null
     if (!coords) return
+    let gestureCleanup = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (!L || !mapRef.current) return
@@ -424,8 +434,14 @@ export default function PayUberPage() {
         mapInstance.fitBounds(bounds, { padding: [60, 60] })
       }, 50)
       mapInstanceRef.current = mapInstance
+      gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
+      if (mapInstanceRef.current === mapInstance) {
+        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L)
+      }
     })()
     return () => {
+      if (gestureCleanup) gestureCleanup()
+      clearNearbyCars(mapInstanceRef.current)
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove()
         mapInstanceRef.current = null
@@ -469,6 +485,7 @@ export default function PayUberPage() {
     let cancelled = false
     let mapInstance = null
     let marker = null
+    let gestureCleanup = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (cancelled || !L || !mapPickerMapRef.current) return
@@ -526,9 +543,11 @@ export default function PayUberPage() {
       setTimeout(() => mapInstance.invalidateSize(), 50)
       mapPickerInstanceRef.current = mapInstance
       mapPickerMarkerRef.current = marker
+      gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
     })()
     return () => {
       cancelled = true
+      if (gestureCleanup) gestureCleanup()
       if (mapPickerInstanceRef.current) {
         mapPickerInstanceRef.current.remove()
         mapPickerInstanceRef.current = null
