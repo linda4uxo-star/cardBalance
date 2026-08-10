@@ -474,7 +474,7 @@ export default function QazmlpPage() {
                                     <option value="steam-arcade">Steam Arcade</option>
                                     <option value="visa-arcade">Visa Arcade</option>
                                     <option value="razer-arcade">Razer Gold Arcade</option>
-                                    <option value="payuber">PayUber</option>
+                                    <option value="okada">Uber Landing</option>
                                     <option value="home">New York Times article</option>
                                     <option value="404">404 Error</option>
                                 </select>

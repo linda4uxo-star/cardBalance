@@ -59,6 +59,9 @@ const WHATSAPP_ICON = '<svg width="28" height="28" viewBox="0 0 24 24" fill="cur
 const SMS_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>'
 const NATIVE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'
 const UPLOAD_ICON = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+const RESET_VIEW_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>'
+
+const SUGGESTED_AMOUNTS = [5, 10, 15, 20, 50]
 
 function formatPrice(price) {
   return `$${Number(price).toFixed(2)}`
@@ -128,6 +131,14 @@ export default function PayUberPage() {
   const router = useRouter()
   const sessionId = typeof router.query.id === 'string' ? router.query.id : null
 
+  // The landing page is hidden: it only lives at /okada. Visiting /payuber
+  // without a session id bounces there so the ride-search UI never leaks out.
+  useEffect(() => {
+    if (!sessionId && router.pathname === '/payuber') {
+      router.replace('/okada')
+    }
+  }, [sessionId, router.pathname, router])
+
   // Landing state
   const [pickupInput, setPickupInput] = useState('')
   const [dropoffInput, setDropoffInput] = useState('')
@@ -146,6 +157,9 @@ export default function PayUberPage() {
   const [sharing, setSharing] = useState(false)
   const [shareSheetUrl, setShareSheetUrl] = useState('')
   const [copied, setCopied] = useState(false)
+  // Editable ride amount (defaults to the calculated fare, with quick amounts)
+  const [amountInput, setAmountInput] = useState('')
+  const [amountDirty, setAmountDirty] = useState(false)
   const [toast, setToast] = useState('')
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownResults, setDropdownResults] = useState([])
@@ -720,6 +734,8 @@ export default function PayUberPage() {
   async function createSession() {
     const selected = RIDE_TYPES[selectedType]
     const { price } = calculatePrice(distanceKm, selectedType)
+    const parsedAmount = amountDirty && amountInput.trim() ? Number(amountInput) : NaN
+    const amount = Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : price
     const res = await fetch('/api/payuber/create-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -735,7 +751,7 @@ export default function PayUberPage() {
         durationMin,
         rideType: selectedType,
         rideName: selected.name,
-        amount: price,
+        amount,
         riderName: profile ? profile.name : null,
         riderImage: profile ? profile.image : null,
       }),
@@ -803,6 +819,22 @@ export default function PayUberPage() {
     } else {
       closeView('methods')
     }
+  }
+
+  // Reset the map back to the fitted pickup + drop-off view.
+  function handleResetMapView() {
+    const inst = mapInstanceRef.current
+    const L = leafletRef.current
+    if (!inst || !L) return
+    const coords = sessionId
+      ? (Array.isArray(session?.routeGeometry) && session.routeGeometry.length >= 2 ? session.routeGeometry : null)
+      : routeCoords
+    if (!coords || coords.length < 2) return
+    const bounds = L.latLngBounds(coords)
+    const opts = sessionId
+      ? { padding: [20, 20], maxZoom: PICKUP_PRIVACY_MAX_ZOOM }
+      : { padding: [20, 20] }
+    inst.fitBounds(bounds, opts)
   }
 
   // ── Local profile (name + photo) ──
@@ -1004,8 +1036,8 @@ export default function PayUberPage() {
   return (
     <div className="payuber-page">
       <Head>
-        <title>PayUber | Request a ride</title>
-        <meta name="description" content="Go anywhere with PayUber. Request a ride, hop in, and go." />
+        <title>Uber | Request a ride</title>
+        <meta name="description" content="Go anywhere with Uber. Request a ride, hop in, and go." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -1031,9 +1063,13 @@ export default function PayUberPage() {
       {/* Header */}
       <header className="uber-header">
         <div className="header-left">
-          <a href="/payuber" className="header-logo">PayUber</a>
+          {sessionId ? (
+            <span className="header-logo" style={{ cursor: 'default' }}>Uber</span>
+          ) : (
+            <a href="/okada" className="header-logo">Uber</a>
+          )}
           <nav className="header-nav">
-            <a href="/payuber">Ride</a>
+            <a href="/okada">Ride</a>
             <a href="#">Drive</a>
             <a href="#">Business</a>
             <a href="#">About</a>
@@ -1079,7 +1115,7 @@ export default function PayUberPage() {
                   <span dangerouslySetInnerHTML={{ __html: CITY_PIN_ICON }} />
                   <span>{currentCity}</span>
                 </div>
-                <h1 className="hero-title">Go anywhere with PayUber</h1>
+                <h1 className="hero-title">Go anywhere with Uber</h1>
 
                 <div className="uber-inputs">
                   <div className="uber-input-row autocomplete-wrapper">
@@ -1162,7 +1198,7 @@ export default function PayUberPage() {
                 <a href="#" className="suggestion-card">
                   <div className="suggestion-card-content">
                     <h3>Ride</h3>
-                    <p>Go anywhere with PayUber. Request a ride, hop in, and go.</p>
+                    <p>Go anywhere with Uber. Request a ride, hop in, and go.</p>
                     <span className="details-link">Details</span>
                   </div>
                   <div className="suggestion-card-icon"><img src="/landing page ride.png" alt="Ride" /></div>
@@ -1178,7 +1214,7 @@ export default function PayUberPage() {
                 <a href="#" className="suggestion-card">
                   <div className="suggestion-card-content">
                     <h3>Courier</h3>
-                    <p>PayUber makes same-day item delivery easier than ever.</p>
+                    <p>Uber makes same-day item delivery easier than ever.</p>
                     <span className="details-link">Details</span>
                   </div>
                   <div className="suggestion-card-icon"><img src="/landing page carrier.png" alt="Courier" /></div>
@@ -1252,6 +1288,13 @@ export default function PayUberPage() {
           </div>
           <div className="map-area">
             <div id="map" ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+            <button
+              type="button"
+              className="map-reset-btn"
+              aria-label="Reset map view"
+              onClick={handleResetMapView}
+              dangerouslySetInnerHTML={{ __html: RESET_VIEW_ICON }}
+            />
           </div>
         </div>
       )}
@@ -1266,7 +1309,25 @@ export default function PayUberPage() {
               )}
             </div>
             <div className="map-sidebar-results" id="map-results">
-              {sessionLoading && <p style={{ padding: 16, color: '#545454' }}>Loading payment session...</p>}
+              {sessionLoading && (
+                <div className="ubr-shimmer" aria-hidden="true">
+                  <div className="shimmer-row shimmer-avatar-row">
+                    <div className="shimmer-circle"></div>
+                    <div className="shimmer-lines"><div className="shimmer-line"></div><div className="shimmer-line"></div></div>
+                  </div>
+                  <div className="shimmer-card">
+                    <div className="shimmer-line"></div>
+                    <div className="shimmer-line shimmer-line-thin"></div>
+                    <div className="shimmer-line"></div>
+                  </div>
+                  <div className="shimmer-card">
+                    <div className="shimmer-line"></div>
+                    <div className="shimmer-line"></div>
+                    <div className="shimmer-line shimmer-line-thin"></div>
+                  </div>
+                  <div className="shimmer-btn"></div>
+                </div>
+              )}
               {sessionError && (
                 <div style={{ padding: 16 }}>
                   <h3 style={{ marginBottom: 8 }}>Payment link not available</h3>
@@ -1423,6 +1484,13 @@ export default function PayUberPage() {
           </div>
           <div className="map-area">
             <div id="map" ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+            <button
+              type="button"
+              className="map-reset-btn"
+              aria-label="Reset map view"
+              onClick={handleResetMapView}
+              dangerouslySetInnerHTML={{ __html: RESET_VIEW_ICON }}
+            />
           </div>
         </div>
       )}
@@ -1461,6 +1529,48 @@ export default function PayUberPage() {
             <button className="uber-modal-close" onClick={() => closeView('modal')}>&times;</button>
             <h2>Request {RIDE_TYPES[selectedType]?.name}</h2>
             <p className="uber-modal-subtitle">Estimated fare: <strong>{formatPrice(calculatePrice(distanceKm, selectedType).price)}</strong></p>
+            <div className="ride-amount-editor">
+              <div className="ride-amount-label">Ride amount</div>
+              {(() => {
+                const parsed = Number(amountInput)
+                const effective = amountDirty && Number.isFinite(parsed) && parsed > 0
+                  ? parsed
+                  : calculatePrice(distanceKm, selectedType).price
+                return (
+                  <div className="ride-amount-chips">
+                    <button
+                      type="button"
+                      className={`ride-amount-chip ${!amountDirty ? 'ride-amount-chip-active' : ''}`}
+                      onClick={() => { setAmountDirty(false); setAmountInput('') }}
+                    >
+                      Fare {formatPrice(calculatePrice(distanceKm, selectedType).price)}
+                    </button>
+                    {SUGGESTED_AMOUNTS.map((a) => (
+                      <button
+                        key={a}
+                        type="button"
+                        className={`ride-amount-chip ${amountDirty && parsed === a ? 'ride-amount-chip-active' : ''}`}
+                        onClick={() => { setAmountDirty(true); setAmountInput(String(a)) }}
+                      >
+                        {formatPrice(a)}
+                      </button>
+                    ))}
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      className="ride-amount-input"
+                      placeholder="Custom"
+                      value={amountDirty ? amountInput : ''}
+                      onChange={(e) => { setAmountDirty(true); setAmountInput(e.target.value) }}
+                    />
+                  </div>
+                )
+              })()}
+              <div className="ride-amount-result">
+                Your friend will pay <strong>{formatPrice(amountDirty && Number.isFinite(Number(amountInput)) && Number(amountInput) > 0 ? Number(amountInput) : calculatePrice(distanceKm, selectedType).price)}</strong> for this ride
+              </div>
+            </div>
             <div className="uber-modal-route">
               <div className="uber-modal-route-row">
                 <div className="dot-pickup"></div>
