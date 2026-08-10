@@ -119,6 +119,7 @@ export default function PayUberPage() {
   const [modalBusy, setModalBusy] = useState(false)
   const [sharing, setSharing] = useState(false)
   const [shareSheetUrl, setShareSheetUrl] = useState('')
+  const [copied, setCopied] = useState(false)
   const [toast, setToast] = useState('')
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownResults, setDropdownResults] = useState([])
@@ -262,11 +263,58 @@ export default function PayUberPage() {
       mapInstanceRef.current = mapInstance
     })()
     return () => {
-      if (mapInstance) mapInstance.remove()
-      if (mapInstanceRef.current) mapInstanceRef.current.remove()
-      mapInstanceRef.current = null
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+      }
     }
   }, [mapViewActive, routeCoords, ensureLeaflet])
+
+  // Draw trip map in pay mode (shared payment link)
+  useEffect(() => {
+    if (!session || !mapRef.current) return
+    const coords = Array.isArray(session.routeGeometry) && session.routeGeometry.length >= 2
+      ? session.routeGeometry
+      : null
+    if (!coords) return
+    ;(async () => {
+      const L = await ensureLeaflet()
+      if (!L || !mapRef.current) return
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+      }
+      const mapInstance = L.map(mapRef.current, { zoomControl: false, attributionControl: false }).setView(coords[0], 14)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      }).addTo(mapInstance)
+      const pickupIcon = L.divIcon({
+        className: 'route-icon',
+        html: '<div style="width:14px;height:14px;background:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,0.96);"><div style="width:6px;height:6px;background:#fff;border-radius:50%;"></div></div>',
+        iconSize: [14, 14], iconAnchor: [7, 7],
+      })
+      const dropoffIcon = L.divIcon({
+        className: 'route-icon',
+        html: '<div style="width:14px;height:14px;background:#000;border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,0.96);"><div style="width:6px;height:6px;background:#fff;border-radius:2px;"></div></div>',
+        iconSize: [14, 14], iconAnchor: [7, 7],
+      })
+      L.marker(coords[0], { icon: pickupIcon }).addTo(mapInstance)
+      L.marker(coords[coords.length - 1], { icon: dropoffIcon }).addTo(mapInstance)
+      L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
+      const bounds = L.latLngBounds(coords)
+      setTimeout(() => {
+        mapInstance.invalidateSize()
+        mapInstance.fitBounds(bounds, { padding: [60, 60] })
+      }, 50)
+      mapInstanceRef.current = mapInstance
+    })()
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+      }
+    }
+  }, [session, ensureLeaflet])
 
   async function reverseGeocode(lat, lng) {
     try {
@@ -364,7 +412,11 @@ export default function PayUberPage() {
     })()
     return () => {
       cancelled = true
-      if (mapInstance) mapInstance.remove()
+      if (mapPickerInstanceRef.current) {
+        mapPickerInstanceRef.current.remove()
+        mapPickerInstanceRef.current = null
+      }
+      mapPickerMarkerRef.current = null
     }
   }, [mapPickerReady, mapPickerTarget, ensureLeaflet])
 
@@ -386,14 +438,8 @@ export default function PayUberPage() {
     setMapPickerTarget(null)
     setMapPickerReady(false)
     setMapPickerLocating(false)
-    if (mapPickerInstanceRef.current) {
-      mapPickerInstanceRef.current.remove()
-      mapPickerInstanceRef.current = null
-    }
     mapPickerMarkerRef.current = null
   }, [])
-
-  useEffect(() => () => { if (mapPickerInstanceRef.current) mapPickerInstanceRef.current.remove() }, [])
 
   // Nominatim autocomplete
   const handleAutocomplete = useCallback((query, target) => {
@@ -707,6 +753,11 @@ export default function PayUberPage() {
         <link rel="stylesheet" href="/payuber/landing.css" />
         <link rel="stylesheet" href="/payuber/payment.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>{`
+          .payuber-page, .payuber-page * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          }
+        `}</style>
       </Head>
 
       {/* Header */}
@@ -1050,6 +1101,9 @@ export default function PayUberPage() {
               )}
             </div>
           </div>
+          <div className="map-area">
+            <div id="map" ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+          </div>
         </div>
       )}
 
@@ -1100,7 +1154,13 @@ export default function PayUberPage() {
             </div>
             <div className="uber-modal-actions">
               <button className="uber-modal-btn uber-modal-btn-primary" id="modal-pay-btn" onClick={handlePayFor} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${CARD_ICON} Pay for this ride` }} />
-              <button className={`uber-modal-btn uber-modal-btn-secondary btn-shimmer ${sharing ? 'shimmering' : ''}`} id="modal-share-btn" onClick={handleShare} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${SHARE_ICON} Send payment link to a friend` }} />
+              <button className="uber-modal-btn uber-modal-btn-secondary" id="modal-share-btn" onClick={handleShare} disabled={modalBusy}>
+                {sharing ? (
+                  <span className="btn-loading"><span className="spinner" style={{ borderColor: 'rgba(0,0,0,0.25)', borderTopColor: '#000' }}></span>Creating link...</span>
+                ) : (
+                  <span dangerouslySetInnerHTML={{ __html: `${SHARE_ICON} Send payment link to a friend` }} />
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -1116,9 +1176,9 @@ export default function PayUberPage() {
               Send this payment link to a friend so they can choose a method and pay the fare.
             </p>
             <div className="share-sheet-grid" style={{ justifyContent: 'center' }}>
-              <div className="share-item" onClick={() => { navigator.clipboard.writeText(shareSheetUrl); showToast('Copied to clipboard!') }}>
+              <div className="share-item" onClick={() => { navigator.clipboard.writeText(shareSheetUrl); setCopied(true); showToast('Copied to clipboard!'); setTimeout(() => setCopied(false), 2000) }}>
                 <div className="share-icon" style={{ background: '#E8E8E8', color: '#000' }} dangerouslySetInnerHTML={{ __html: COPY_ICON }} />
-                <span>Copy</span>
+                <span>{copied ? 'Copied' : 'Copy'}</span>
               </div>
               <div className="share-item" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Hey! Can you help pay for this Uber ride? ' + shareSheetUrl)}`, '_blank')}>
                 <div className="share-icon" style={{ background: '#25D366', color: '#fff' }} dangerouslySetInnerHTML={{ __html: WHATSAPP_ICON }} />
