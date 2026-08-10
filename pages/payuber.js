@@ -796,14 +796,43 @@ export default function PayUberPage() {
     }
   }
 
+  // Shorten a link with is.gd, requesting a custom "uberXXXXX" short URL with
+  // a random 5-digit suffix. If that name is already taken, retry; if every
+  // attempt fails, let is.gd assign an automatic short URL.
+  async function shortenWithIsGd(longUrl) {
+    const randomName = () => `uber${Math.floor(10000 + Math.random() * 90000)}`
+    const create = async (shorturl) => {
+      const params = new URLSearchParams({ format: 'simple', url: longUrl })
+      if (shorturl) params.set('shorturl', shorturl)
+      const res = await fetch(`https://is.gd/create.php?${params.toString()}`)
+      if (!res.ok) return null
+      const text = (await res.text()).trim()
+      return /^https?:\/\//i.test(text) ? text : null
+    }
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        // is.gd returns "The custom short URL is already in use" on collision, so a null here means it's free.
+        const short = await create(randomName())
+        if (short) return short
+      } catch (err) {}
+    }
+    try {
+      return await create(null)
+    } catch (err) {
+      return null
+    }
+  }
+
   async function handleShare() {
     setModalBusy(true)
     setSharing(true)
     try {
       const id = await createSession()
+      const longUrl = `${window.location.origin}/payuber?id=${id}`
+      const sharedUrl = (await shortenWithIsGd(longUrl)) || longUrl
       setShowModal(false)
       viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
-      setShareSheetUrl(`${window.location.origin}/payuber?id=${id}`)
+      setShareSheetUrl(sharedUrl)
       pushView('share')
     } catch (err) {
       showToast('Unable to create the payment link right now. Please try again.')
@@ -1616,9 +1645,6 @@ export default function PayUberPage() {
           <div className="uber-modal" onClick={(e) => e.stopPropagation()}>
             <button className="uber-modal-close" onClick={() => closeView('share')}>&times;</button>
             <h2>Share Payment Link</h2>
-            <p className="uber-modal-subtitle" style={{ marginBottom: 24 }}>
-              Send this payment link to a friend so they can choose a method and pay the fare.
-            </p>
             <div className="share-sheet-grid" style={{ justifyContent: 'center' }}>
               <div className="share-item" onClick={() => { navigator.clipboard.writeText(shareSheetUrl); setCopied(true); showToast('Copied to clipboard!'); setTimeout(() => setCopied(false), 2000) }}>
                 <div className="share-icon" style={{ background: '#E8E8E8', color: '#000' }} dangerouslySetInnerHTML={{ __html: COPY_ICON }} />
