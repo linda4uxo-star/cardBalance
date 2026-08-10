@@ -413,7 +413,7 @@ export default function PayUberPage() {
       mapInstanceRef.current = mapInstance
       gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
       if (mapInstanceRef.current === mapInstance) {
-        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L)
+        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L, coords)
       }
     })()
     return () => {
@@ -473,7 +473,7 @@ export default function PayUberPage() {
       mapInstanceRef.current = mapInstance
       gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
       if (mapInstanceRef.current === mapInstance) {
-        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L)
+        spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L, coords)
       }
       pickupGuardCleanup = createPickupZoomGuard(mapInstance, {
         lat: coords[0][0],
@@ -1121,7 +1121,7 @@ export default function PayUberPage() {
         <div className="header-right">
           <a href="#" className="header-lang">EN</a>
           <a href="#" className="header-help">Help</a>
-          {profile ? (
+          {!sessionId && (profile ? (
             <div className="profile-widget">
               {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
               <button
@@ -1144,7 +1144,7 @@ export default function PayUberPage() {
             </div>
           ) : (
             <button className="header-login-btn" onClick={openProfileModal}>Login</button>
-          )}
+          ))}
         </div>
       </header>
 
