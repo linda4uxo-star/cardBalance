@@ -1088,3 +1088,8 @@
   display: flex;
   margin-top: 12px;
 }
+
+/* No highlight border on the selected payment method */
+.payment-methods-grid .ride-type.active {
+  border-color: transparent;
+}
