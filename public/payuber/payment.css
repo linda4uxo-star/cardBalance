@@ -1162,3 +1162,199 @@
 .payment-method-expanded .uber-input-field {
   padding: 13px 16px;
 }
+
+/* PaySheet header: back button flush at the top, no divider line */
+.pay-mode .map-sidebar-header {
+  border-bottom: none;
+  padding: 0 var(--sp-6);
+}
+
+/* ── Local account (profile chip in the page header) ── */
+.profile-widget {
+  position: relative;
+}
+
+.profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.profile-avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.profile-name-only {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--uber-white);
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
+}
+
+.profile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 41;
+  background: var(--uber-white);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.profile-menu-item {
+  padding: 10px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.profile-menu-item:hover { background: var(--gray-100); }
+
+.profile-menu-item-danger { color: #c53030; }
+
+.header-login-btn {
+  font-family: var(--font-family);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--uber-white);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+}
+
+.header-login-btn:hover { background: rgba(0, 0, 0, 0.4); }
+
+/* ── PaySheet ride summary header (rider account) ── */
+.ride-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: var(--sp-5);
+}
+
+.ride-summary-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.ride-summary-name {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.ride-summary-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ride-summary-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ride-summary-avatar span {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Profile modal form ── */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: var(--sp-6);
+}
+
+.profile-avatar-upload {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 2px dashed var(--gray-300);
+  background: var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.profile-avatar-upload:hover { border-color: var(--text-primary); }
+
+.profile-avatar-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-avatar-upload-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-secondary);
+}
+
+.profile-avatar-upload-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.profile-name-input {
+  width: 100%;
+  font-family: var(--font-family);
+  font-size: 15px;
+  padding: 12px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 12px;
+  background: var(--uber-white);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.profile-name-input:focus { border-color: var(--text-primary); }
+
+.profile-form .uber-modal-btn-primary { width: 100%; }

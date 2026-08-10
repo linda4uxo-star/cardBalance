@@ -24,6 +24,9 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'This payment link has expired. Please request a new one.' })
     }
 
+    const geo = data.route_geometry
+    const isExtended = geo && !Array.isArray(geo)
+
     return res.status(200).json({
       id: data.id,
       pickupAddress: data.pickup_address,
@@ -32,7 +35,7 @@ export default async function handler(req, res) {
       pickupLng: data.pickup_lng,
       dropoffLat: data.dropoff_lat,
       dropoffLng: data.dropoff_lng,
-      routeGeometry: data.route_geometry,
+      routeGeometry: isExtended ? (geo.coords || null) : geo,
       distanceKm: data.distance_km,
       durationMin: data.duration_min,
       rideType: data.ride_type,
@@ -40,6 +43,9 @@ export default async function handler(req, res) {
       amount: data.amount,
       status: data.status,
       createdAt: data.created_at,
+      riderName: isExtended ? (geo.rider?.name || null) : null,
+      riderImage: isExtended ? (geo.rider?.image || null) : null,
+      rideNumber: isExtended ? (geo.rideNumber || null) : null,
     })
   } catch (err) {
     console.error('Failed to get payuber session:', err)

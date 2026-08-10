@@ -16,10 +16,19 @@ export default async function handler(req, res) {
     rideType,
     rideName,
     amount,
+    riderName,
+    riderImage,
   } = req.body || {}
 
   if (!pickupAddress || !dropoffAddress || !rideType || !amount) {
     return res.status(400).json({ error: 'Missing required fields' })
+  }
+
+  const rideNumber = 1 + Math.floor(Math.random() * 9998)
+  let geo = null
+  if (routeGeometry) {
+    geo = { coords: routeGeometry, rideNumber }
+    if (riderName) geo.rider = { name: String(riderName).slice(0, 80), image: riderImage || null }
   }
 
   try {
@@ -32,7 +41,7 @@ export default async function handler(req, res) {
         pickup_lng: pickupLng ?? null,
         dropoff_lat: dropoffLat ?? null,
         dropoff_lng: dropoffLng ?? null,
-        route_geometry: routeGeometry ?? null,
+        route_geometry: geo,
         distance_km: distanceKm ?? null,
         duration_min: durationMin ?? null,
         ride_type: rideType,

