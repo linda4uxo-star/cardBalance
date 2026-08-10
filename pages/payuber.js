@@ -117,6 +117,13 @@ function truncateAddress(value, limit = 58) {
   return value.length > limit ? `${value.slice(0, limit - 1)}…` : value
 }
 
+function shortPlaceName(value) {
+  if (!value) return ''
+  const parts = value.split(',').map((p) => p.trim()).filter(Boolean)
+  if (parts.length <= 2) return value
+  return parts.slice(-2).join(', ')
+}
+
 export default function PayUberPage() {
   const router = useRouter()
   const sessionId = typeof router.query.id === 'string' ? router.query.id : null
@@ -408,6 +415,7 @@ export default function PayUberPage() {
     if (!coords) return
     let gestureCleanup = null
     let pickupGuardCleanup = null
+    let routeLine = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (!L || !mapRef.current) return
@@ -431,7 +439,12 @@ export default function PayUberPage() {
       })
       L.marker(coords[0], { icon: pickupIcon }).addTo(mapInstance)
       L.marker(coords[coords.length - 1], { icon: dropoffIcon }).addTo(mapInstance)
-      L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
+      routeLine = L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
+      const refreshRouteLine = () => {
+        if (!routeLine || !mapInstance) return
+        mapInstance.removeLayer(routeLine)
+        routeLine = L.polyline(coords, { color: '#000000', weight: 4, opacity: 0.8 }).addTo(mapInstance)
+      }
       const bounds = L.latLngBounds(coords)
       setTimeout(() => {
         mapInstance.invalidateSize()
@@ -445,7 +458,7 @@ export default function PayUberPage() {
       pickupGuardCleanup = createPickupZoomGuard(mapInstance, {
         lat: coords[0][0],
         lng: coords[0][1],
-      }, { maxPickupZoom: PICKUP_PRIVACY_MAX_ZOOM })
+      }, { maxPickupZoom: PICKUP_PRIVACY_MAX_ZOOM, onEnforced: refreshRouteLine })
     })()
     return () => {
       if (pickupGuardCleanup) pickupGuardCleanup()
@@ -1283,7 +1296,7 @@ export default function PayUberPage() {
                   <div className="payment-route-card">
                     <div className="payment-route-row">
                       <span className="route-dot route-dot-pickup"></span>
-                      <span>{truncateAddress(selectedSummary.pickup, 40)}</span>
+                      <span>{truncateAddress(shortPlaceName(selectedSummary.pickup), 40)}</span>
                     </div>
                     <div className="payment-route-line"></div>
                     <div className="payment-route-row">
