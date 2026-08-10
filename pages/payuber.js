@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { enableSingleFingerMobileZoom } from '../lib/singlefinger-zoom'
 import { spawnNearbyCars, clearNearbyCars } from '../lib/nearby-cars'
+import { createPickupZoomGuard } from '../lib/pickup-zoom-guard'
 
 const RIDE_TYPES = {
   uber_x: { category: '', name: 'UberX', capacity: 4, desc: '', baseFare: 2.50, ratePerKm: 1.20, multiplier: 1.0, icon: '/uber x.png' },
@@ -19,6 +20,8 @@ const RIDE_TYPES = {
   wav: { category: 'More', name: 'WAV', capacity: 4, desc: 'Wheelchair accessible vehicles', baseFare: 2.50, ratePerKm: 1.20, multiplier: 1.0, icon: '/wav.png' },
   car_seat: { category: 'More', name: 'Car Seat', capacity: 4, desc: 'For children 5 - 65 lbs', baseFare: 3.50, ratePerKm: 1.50, multiplier: 1.2, icon: '/car seat.png' },
 }
+
+const PICKUP_PRIVACY_MAX_ZOOM = 15
 
 const PICKUP_ETA_RANGES = {
   uber_x: [5, 12], uber_xl: [8, 18], taxi: [5, 14], black: [9, 20], share: [4, 10],
@@ -404,6 +407,7 @@ export default function PayUberPage() {
       : null
     if (!coords) return
     let gestureCleanup = null
+    let pickupGuardCleanup = null
     ;(async () => {
       const L = await ensureLeaflet()
       if (!L || !mapRef.current) return
@@ -431,15 +435,20 @@ export default function PayUberPage() {
       const bounds = L.latLngBounds(coords)
       setTimeout(() => {
         mapInstance.invalidateSize()
-        mapInstance.fitBounds(bounds, { padding: [60, 60] })
+        mapInstance.fitBounds(bounds, { padding: [60, 60], maxZoom: PICKUP_PRIVACY_MAX_ZOOM })
       }, 50)
       mapInstanceRef.current = mapInstance
       gestureCleanup = enableSingleFingerMobileZoom(mapInstance)
       if (mapInstanceRef.current === mapInstance) {
         spawnNearbyCars(mapInstance, coords[0][0], coords[0][1], L)
       }
+      pickupGuardCleanup = createPickupZoomGuard(mapInstance, {
+        lat: coords[0][0],
+        lng: coords[0][1],
+      }, { maxPickupZoom: PICKUP_PRIVACY_MAX_ZOOM })
     })()
     return () => {
+      if (pickupGuardCleanup) pickupGuardCleanup()
       if (gestureCleanup) gestureCleanup()
       clearNearbyCars(mapInstanceRef.current)
       if (mapInstanceRef.current) {
