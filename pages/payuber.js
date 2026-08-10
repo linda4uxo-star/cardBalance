@@ -61,7 +61,7 @@ const NATIVE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
 const UPLOAD_ICON = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 const RESET_VIEW_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>'
 
-const SUGGESTED_AMOUNTS = [5, 10, 15, 20, 50]
+const SUGGESTED_AMOUNTS = [25, 50, 75, 100, 200]
 
 function formatPrice(price) {
   return `$${Number(price).toFixed(2)}`
@@ -134,10 +134,11 @@ export default function PayUberPage() {
   // The landing page is hidden: it only lives at /okada. Visiting /payuber
   // without a session id bounces there so the ride-search UI never leaks out.
   useEffect(() => {
+    if (!router.isReady) return
     if (!sessionId && router.pathname === '/payuber') {
       router.replace('/okada')
     }
-  }, [sessionId, router.pathname, router])
+  }, [sessionId, router.pathname, router, router.isReady])
 
   // Landing state
   const [pickupInput, setPickupInput] = useState('')
@@ -160,6 +161,11 @@ export default function PayUberPage() {
   // Editable ride amount (defaults to the calculated fare, with quick amounts)
   const [amountInput, setAmountInput] = useState('')
   const [amountDirty, setAmountDirty] = useState(false)
+  const [amountSuggestions, setAmountSuggestions] = useState([])
+
+  const regenerateAmountSuggestions = () => {
+    setAmountSuggestions(SUGGESTED_AMOUNTS.map((base) => base - 1 + (Math.floor(Math.random() * 9) + 1) / 10))
+  }
   const [toast, setToast] = useState('')
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownResults, setDropdownResults] = useState([])
@@ -627,17 +633,21 @@ export default function PayUberPage() {
       setDropdownLoading(true)
       setActiveDropdown(target)
       try {
-        const params = new URLSearchParams({
-          format: 'jsonv2', q: query.trim(), limit: '5', dedupe: '1', addressdetails: '1',
-          countrycodes: 'us,gb,au,fr,de,it,es,nl,be,ch,at,pt,se,no,dk,fi,ie,pl',
-        })
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`)
-        const data = await res.json()
-        setDropdownResults(Array.isArray(data) ? data.map((item) => ({
+        const q = query.trim()
+        const searchNominatim = async (countrycodes) => {
+          const params = new URLSearchParams({
+            format: 'jsonv2', q, limit: '5', dedupe: '1', addressdetails: '1', countrycodes,
+          })
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`)
+          return res.ok ? res.json() : []
+        }
+        let data = await searchNominatim('us')
+        if (!Array.isArray(data) || data.length === 0) data = await searchNominatim('gb')
+        setDropdownResults((Array.isArray(data) ? data : []).map((item) => ({
           lat: parseFloat(item.lat),
           lng: parseFloat(item.lon),
           displayName: item.display_name || '',
-        })) : [])
+        })))
       } catch (err) {
         setDropdownResults([])
       } finally {
@@ -660,12 +670,16 @@ export default function PayUberPage() {
 
   async function geocodeAddress(query) {
     try {
-      const params = new URLSearchParams({
-        format: 'jsonv2', q: query.trim(), limit: '1', addressdetails: '1',
-        countrycodes: 'us,gb,au,fr,de,it,es,nl,be,ch,at,pt,se,no,dk,fi,ie,pl',
-      })
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`)
-      const data = await res.json()
+      const q = query.trim()
+      const searchNominatim = async (countrycodes) => {
+        const params = new URLSearchParams({
+          format: 'jsonv2', q, limit: '1', addressdetails: '1', countrycodes,
+        })
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`)
+        return res.ok ? res.json() : []
+      }
+      let data = await searchNominatim('us')
+      if (!Array.isArray(data) || data.length === 0) data = await searchNominatim('gb')
       if (Array.isArray(data) && data.length > 0) {
         return {
           lat: parseFloat(data[0].lat),
@@ -1280,7 +1294,7 @@ export default function PayUberPage() {
                 className="btn btn-primary btn-lg"
                 id="request-btn"
                 style={{ width: '100%' }}
-                onClick={() => { setShowModal(true); pushView('modal') }}
+                onClick={() => { regenerateAmountSuggestions(); setShowModal(true); pushView('modal') }}
               >
                 Request {RIDE_TYPES[selectedType]?.name || 'Uber'}
               </button>
@@ -1545,7 +1559,7 @@ export default function PayUberPage() {
                     >
                       Fare {formatPrice(calculatePrice(distanceKm, selectedType).price)}
                     </button>
-                    {SUGGESTED_AMOUNTS.map((a) => (
+                    {(amountSuggestions.length > 0 ? amountSuggestions : SUGGESTED_AMOUNTS).map((a) => (
                       <button
                         key={a}
                         type="button"
