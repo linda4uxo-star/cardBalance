@@ -1136,3 +1136,29 @@
     border-bottom: none;
   }
 }
+
+/* Trim the gap between the map and the sidebar content */
+.map-view .map-sidebar-header {
+  padding: 10px var(--sp-6);
+}
+
+.map-view .map-sidebar-results {
+  padding-top: 12px;
+}
+
+.map-view .ride-category-title {
+  margin-top: 4px;
+}
+
+/* Card code field: breathing room on left and right */
+.payment-method-expanded {
+  padding: 0 16px 4px;
+}
+
+.payment-method-expanded .uber-input-row {
+  border-radius: 12px;
+}
+
+.payment-method-expanded .uber-input-field {
+  padding: 13px 16px;
+}
