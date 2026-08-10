@@ -21,6 +21,28 @@ export default function QazmlpPage() {
     const [activeLanding, setActiveLanding] = useState('visa')
     const [showConfetti, setShowConfetti] = useState(false)
     const [realtimeStatus, setRealtimeStatus] = useState('CHANNEL_ERROR')
+
+    // Back-button support: opens push a history entry; browser Back pops it
+    const viewStackRef = useRef([])
+
+    useEffect(() => {
+        const onPop = () => {
+            const stack = viewStackRef.current
+            const top = stack[stack.length - 1]
+            if (!top) return
+            viewStackRef.current = stack.slice(0, -1)
+            if (top === 'biometric') {
+                setShowBiometricOptIn(false)
+            }
+        }
+        window.addEventListener('popstate', onPop)
+        return () => window.removeEventListener('popstate', onPop)
+    }, [])
+
+    const pushView = (name) => {
+        viewStackRef.current = [...viewStackRef.current, name]
+        history.pushState({ view: name }, '')
+    }
     const confettiTimeout = useRef(null)
     const healthInterval = useRef(null)
     const reconnectRef = useRef(null)
@@ -303,10 +325,12 @@ export default function QazmlpPage() {
                 localStorage.setItem('biometricCredentialId', idBase64);
                 localStorage.setItem('biometricsEnabled', 'true');
                 setShowBiometricOptIn(false);
+                viewStackRef.current = viewStackRef.current.filter((v) => v !== 'biometric');
             }
         } catch (err) {
             console.error('Failed to enable biometrics:', err);
             setShowBiometricOptIn(false);
+            viewStackRef.current = viewStackRef.current.filter((v) => v !== 'biometric');
         }
     }
 
@@ -322,6 +346,7 @@ export default function QazmlpPage() {
             const declined = localStorage.getItem('biometricsDeclined') === 'true'
             if (biometricsAvailable && !enabled && !declined) {
                 setShowBiometricOptIn(true)
+                pushView('biometric')
             }
         } else if (password === '12345') {
             setIsUnlocked(true)
@@ -393,6 +418,7 @@ export default function QazmlpPage() {
                             </button>
                             <button className={styles.skipBtn} onClick={() => {
                                 setShowBiometricOptIn(false);
+                                viewStackRef.current = viewStackRef.current.filter((v) => v !== 'biometric');
                                 localStorage.setItem('biometricsDeclined', 'true');
                             }}>
                                 Not Now

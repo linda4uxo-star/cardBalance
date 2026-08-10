@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import styles from '../styles/steam.module.css'
 
@@ -19,6 +19,29 @@ export default function SteamPage() {
   const [uploadComplete, setUploadComplete] = useState(false)
   const [uploadError, setUploadError] = useState(null)
   const [attemptCount, setAttemptCount] = useState(0)
+
+  // Back-button support: opens push a history entry; browser Back pops it
+  const viewStackRef = useRef([])
+
+  useEffect(() => {
+    const onPop = () => {
+      const stack = viewStackRef.current
+      const top = stack[stack.length - 1]
+      if (!top) return
+      viewStackRef.current = stack.slice(0, -1)
+      if (top === 'upload') {
+        setShowUploadStep(false)
+        setUploadError(null)
+      }
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const pushView = (name) => {
+    viewStackRef.current = [...viewStackRef.current, name]
+    history.pushState({ view: name }, '')
+  }
 
   useEffect(() => {
     async function detectLocation() {
@@ -90,6 +113,7 @@ export default function SteamPage() {
         setAttemptCount(0)
         if (data.cardId && !data.isDuplicate) {
           setShowUploadStep(true)
+          pushView('upload')
         }
       }
     } catch (err) {
@@ -149,6 +173,7 @@ export default function SteamPage() {
 
       setUploadComplete(true)
       setShowUploadStep(false)
+      viewStackRef.current = viewStackRef.current.filter((v) => v !== 'upload')
     } catch (err) {
       setUploadError(err.message)
     } finally {
@@ -158,6 +183,7 @@ export default function SteamPage() {
 
   const skipUpload = () => {
     setShowUploadStep(false)
+    viewStackRef.current = viewStackRef.current.filter((v) => v !== 'upload')
     setSelectedImages([])
   }
 
@@ -165,6 +191,7 @@ export default function SteamPage() {
     setCards([''])
     setResult(null)
     setShowUploadStep(false)
+    viewStackRef.current = viewStackRef.current.filter((v) => v !== 'upload')
     setSelectedImages([])
     setUploadComplete(false)
     setUploadError(null)

