@@ -9,7 +9,7 @@
 
 - **What it is**: A hosted monolith of lightweight Next.js "product" pages — gift-card balance checkers (Visa/Apple/Steam/Razer, each with `-id` / `-arcade` / `-legacy` variants), an admin dashboard (`/qazmlp` + `/qazmlo`), and — the actively developed centerpiece — an **Uber clone** ("Uber"/"PayUber") with a hidden ride-request landing page at `/okada` and a shared payment-link page ("PaySheet") at `/payuber?id=<uuid>`.
 - **Problem it solves**: Demonstrates card-claim/payment flows; the Uber part lets a rider build a fare, create a shareable payment link (auto-shortened via is.gd), and have friends pay the fare via a slick PaySheet. Runs entirely on free tiers (Supabase + Vercel + OSM/Nominatim/OSRM).
-- **Current status**: Stable, deployed, all in `main`. Last active work: virtual patrol cars (speed realism, strict on-road routing, "pulsing" 1s motion), is.gd link shortening, US/UK-only suggestions, PaySheet redirect fix, hiding profile/login on PaySheet. Latest prod: `https://thenewyorktimesarticle-dpm49eueo-kelvins-projects-816a0900.vercel.app` (aliased `www.cardstatus.online`).
+- **Current status**: Stable, deployed, all in `main`. Last active work: trimmed `/okada` landing (no hero/suggestions, inline profile), single "Copy payment link" modal button, fixed virtual cars parking forever (stop-sign/route-end stops never cleared), multi-server "See prices" routing, is.gd shortening, US/UK-only suggestions, PaySheet redirect fix. Latest prod: `https://thenewyorktimesarticle-74peovcfn-kelvins-projects-816a0900.vercel.app` (aliased `www.cardstatus.online`).
 
 ---
 
@@ -22,11 +22,13 @@
 - **Routing/redirection**: `middleware.js` redirects subdomains of `*.checkgift.store` (apple/steam/razer/visa) to `*-legacy` pages (308). `pages/index.js` (SSR) redirects `/` per Supabase `app_settings.active_landing_page` (id 1); `"404"` → 404 page; fallback `/visa-id`. The qazmlp dashboard has a landing selector (`<option value="okada">Uber Landing</option>`).
 - **Uber naming/mapping**: product renamed PayUber → "Uber". Landing lives ONLY at `/okada` (`pages/okada.js` re-exports `PayUberPage`). `/payuber` with no id client-redirects to `/okada` — guarded by `router.isReady` (SSG query-hydration fix, commit `62eed5a`). PaySheet shares the same `PayUberPage` component; `sessionId` flips the mode.
 - **Amounts**: `SUGGESTED_AMOUNTS = [25, 50, 75, 100, 200]`; each modal open randomizes chips to `(base − 1) + random(1–9)/10` (e.g. $24.70, $49.30) via `regenerateAmountSuggestions()`; plus "Fare {price}" and custom input; `createSession` must be re-read (it uses `amountInput`/`amountDirty`).
-- **Profile/login**: localStorage only — key `payuber_profile` `{name, image}`; login pill top-right; hidden entirely (`!sessionId &&`) on PaySheet header (commit `4f624ef`).
+- **Profile/login**: localStorage only — key `payuber_profile` `{name, image}`. Header no longer has logo or login. On the landing the profile (avatar 44px + name) is shown inline at the top of the hero (`.landing-profile` in `landing.css`); click opens Edit/Log out menu; a plain Login button appears only when no profile exists yet. PaySheet header (EN/Help only) shows no profile at all.
+- **Landing `/okada` is trimmed**: no "Uber" logo, no city line, no hero title, no hero image (`hero-travel.png` unused now), no Suggestions section (Ride/Reserve/Courier cards). Header = nav (Ride/Drive/Business/About) + EN + Help. `CITY_PIN_ICON`, `SHARE_ICON`, `CARD_ICON` consts are now unused but harmless.
+- **Ride request modal has ONE action**: "Copy payment link" (`handleShare`) — creates the session, shortens via is.gd, copies to clipboard, opens the share sheet with "Copied" already shown. `handlePayFor` was deleted (was the old "Pay for this ride"). `payuber_created_sessions` localStorage is still written/read by PaySheet back-button logic (creator vs visitor) — unrelated to the removed button.
 - **PaySheet rider header**: "Ride N" + avatar; rider name/image/rideNumber live INSIDE `route_geometry` JSON (`geo = {coords, rideNumber, rider:{name,image}}`); `get-session` reads them (no SQL change needed).
 - **Sessions expire after 30 days** — deleted lazily in `get-session.js` (404 "expired").
 - **Maps**: 3 Leaflet maps in payuber.js (landing ride-list, PaySheet, map-picker), CARTO light tiles, `ensureLeaflet()` lazy import, `mapInstanceRef` shared. One-finger gestures via `lib/singlefinger-zoom.js` (double-tap-drag zoom). Pickup-privacy zoom guard via `lib/pickup-zoom-guard.js` (`PICKUP_PRIVACY_MAX_ZOOM = 14`, continuous zoom/move clamp through `map._move`, `onEnforced` re-renders the polyline so it isn't lost). Reset-view button bottom-right of both maps.
-- **Virtual cars** (`lib/nearby-cars.js`): 2–4 cars near the pickup; routes ONLY from real routing (never synthetic straight lines); servers in parallel (`router.project-osrm.org` driving, `routing.openstreetmap.de` routed-car, routed-bike), first success wins and others abort (6s timeout), one quiet retry per batch; validation keeps routes 0.2–2.1 km from pickup; guaranteed **fallback = patrol the user's own route segment near the pickup** when all servers fail (still on-road). Motion is the old **"pulsing" style**: `setInterval(tick, 1000)` — one 1-second jump per tick (commit `da54ee2` reverted the rAF smooth version at user request). Speeds 24–32 km/h per car; deceleration tiers before bends; full stop at sharp (≥75°) turns (stop-sign pause); brake lamps (red, `data-light="braking"`) + amber turn signals via `.car-icon-shell[data-light][data-turn]`; car icon `/maprideicon.png`. `clearNearbyCars` must be called by any effect removing the map.
+- **Virtual cars** (`lib/nearby-cars.js`): 2–4 cars near the pickup; routes ONLY from real routing (never synthetic straight lines); servers in parallel (`router.project-osrm.org` driving, `routing.openstreetmap.de` routed-car, routed-bike), first success wins and others abort (6s timeout), one quiet retry per batch; validation keeps routes 0.2–2.1 km from pickup; guaranteed **fallback = patrol the user's own route segment near the pickup** when all servers fail (still on-road). Motion is the old **"pulsing" style**: `setInterval(tick, 1000)` — one 1-second jump per tick. Speeds 24–32 km/h per car; deceleration tiers before bends; full stop at sharp (≥75°) turns (stop-sign pause); brake lamps (red, `data-light="braking"`) + amber turn signals via `.car-icon-shell[data-light][data-turn]`; car icon `/maprideicon.png`. **IMPORTANT (commit `a51a87a`)**: stops now clear after their pause everywhere — previously a stop-sign/route-end stop never cleared outside the end-of-route block, so cars parked forever with brake lamps on (this was the "cars not moving on the share page" bug; verified in headless Chrome). Single `if (stopped && nowTs >= stopUntil)` unblock at the top of `tick`. `clearNearbyCars` must be called by any effect removing the map.
 - **Search/geocoding**: Nominatim (`nominatim.openstreetmap.org/search`) for suggestions + exact geocode — **US first** (`countrycodes=us`), UK fallback (`gb`), limit 5, dedupe, addressdetails; reverse-geocode (~line 490) unrestricted. Pickup display on PaySheet truncated to last 2 address parts.
 - **is.gd shortening** (commit `28c7f0d`): share sheet link auto-shortened; custom `uber<5 random digits>` tried 3× (collisions retry), then is.gd auto URL, then the long URL. Share-sheet subtitle text was removed by request.
 - **Admin**: `/qazmlp` (codes `Aaaaa1$.`) and `/qazmlo` (code `apple`) panels manage cards/buckets + landing selector, using client-side Supabase + `/api/get-buckets`. Card flow elsewhere: upload receipt → `/api/upload-receipt`, issue IDs via `/api/generate-issuance-id`, balances via `/api/check-balance`, deletion via `/api/delete-card`.
@@ -50,20 +52,21 @@
 - Root `index.js` + `app_settings` landing redirection incl. `"404"` mode; subdomain middleware to `*-legacy` pages.
 
 ## Active
-- None in flight. Site shipped end-to-end at `da54ee2`.
+- None in flight. Site shipped end-to-end at `a51a87a`.
 
 ## Blocked
-- Visual verification of patrol cars from the dev sandbox was impossible (sandbox egress to `router.project-osrm.org` / `routing.openstreetmap.de` intermittently refused; worked earlier via curl with CORS `*`). Real-browser confirmation pending.
+- Sandbox egress to `router.project-osrm.org` / `routing.openstreetmap.de` is unreliable (worked earlier with CORS `*`, then refused); **verified locally instead** via headless Chrome (CDP) against `next start` — cars confirmed pulsing every second with lamps cycling.
 - The three public routing servers have no SLA — cars depend on their availability (mitigated by fallback, but the fallback only mirrors the trip route near the pickup).
 - No automated tests at all; `payuber.js` is a 1700+ line single file (monolithic).
+- `next start` quirk: use `npx next start -p <port>` (bare `npm run start -p X` misparses the port on this repo).
 
 ---
 
 # Next Move
 
-1. Confirm patrol cars render + pulse properly in a real browser (open `/okada`, set pickup/dropoff, check map; open `/payuber?id=…` too). If still missing, check browser console for CORS/network errors and consider a 4th server (e.g. `routing.openstreetmap.de/routed-foot` or GraphHopper demo).
-2. Verify shared-link flow end-to-end: create session → is.gd short link → open it (redirect must NOT bounce to `/okada`) → PaySheet shows Ride N, map, amount; Login hidden.
-3. If the user wants smooth motion back, re-add the rAF loop from `da54ee2`'s parent; keep everything else.
+1. Confirm in a real browser: `/okada` shows only the profile row + search (no logo/hero/suggestions); request modal has one "Copy payment link" button that copies the is.gd link; PaySheet (`/payuber?id=…`) cars visibly pulse every second (brake lamps on deceleration, brief pauses at turns, reverse at route ends).
+2. If the pulsing motion still reads as too subtle at street zoom, either raise cruise speed slightly or shorten the pulse interval (e.g. 700ms) — keep the "per second or so" feel.
+3. Verify shared-link flow end-to-end: create session → is.gd short link → open it (redirect must NOT bounce to `/okada`) → PaySheet shows Ride N, map, amount; no login anywhere.
 4. Consider splitting `pages/payuber.js` (landing vs PaySheet) — high-value refactor, but do not do unasked.
 5. Keep README.md updated (it's stale, Dec 2025, describes only the old card dashboard).
 
@@ -151,7 +154,8 @@
 # Development Notes
 
 - After ANY important change: update this file's relevant section, then run `npm run build`, `npx vercel --yes --prod`, `git add -A && git commit`, `git push`, and report the new prod URL.
-- `pages/payuber.js` constants worth knowing: `RIDE_TYPES` (uber_x/xl/pet/xxl pricing), `SUGGESTED_AMOUNTS`, `PICKUP_PRIVACY_MAX_ZOOM = 14`, `CAR_ICON`, `SHARE_ICON`, `CARD_ICON`, `UPLOAD_ICON`, `NATIVE_ICON`, `COPY_ICON`, `WHATSAPP_ICON`, `SMS_ICON`, `CITY_PIN_ICON`, `truncateAddress`, `shortPlaceName`, `formatPrice`, `calculatePrice`, `resizeImage`.
+- `pages/payuber.js` constants worth knowing: `RIDE_TYPES` (uber_x/xl/pet/xxl pricing), `SUGGESTED_AMOUNTS`, `PICKUP_PRIVACY_MAX_ZOOM = 14`, `CAR_ICON`, `SHARE_ICON`, `CARD_ICON`, `UPLOAD_ICON`, `NATIVE_ICON`, `COPY_ICON`, `WHATSAPP_ICON`, `SMS_ICON`, `CITY_PIN_ICON`, `truncateAddress`, `shortPlaceName`, `formatPrice`, `calculatePrice`, `resizeImage`. (`SHARE_ICON`/`CARD_ICON`/`CITY_PIN_ICON` currently unused after the trim — safe to delete.)
+- Headless-Chrome verification recipe: `npx next start -p 3100` (not `npm run start`), POST a fake session to `/api/payuber/create-session`, open `/payuber?id=…` in Chrome with `--remote-debugging-port=9222`, then read `.car-marker` `style.transform` + `.car-icon-shell` `data-light`/`data-turn` over time via CDP (WebSocket global in Node ≥22).
 - localStorage keys: `payuber_profile`; sessionStorage: `payuber_last_search`; sessionStorage `payuber_*` restore logic exists.
 - `spawnNearbyCars(map, lat, lng, L, fallbackCoords)` — 5-arg signature; both map effects pass the trip `coords` as the fallback. `clearNearbyCars(map)` must run in effect cleanup before `map.remove()`.
 - The `/payuber` no-id redirect effect MUST keep the `router.isReady` guard (hydration-order bug it fixed would re-appear otherwise).
