@@ -820,27 +820,6 @@ export default function PayUberPage() {
     return data.id
   }
 
-  async function handlePayFor() {
-    setModalBusy(true)
-    try {
-      const id = await createSession()
-      setShowModal(false)
-      viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
-      try {
-        const list = JSON.parse(localStorage.getItem('payuber_created_sessions') || '[]')
-        if (Array.isArray(list) && !list.includes(id)) {
-          list.push(id)
-          localStorage.setItem('payuber_created_sessions', JSON.stringify(list))
-        }
-      } catch (err) {}
-      router.push(`/payuber?id=${id}`)
-    } catch (err) {
-      showToast('Unable to create the payment link right now. Please try again.')
-    } finally {
-      setModalBusy(false)
-    }
-  }
-
   // Shorten a link with is.gd, requesting a custom "uberXXXXX" short URL with
   // a random 5-digit suffix. If that name is already taken, retry; if every
   // attempt fails, let is.gd assign an automatic short URL.
@@ -878,6 +857,13 @@ export default function PayUberPage() {
       setShowModal(false)
       viewStackRef.current = viewStackRef.current.filter((v) => v !== 'modal' && v !== 'mapView')
       setShareSheetUrl(sharedUrl)
+      try {
+        await navigator.clipboard.writeText(sharedUrl)
+        setCopied(true)
+        showToast('Payment link copied to clipboard!')
+      } catch (err) {
+        setCopied(false)
+      }
       pushView('share')
     } catch (err) {
       showToast('Unable to create the payment link right now. Please try again.')
@@ -1151,11 +1137,6 @@ export default function PayUberPage() {
       {/* Header */}
       <header className="uber-header">
         <div className="header-left">
-          {sessionId ? (
-            <span className="header-logo" style={{ cursor: 'default' }}>Uber</span>
-          ) : (
-            <a href="/okada" className="header-logo">Uber</a>
-          )}
           <nav className="header-nav">
             <a href="/okada">Ride</a>
             <a href="#">Drive</a>
@@ -1166,30 +1147,6 @@ export default function PayUberPage() {
         <div className="header-right">
           <a href="#" className="header-lang">EN</a>
           <a href="#" className="header-help">Help</a>
-          {!sessionId && (profile ? (
-            <div className="profile-widget">
-              {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
-              <button
-                className="profile-trigger"
-                onClick={() => setProfileMenuOpen((v) => !v)}
-                aria-label="Profile menu"
-              >
-                {profile.image ? (
-                  <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
-                ) : (
-                  <span className="profile-name-only">{profile.name}</span>
-                )}
-              </button>
-              {profileMenuOpen && (
-                <div className="profile-menu">
-                  <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
-                  <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button className="header-login-btn" onClick={openProfileModal}>Login</button>
-          ))}
         </div>
       </header>
 
@@ -1199,11 +1156,33 @@ export default function PayUberPage() {
           <section className="hero-section">
             <div className="hero-inner">
               <div className="hero-left">
-                <div className="hero-city">
-                  <span dangerouslySetInnerHTML={{ __html: CITY_PIN_ICON }} />
-                  <span>{currentCity}</span>
+                <div className="landing-profile">
+                  {profile ? (
+                    <div className="profile-widget">
+                      {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
+                      <button
+                        className="profile-trigger"
+                        onClick={() => setProfileMenuOpen((v) => !v)}
+                        aria-label="Profile menu"
+                      >
+                        {profile.image ? (
+                          <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
+                        ) : (
+                          <span className="profile-name-only">{profile.name}</span>
+                        )}
+                        <span className="landing-profile-name">{profile.name}</span>
+                      </button>
+                      {profileMenuOpen && (
+                        <div className="profile-menu">
+                          <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
+                          <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button className="header-login-btn" onClick={openProfileModal}>Login</button>
+                  )}
                 </div>
-                <h1 className="hero-title">Go anywhere with Uber</h1>
 
                 <div className="uber-inputs">
                   <div className="uber-input-row autocomplete-wrapper">
@@ -1266,47 +1245,6 @@ export default function PayUberPage() {
                   </button>
                 </div>
                 {searchError && <p style={{ color: '#E54B4B', marginTop: 12, fontSize: 14 }}>{searchError}</p>}
-              </div>
-              <div className="hero-right">
-                <div className="hero-image-wrapper">
-                  <img src="/hero-travel.png" alt="Ready to travel?" />
-                  <div className="hero-cta-overlay">
-                    <span>Ready to travel?</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Suggestions section */}
-          <section className="suggestions-section">
-            <div className="suggestions-inner">
-              <h2 className="suggestions-title">Suggestions</h2>
-              <div className="suggestions-grid">
-                <a href="#" className="suggestion-card">
-                  <div className="suggestion-card-content">
-                    <h3>Ride</h3>
-                    <p>Go anywhere with Uber. Request a ride, hop in, and go.</p>
-                    <span className="details-link">Details</span>
-                  </div>
-                  <div className="suggestion-card-icon"><img src="/landing page ride.png" alt="Ride" /></div>
-                </a>
-                <a href="#" className="suggestion-card">
-                  <div className="suggestion-card-content">
-                    <h3>Reserve</h3>
-                    <p>Reserve your ride in advance so you can relax on the day of your trip.</p>
-                    <span className="details-link">Details</span>
-                  </div>
-                  <div className="suggestion-card-icon"><img src="/landing page reserve.png" alt="Reserve" /></div>
-                </a>
-                <a href="#" className="suggestion-card">
-                  <div className="suggestion-card-content">
-                    <h3>Courier</h3>
-                    <p>Uber makes same-day item delivery easier than ever.</p>
-                    <span className="details-link">Details</span>
-                  </div>
-                  <div className="suggestion-card-icon"><img src="/landing page carrier.png" alt="Courier" /></div>
-                </a>
               </div>
             </div>
           </section>
@@ -1671,12 +1609,11 @@ export default function PayUberPage() {
               </div>
             </div>
             <div className="uber-modal-actions">
-              <button className="uber-modal-btn uber-modal-btn-primary" id="modal-pay-btn" onClick={handlePayFor} disabled={modalBusy} dangerouslySetInnerHTML={{ __html: `${CARD_ICON} Pay for this ride` }} />
-              <button className="uber-modal-btn uber-modal-btn-secondary" id="modal-share-btn" onClick={handleShare} disabled={modalBusy}>
+              <button className="uber-modal-btn uber-modal-btn-primary" id="modal-copy-btn" onClick={handleShare} disabled={modalBusy}>
                 {sharing ? (
                   <span className="btn-loading"><span className="spinner" style={{ borderColor: 'rgba(0,0,0,0.25)', borderTopColor: '#000' }}></span>Creating link...</span>
                 ) : (
-                  <span dangerouslySetInnerHTML={{ __html: `${SHARE_ICON} Send payment link to a friend` }} />
+                  <span dangerouslySetInnerHTML={{ __html: `${COPY_ICON} Copy payment link` }} />
                 )}
               </button>
             </div>

@@ -228,7 +228,7 @@ body.landing-mobile-menu-lock {
 
 /* ── Hero Section ── */
 .hero-section {
-  padding: var(--sp-12) 0 var(--sp-16);
+  padding: var(--sp-8) 0 var(--sp-16);
 }
 
 .hero-inner {
@@ -243,6 +243,37 @@ body.landing-mobile-menu-lock {
 .hero-left {
   flex: 1;
   max-width: 500px;
+}
+
+/* ── Landing profile (photo + name, no login step) ── */
+.landing-profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--sp-8);
+}
+
+.landing-profile .profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-profile .profile-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.landing-profile-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.landing-profile .profile-menu {
+  top: calc(100% + 8px);
+  left: 0;
+  right: auto;
 }
 
 .hero-city {
