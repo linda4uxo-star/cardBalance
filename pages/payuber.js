@@ -693,6 +693,48 @@ export default function PayUberPage() {
     }
   }
 
+  // Fetch a driving route from several public OSRM servers at once and use
+  // whichever responds first (same pattern as the patrol cars).
+  async function fetchRideRoute(pickup, dropoff) {
+    const endpoints = [
+      `https://router.project-osrm.org/route/v1/driving/${pickup.lng},${pickup.lat};${dropoff.lng},${dropoff.lat}?overview=full&geometries=geojson`,
+      `https://routing.openstreetmap.de/routed-car/route/v1/driving/${pickup.lng},${pickup.lat};${dropoff.lng},${dropoff.lat}?overview=full&geometries=geojson`,
+      `https://routing.openstreetmap.de/routed-bike/route/v1/bike/${pickup.lng},${pickup.lat};${dropoff.lng},${dropoff.lat}?overview=full&geometries=geojson`,
+    ]
+    return new Promise((resolve) => {
+      const controllers = []
+      let settled = 0
+      let done = false
+      const finish = (value) => {
+        if (done) return
+        done = true
+        controllers.forEach((c) => c.abort())
+        resolve(value)
+      }
+      endpoints.forEach((url) => {
+        const controller = new AbortController()
+        controllers.push(controller)
+        const timeoutId = setTimeout(() => controller.abort(), 9000)
+        fetch(url, { signal: controller.signal })
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            clearTimeout(timeoutId)
+            if (done) return
+            const route = data && data.code === 'Ok' && data.routes && data.routes[0] && data.routes[0].geometry
+            if (route && route.coordinates && route.coordinates.length > 0) {
+              finish(route)
+              return
+            }
+            if (++settled === endpoints.length) finish(null)
+          })
+          .catch(() => {
+            clearTimeout(timeoutId)
+            if (++settled === endpoints.length) finish(null)
+          })
+      })
+    })
+  }
+
   async function runRideSearch(preResolved = {}) {
     setSearchError('')
     const pickupText = (preResolved.pickup ? preResolved.pickup.displayName : pickupInput).trim()
@@ -710,20 +752,23 @@ export default function PayUberPage() {
       setPickupData(pickup)
       setDropoffData(dropoff)
 
-      const res = await fetch(
-        `https://router.project-osrm.org/route/v1/driving/${pickup.lng},${pickup.lat};${dropoff.lng},${dropoff.lat}?overview=full&geometries=geojson`
-      )
-      const data = await res.json()
-      if (!data.routes || data.routes.length === 0) {
+      let route = null
+      for (let attempt = 0; attempt < 2 && !route; attempt += 1) {
+        route = await fetchRideRoute(pickup, dropoff)
+        if (!route && attempt === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 400))
+        }
+      }
+      if (!route) {
         setSearchError('Could not calculate route between these locations')
         return
       }
-      const route = data.routes[0]
-      const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng])
+      const coords = route.coordinates.map(([lng, lat]) => [lat, lng])
+      const distanceKm = route.distance / 1000
       setRouteCoords(coords)
-      setDistanceKm(route.distance / 1000)
+      setDistanceKm(distanceKm)
       setDurationMin(Math.round(route.duration / 60))
-      setRideList(getAllPrices(route.distance / 1000))
+      setRideList(getAllPrices(distanceKm))
       setSelectedType('uber_x')
       setMapViewActive(true)
       pushView('mapView')
@@ -732,9 +777,9 @@ export default function PayUberPage() {
           pickup,
           dropoff,
           routeCoords: coords,
-          distanceKm: route.distance / 1000,
+          distanceKm,
           durationMin: Math.round(route.duration / 60),
-          rideList: getAllPrices(route.distance / 1000),
+          rideList: getAllPrices(distanceKm),
           selectedType: 'uber_x',
         }))
       } catch (err) {}
