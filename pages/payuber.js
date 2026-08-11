@@ -722,7 +722,7 @@ export default function PayUberPage() {
             if (done) return
             const route = data && data.code === 'Ok' && data.routes && data.routes[0] && data.routes[0].geometry
             if (route && route.coordinates && route.coordinates.length > 0) {
-              finish(route)
+              finish(data.routes[0])
               return
             }
             if (++settled === endpoints.length) finish(null)
@@ -763,7 +763,7 @@ export default function PayUberPage() {
         setSearchError('Could not calculate route between these locations')
         return
       }
-      const coords = route.coordinates.map(([lng, lat]) => [lat, lng])
+      const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng])
       const distanceKm = route.distance / 1000
       setRouteCoords(coords)
       setDistanceKm(distanceKm)
