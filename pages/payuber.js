@@ -309,6 +309,14 @@ export default function PayUberPage() {
     } catch (err) {}
   }, [])
 
+  // Keep the inline landing form in sync with the saved profile
+  useEffect(() => {
+    if (profile) {
+      setProfileName(profile.name)
+      setProfileImage(profile.image || '')
+    }
+  }, [profile])
+
   // Load Leaflet on demand
   const ensureLeaflet = useCallback(async () => {
     if (leafletRef.current) return leafletRef.current
@@ -735,7 +743,22 @@ export default function PayUberPage() {
     })
   }
 
+  // Persist the inline landing profile (photo + name) — no save button.
+  // Called automatically when the ride search runs ("See prices").
+  const persistInlineProfile = () => {
+    const name = profileName.trim()
+    if (!name) return
+    try {
+      localStorage.setItem('payuber_profile', JSON.stringify({
+        name,
+        image: profileImage || null,
+      }))
+      setProfile({ name, image: profileImage || null })
+    } catch (err) {}
+  }
+
   async function runRideSearch(preResolved = {}) {
+    persistInlineProfile()
     setSearchError('')
     const pickupText = (preResolved.pickup ? preResolved.pickup.displayName : pickupInput).trim()
     const dropoffText = (preResolved.dropoff ? preResolved.dropoff.displayName : dropoffInput).trim()
@@ -1142,17 +1165,21 @@ export default function PayUberPage() {
           ) : (
             <a href="/okada" className="header-logo">Uber</a>
           )}
-          <nav className="header-nav">
-            <a href="/okada">Ride</a>
-            <a href="#">Drive</a>
-            <a href="#">Business</a>
-            <a href="#">About</a>
-          </nav>
+          {sessionId && (
+            <nav className="header-nav">
+              <a href="/okada">Ride</a>
+              <a href="#">Drive</a>
+              <a href="#">Business</a>
+              <a href="#">About</a>
+            </nav>
+          )}
         </div>
-        <div className="header-right">
-          <a href="#" className="header-lang">EN</a>
-          <a href="#" className="header-help">Help</a>
-        </div>
+        {sessionId && (
+          <div className="header-right">
+            <a href="#" className="header-lang">EN</a>
+            <a href="#" className="header-help">Help</a>
+          </div>
+        )}
       </header>
 
       {/* Landing content (no session) */}
@@ -1162,35 +1189,24 @@ export default function PayUberPage() {
             <div className="hero-inner">
               <div className="hero-left">
                 <div className="landing-profile">
-                  <div className="profile-widget">
-                    {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
-                    <button
-                      className="profile-trigger"
-                      onClick={() => {
-                        if (!profile) { openProfileModal(); return }
-                        setProfileMenuOpen((v) => !v)
-                      }}
-                      aria-label="Profile"
-                    >
-                      {profile ? (
-                        <>
-                          {profile.image ? (
-                            <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
-                          ) : (
-                            <span className="profile-name-only">{profile.name}</span>
-                          )}
-                          <span className="landing-profile-name">{profile.name}</span>
-                        </>
+                  <div className="landing-profile-label">Upload photo and your name</div>
+                  <div className="landing-profile-row">
+                    <label className="landing-avatar-upload" title="Choose photo">
+                      {profileImage ? (
+                        <img src={profileImage} alt={profileName || 'Your photo'} className="landing-avatar-img" />
                       ) : (
-                        <span className="landing-profile-name">Add your photo & name</span>
+                        <span className="landing-avatar-placeholder" dangerouslySetInnerHTML={{ __html: UPLOAD_ICON }} />
                       )}
-                    </button>
-                    {profileMenuOpen && profile && (
-                      <div className="profile-menu">
-                        <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
-                        <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
-                      </div>
-                    )}
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfileImageSelect} />
+                    </label>
+                    <input
+                      type="text"
+                      className="landing-profile-name-input"
+                      placeholder="Your name"
+                      autoComplete="off"
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                    />
                   </div>
                 </div>
 

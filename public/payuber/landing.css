@@ -245,35 +245,66 @@ body.landing-mobile-menu-lock {
   max-width: 500px;
 }
 
-/* ── Landing profile (photo + name, no login step) ── */
+/* ── Landing profile form (photo + name, saved on "See prices") ── */
 .landing-profile {
+  margin-bottom: var(--sp-8);
+  max-width: 500px;
+}
+
+.landing-profile-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-3);
+}
+
+.landing-profile-row {
   display: flex;
   align-items: center;
-  margin-bottom: var(--sp-8);
+  gap: var(--sp-4);
 }
 
-.landing-profile .profile-trigger {
+.landing-avatar-upload {
+  flex-shrink: 0;
+  cursor: pointer;
   display: inline-flex;
+}
+
+.landing-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.landing-avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px dashed var(--gray-300);
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--gray-50);
 }
 
-.landing-profile .profile-avatar-img {
-  width: 44px;
-  height: 44px;
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-.landing-profile-name {
-  font-size: 18px;
-  font-weight: 600;
+.landing-profile-name-input {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-family: var(--font-family);
   color: var(--text-primary);
+  background: var(--surface-primary);
+  transition: border-color var(--transition-fast);
 }
 
-.landing-profile .profile-menu {
-  top: calc(100% + 8px);
-  left: 0;
-  right: auto;
+.landing-profile-name-input:focus {
+  border-color: var(--uber-black);
 }
 
 .hero-city {
