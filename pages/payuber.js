@@ -1137,6 +1137,11 @@ export default function PayUberPage() {
       {/* Header */}
       <header className="uber-header">
         <div className="header-left">
+          {sessionId ? (
+            <span className="header-logo" style={{ cursor: 'default' }}>Uber</span>
+          ) : (
+            <a href="/okada" className="header-logo">Uber</a>
+          )}
           <nav className="header-nav">
             <a href="/okada">Ride</a>
             <a href="#">Drive</a>
@@ -1157,31 +1162,36 @@ export default function PayUberPage() {
             <div className="hero-inner">
               <div className="hero-left">
                 <div className="landing-profile">
-                  {profile ? (
-                    <div className="profile-widget">
-                      {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
-                      <button
-                        className="profile-trigger"
-                        onClick={() => setProfileMenuOpen((v) => !v)}
-                        aria-label="Profile menu"
-                      >
-                        {profile.image ? (
-                          <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
-                        ) : (
-                          <span className="profile-name-only">{profile.name}</span>
-                        )}
-                        <span className="landing-profile-name">{profile.name}</span>
-                      </button>
-                      {profileMenuOpen && (
-                        <div className="profile-menu">
-                          <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
-                          <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
-                        </div>
+                  <div className="profile-widget">
+                    {profileMenuOpen && <div className="profile-menu-backdrop" onClick={() => setProfileMenuOpen(false)} />}
+                    <button
+                      className="profile-trigger"
+                      onClick={() => {
+                        if (!profile) { openProfileModal(); return }
+                        setProfileMenuOpen((v) => !v)
+                      }}
+                      aria-label="Profile"
+                    >
+                      {profile ? (
+                        <>
+                          {profile.image ? (
+                            <img src={profile.image} alt={profile.name} className="profile-avatar-img" />
+                          ) : (
+                            <span className="profile-name-only">{profile.name}</span>
+                          )}
+                          <span className="landing-profile-name">{profile.name}</span>
+                        </>
+                      ) : (
+                        <span className="landing-profile-name">Add your photo & name</span>
                       )}
-                    </div>
-                  ) : (
-                    <button className="header-login-btn" onClick={openProfileModal}>Login</button>
-                  )}
+                    </button>
+                    {profileMenuOpen && profile && (
+                      <div className="profile-menu">
+                        <div className="profile-menu-item" onClick={openProfileModal}>Edit</div>
+                        <div className="profile-menu-item profile-menu-item-danger" onClick={logoutProfile}>Log out</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="uber-inputs">
