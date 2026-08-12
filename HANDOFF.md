@@ -9,7 +9,7 @@
 
 - **What it is**: A hosted monolith of lightweight Next.js "product" pages — gift-card balance checkers (Visa/Apple/Steam/Razer, each with `-id` / `-arcade` / `-legacy` variants), an admin dashboard (`/qazmlp` + `/qazmlo`), and — the actively developed centerpiece — an **Uber clone** ("Uber"/"PayUber") with a hidden ride-request landing page at `/okada` and a shared payment-link page ("PaySheet") at `/payuber?id=<uuid>`.
 - **Problem it solves**: Demonstrates card-claim/payment flows; the Uber part lets a rider build a fare, create a shareable payment link (auto-shortened via is.gd), and have friends pay the fare via a slick PaySheet. Runs entirely on free tiers (Supabase + Vercel + OSM/Nominatim/OSRM).
-- **Current status**: Stable, deployed, all in `main`. Last active work: trimmed `/okada` landing (no hero/suggestions, inline profile), single "Copy payment link" modal button, fixed virtual cars parking forever (stop-sign/route-end stops never cleared), multi-server "See prices" routing, is.gd shortening, US/UK-only suggestions, PaySheet redirect fix. Latest prod: `https://thenewyorktimesarticle-74peovcfn-kelvins-projects-816a0900.vercel.app` (aliased `www.cardstatus.online`).
+- **Current status**: Stable, deployed, all in `main`. Last active work: inline profile form on `/okada` (no save button — persists on "See prices"), Okada header reduced to the Uber logo only, trimmed landing, single "Copy payment link" button, fixed virtual cars parking forever, multi-server "See prices" routing, is.gd shortening, US/UK-only suggestions. Latest prod: `https://thenewyorktimesarticle-243ryn36c-kelvins-projects-816a0900.vercel.app` (aliased `www.cardstatus.online`).
 
 ---
 
@@ -22,7 +22,7 @@
 - **Routing/redirection**: `middleware.js` redirects subdomains of `*.checkgift.store` (apple/steam/razer/visa) to `*-legacy` pages (308). `pages/index.js` (SSR) redirects `/` per Supabase `app_settings.active_landing_page` (id 1); `"404"` → 404 page; fallback `/visa-id`. The qazmlp dashboard has a landing selector (`<option value="okada">Uber Landing</option>`).
 - **Uber naming/mapping**: product renamed PayUber → "Uber". Landing lives ONLY at `/okada` (`pages/okada.js` re-exports `PayUberPage`). `/payuber` with no id client-redirects to `/okada` — guarded by `router.isReady` (SSG query-hydration fix, commit `62eed5a`). PaySheet shares the same `PayUberPage` component; `sessionId` flips the mode.
 - **Amounts**: `SUGGESTED_AMOUNTS = [25, 50, 75, 100, 200]`; each modal open randomizes chips to `(base − 1) + random(1–9)/10` (e.g. $24.70, $49.30) via `regenerateAmountSuggestions()`; plus "Fare {price}" and custom input; `createSession` must be re-read (it uses `amountInput`/`amountDirty`).
-- **Profile/login**: localStorage only — key `payuber_profile` `{name, image}`. Header no longer has logo or login. On the landing the profile (avatar 44px + name) is shown inline at the top of the hero (`.landing-profile` in `landing.css`); click opens Edit/Log out menu; a plain Login button appears only when no profile exists yet. PaySheet header (EN/Help only) shows no profile at all.
+- **Profile/login**: localStorage only — key `payuber_profile` `{name, image}`. The `/okada` header shows ONLY the Uber logo (nav + EN/Help appear only on the PaySheet). The landing embeds an **inline profile form** (`.landing-profile-form` in `landing.css`): label "Upload photo and your name", a clickable 64px photo circle (opens the file picker via `handleProfileImageSelect`; click the image again to change it) and an always-visible name text input bound to `profileName`. **There is no save button** — `persistInlineProfile()` (saves to localStorage + `setProfile`) runs automatically at the top of `runRideSearch` ("See prices"). A mount effect syncs the fields from the saved profile. The old profile modal (`saveProfile`/`logoutProfile`/`profileMenuOpen`) still exists but its triggers are gone (dead code — safe to remove later). PaySheet header shows no profile at all.
 - **Landing `/okada` is trimmed**: no "Uber" logo, no city line, no hero title, no hero image (`hero-travel.png` unused now), no Suggestions section (Ride/Reserve/Courier cards). Header = nav (Ride/Drive/Business/About) + EN + Help. `CITY_PIN_ICON`, `SHARE_ICON`, `CARD_ICON` consts are now unused but harmless.
 - **Ride request modal has ONE action**: "Copy payment link" (`handleShare`) — creates the session, shortens via is.gd, copies to clipboard, opens the share sheet with "Copied" already shown. `handlePayFor` was deleted (was the old "Pay for this ride"). `payuber_created_sessions` localStorage is still written/read by PaySheet back-button logic (creator vs visitor) — unrelated to the removed button.
 - **PaySheet rider header**: "Ride N" + avatar; rider name/image/rideNumber live INSIDE `route_geometry` JSON (`geo = {coords, rideNumber, rider:{name,image}}`); `get-session` reads them (no SQL change needed).
@@ -64,11 +64,11 @@
 
 # Next Move
 
-1. Confirm in a real browser: `/okada` shows only the profile row + search (no logo/hero/suggestions); request modal has one "Copy payment link" button that copies the is.gd link; PaySheet (`/payuber?id=…`) cars visibly pulse every second (brake lamps on deceleration, brief pauses at turns, reverse at route ends).
+1. Confirm in a real browser: `/okada` shows only the Uber logo header, the "Upload photo and your name" form (photo circle + name field), and the search inputs; profile saves when "See prices" is pressed; PaySheet (`.cardstatus.online/payuber?id=…`) pulse-moves its cars every second and shows the full nav/EN/Help header.
 2. If the pulsing motion still reads as too subtle at street zoom, either raise cruise speed slightly or shorten the pulse interval (e.g. 700ms) — keep the "per second or so" feel.
-3. Verify shared-link flow end-to-end: create session → is.gd short link → open it (redirect must NOT bounce to `/okada`) → PaySheet shows Ride N, map, amount; no login anywhere.
+3. Verify shared-link flow end-to-end: create session → is.gd short link → open it (redirect must NOT bounce to `/okada`).
 4. Consider splitting `pages/payuber.js` (landing vs PaySheet) — high-value refactor, but do not do unasked.
-5. Keep README.md updated (it's stale, Dec 2025, describes only the old card dashboard).
+5. The old profile modal (saveProfile/logoutProfile/openProfileModal) is now dead code on the landing — remove if desired.
 
 ---
 
